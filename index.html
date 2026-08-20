@@ -74,36 +74,778 @@
       .dont-show-again { width: 100%; margin-left: 0 !important; text-align: left; }
       .show-suggestions { padding-inline: 5px; font-size: 9px; }
     }
-  </style>
+  
 
-
-
-
-<style id="v49-results-fallback-style">
-.v49-alt-copy {
-  font-size: 10px;
-  color: var(--secondaryContent, #777481);
-}
-.v49-alt-pill {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  height: 20px;
-  padding: 0 7px;
-  border-radius: 999px;
-  background: #fff3d6;
-  border: 1px solid #e6d39e;
-  color: #7b5f28;
-  font-size: 9px;
-  font-weight: 750;
-}
 </style>
 
 
-<style id="v50-guaranteed-results-style">
-.v50-demo-row .art{
-  width:40px!important;height:40px!important;min-width:40px!important;max-width:40px!important;
-  min-height:40px!important;max-height:40px!important;aspect-ratio:1/1!important;border-radius:4px!important;
+
+
+<style id="bridge-clean-ui">
+/* =========================================================
+   CLEAN CONSOLIDATED UI LAYER
+   The React search engine remains untouched.
+   ========================================================= */
+
+.criteria-summary-trigger,
+.criteria-summary-panel,
+.view-switch,
+.review-experience,
+.review-stage,
+.review-card,
+.review-complete,
+.review-actions,
+.review-footer,
+.show-more,
+.sort-button,
+.results-tools {
+  display:none !important;
+}
+.results-head p { display:none !important; }
+
+.suggestions,
+.filter-panel {
+  width:100%;
+  max-width:100%;
+  transform-origin:top center;
+  animation:bridgeDropdownIn 120ms ease-out;
+}
+@keyframes bridgeDropdownIn {
+  from { opacity:0; transform:translateY(-3px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.search-area.bridge-dismissed > .suggestions { display:none !important; }
+
+/* ----- Native precise filters ----- */
+.tag-family-items > button:focus-visible {
+  outline:none;
+  border-color:#aeb7ff;
+  background:#f7f8ff;
+  box-shadow:0 0 0 3px rgba(52,70,228,.10);
+}
+.tag-family-items > button.bridge-query-match strong {
+  color:#2f43de;
+  font-weight:850;
+}
+.tag-family-items > button.bridge-feedback .tag-add {
+  animation:bridgeTagFeedback 180ms ease-out;
+}
+@keyframes bridgeTagFeedback {
+  0% { transform:scale(.92); opacity:.72; }
+  55% { transform:scale(1.08); opacity:1; }
+  100% { transform:scale(1); opacity:1; }
+}
+
+/* ----- Shared suggestion row primitives ----- */
+.bridge-meta-type {
+  flex:0 0 auto; min-width:58px; height:22px; padding:0 7px; border-radius:999px;
+  background:#eef0ff; color:#3446e4; display:inline-flex; align-items:center; justify-content:center;
+  font-size:9px; font-weight:800; text-transform:uppercase;
+}
+.bridge-meta-copy{min-width:0;flex:1}
+.bridge-meta-copy strong,.bridge-meta-copy small{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.bridge-meta-copy strong{font-size:12px}
+.bridge-meta-copy small{margin-top:2px;color:var(--secondaryContent,#777481);font-size:10px}
+
+/* ----- External metadata scope criterion ----- */
+.bridge-scope-chip {
+  flex:0 0 auto;
+  min-height:30px;
+  max-width:270px;
+  padding:4px 7px;
+  border:1px solid #e1e3fb;
+  border-radius:8px;
+  background:#f5f6ff;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+}
+.bridge-scope-pill {
+  flex:0 0 auto;
+  height:18px;
+  padding:0 6px;
+  border-radius:999px;
+  background:#e8eaff;
+  color:#3446e4;
+  display:inline-flex;
+  align-items:center;
+  font-size:9px;
+  font-weight:800;
+  text-transform:capitalize;
+}
+.bridge-scope-value {
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.bridge-scope-chip button {
+  flex:0 0 auto;
+  border:0;
+  background:transparent;
+  padding:0;
+  color:#777481;
+}
+
+/* ----- Voice recording: live text mirror + controls at far right ----- */
+.search-box.bridge-recording {
+  position:relative !important;
+}
+.search-box.bridge-recording .input-flow {
+  position:relative !important;
+  min-width:0 !important;
+  padding-right:92px !important;
+}
+.search-box.bridge-recording .input-flow input {
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+.bridge-live-transcript {
+  position:absolute;
+  inset:0 92px 0 0;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  color:var(--primaryDarkContent,#252428);
+  pointer-events:none;
+}
+.bridge-live-transcript.placeholder { color:#9b98a1; }
+.search-box.bridge-recording > .voice-button,
+.search-box.bridge-recording > .filter-button,
+.search-box.bridge-recording > .search-button {
+  display:none !important;
+}
+.bridge-record-controls {
+  position:absolute;
+  top:50%;
+  right:8px;
+  transform:translateY(-50%);
+  display:flex;
+  align-items:center;
+  gap:6px;
+  z-index:50;
+}
+.bridge-record-controls button {
+  position:static;
+  width:38px;
+  min-width:38px;
+  height:38px;
+  padding:0;
+  margin:0;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+}
+.bridge-record-cancel {
+  border:1px solid #e1e0e4;
+  background:#fff;
+  color:#64616a;
+}
+.bridge-record-confirm {
+  border:0;
+  background:#252428;
+  color:#fff;
+}
+.search-area:has(.search-box.bridge-recording) > .suggestions,
+.search-area:has(.search-box.bridge-recording) > .filter-panel {
+  display:none !important;
+}
+
+/* ----- Results: Bridge list ----- */
+.bridge-results-live {
+  margin-top:14px;
+  background:var(--secondarySurface,#fcfcfc);
+}
+.bridge-group-head {
+  min-height:34px;
+  padding:7px 8px;
+  border-bottom:1px solid var(--secondaryBorder,#dcdce0);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:var(--secondarySurface,#fcfcfc);
+}
+.bridge-group-head.alt { background:#fffaf0; border-bottom-color:#f0dfb7; }
+.bridge-group-head strong {
+  font-size:11px;
+  font-weight:700;
+}
+.bridge-group-detail {
+  min-width:0;
+  color:var(--secondaryContent,#777481);
+  font-size:10px;
+}
+.bridge-result-pill {
+  margin-left:auto;
+  height:20px;
+  padding:0 7px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  white-space:nowrap;
+  background:#f3f3f5;
+  color:#5e5b66;
+  font-size:9px;
+  font-weight:800;
+}
+.bridge-group-head.alt .bridge-result-pill {
+  background:#fff3d6;
+  color:#7b5f28;
+  border:1px solid #e6d39e;
+}
+.bridge-list-head {
+  height:40px;
+  display:grid;
+  grid-template-columns:24px minmax(150px,2fr) minmax(150px,2fr) 100px minmax(150px,1fr) minmax(150px,1fr) 140px;
+  align-items:center;
+  border-bottom:1px solid var(--secondaryBorder,#dcdce0);
+  background:var(--secondarySurface,#fcfcfc);
+  color:var(--primaryDarkContent,#252428);
+  font-size:12px;
+  font-weight:600;
+}
+.bridge-list-head > span { min-width:0; padding-left:8px; }
+.bridge-list-head > span:last-child { padding-right:8px; text-align:right; }
+
+.track-head { display:none !important; }
+.track-result {
+  height:52px !important;
+  min-height:52px !important;
+  border:0 !important;
+  overflow:hidden !important;
+}
+.track-result:hover { background:var(--primary3XlSoftBg,#f6f7fe) !important; }
+.track-result > .track {
+  width:100% !important;
+  height:52px !important;
+  min-height:52px !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  display:grid !important;
+  grid-template-columns:24px minmax(150px,2fr) minmax(150px,2fr) 100px minmax(150px,1fr) minmax(150px,1fr) 140px !important;
+  align-items:center !important;
+  gap:0 !important;
+}
+.bridge-select {
+  grid-column:1;
+  width:14px;
+  height:14px;
+  margin-left:8px;
+  accent-color:#2f43de;
+}
+.track-result .art {
+  grid-column:2 !important;
+  grid-row:1 !important;
+  width:40px !important;
+  min-width:40px !important;
+  max-width:40px !important;
+  height:40px !important;
+  min-height:40px !important;
+  max-height:40px !important;
+  aspect-ratio:1/1 !important;
+  margin-left:8px !important;
+  border-radius:4px !important;
+  overflow:hidden !important;
+}
+.track-result .art img,
+.track-result .art svg {
+  width:40px !important;
+  height:40px !important;
+  object-fit:cover !important;
+  display:block !important;
+}
+.track-result .track-main {
+  grid-column:2 !important;
+  grid-row:1 !important;
+  min-width:0 !important;
+  margin-left:56px !important;
+  margin-right:8px !important;
+  display:grid !important;
+  gap:1px !important;
+}
+.track-result .track-main strong {
+  font-size:12px !important;
+  line-height:16px !important;
+  font-weight:700 !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+}
+.track-result .track-main span {
+  font-size:10px !important;
+  line-height:14px !important;
+  color:var(--secondaryContent,#777481) !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+}
+.track-result .track-album {
+  grid-column:3 !important;
+  grid-row:1 !important;
+  height:52px !important;
+  padding:0 8px !important;
+  min-width:0 !important;
+  display:flex !important;
+  align-items:center !important;
+}
+.track-result .track-album strong {
+  font-size:12px !important;
+  font-weight:400 !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+}
+.track-result .track-album > span,
+.track-result .track-music,
+.track-result .match {
+  display:none !important;
+}
+.bridge-duration,
+.bridge-added,
+.bridge-hubs,
+.bridge-actions {
+  height:52px;
+  min-width:0;
+  padding:0 8px;
+  display:flex;
+  align-items:center;
+  color:var(--primaryDarkContent,#252428);
+  font-size:12px;
+}
+.bridge-duration { grid-column:4; }
+.bridge-added {
+  grid-column:5;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  line-height:15px;
+}
+.bridge-added small { color:var(--secondaryContent,#777481); font-size:10px; }
+.bridge-hubs { grid-column:6; }
+.bridge-actions {
+  grid-column:7;
+  justify-content:flex-end;
+  gap:0;
+  padding-right:8px;
+}
+.bridge-icon-btn {
+  width:32px;
+  min-width:32px;
+  height:32px;
+  border:0;
+  border-radius:7px;
+  background:transparent;
+  color:var(--primaryDarkContent,#252428);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+}
+.bridge-icon-btn:hover { background:var(--neutralSoftBg,#f7f7f8); }
+.bridge-icon-btn svg { display:block; max-width:20px; max-height:20px; }
+
+.bridge-options-menu {
+  position:fixed;
+  z-index:120;
+  width:210px;
+  padding:6px;
+  border:1px solid var(--secondaryBorder,#dcdce0);
+  border-radius:12px;
+  background:#fff;
+  box-shadow:0 16px 40px rgba(30,29,32,.16);
+}
+.bridge-option {
+  width:100%;
+  height:36px;
+  padding:0 9px;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  text-align:left;
+  color:#252428;
+  font-size:12px;
+  font-weight:650;
+}
+.bridge-option:hover { background:#f7f7f8; }
+.bridge-option.danger { color:#a4352f; }
+.bridge-option svg { width:17px; height:17px; display:block; }
+.bridge-option-divider { height:1px; margin:4px; background:#ededed; }
+
+/* Hide native result groups only while external live metadata is active. */
+.results.bridge-live-active > .result-group,
+.results.bridge-live-active .result-group.exact-group,
+.results.bridge-live-active .result-group.alternative-group {
+  display:none !important;
+}
+.results.bridge-live-active .bridge-results-live { display:block !important; }
+
+/* =========================================================
+   ONE MOBILE LAYER
+   ========================================================= */
+@media (max-width:760px) {
+  html,body { width:100%; max-width:100%; overflow-x:hidden !important; }
+  .page {
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    padding:8px 8px 24px !important;
+  }
+
+  .search-area { width:100% !important; max-width:100% !important; }
+  .search-box {
+    width:100% !important;
+    max-width:100% !important;
+    min-height:52px !important;
+    padding:6px 7px !important;
+    display:flex !important;
+    align-items:center !important;
+    flex-wrap:nowrap !important;
+    gap:4px !important;
+    border-radius:13px !important;
+  }
+  .search-box > svg { flex:0 0 auto; }
+  .search-box > .input-flow {
+    flex:1 1 auto !important;
+    min-width:0 !important;
+    width:auto !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:5px !important;
+    flex-wrap:nowrap !important;
+    overflow:hidden !important;
+  }
+  .search-box .input-flow input {
+    flex:1 1 auto !important;
+    min-width:70px !important;
+    width:auto !important;
+    height:38px !important;
+    font-size:16px !important;
+  }
+  .criteria {
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    max-width:52% !important;
+    gap:4px !important;
+    scrollbar-width:none !important;
+  }
+  .criteria::-webkit-scrollbar { display:none !important; }
+  .criterion,
+  .bridge-scope-chip {
+    flex:0 0 auto !important;
+    max-width:155px !important;
+  }
+  .bridge-scope-value { max-width:90px; }
+
+  .search-box > .voice-button,
+  .search-box > .filter-button,
+  .search-box > .search-button {
+    flex:0 0 38px !important;
+    width:38px !important;
+    min-width:38px !important;
+    height:38px !important;
+    padding:0 !important;
+    margin:0 !important;
+    border-radius:9px !important;
+  }
+  .search-box > .filter-button span { display:none !important; }
+
+  .suggestions {
+    left:0 !important;
+    right:0 !important;
+    width:100% !important;
+    max-height:min(64vh,540px) !important;
+    overflow:auto !important;
+    padding:6px !important;
+    border-radius:13px !important;
+    -webkit-overflow-scrolling:touch;
+  }
+  .suggestion-heading { padding-inline:7px !important; }
+  .suggestion-heading > span:last-child { display:none !important; }
+  .suggestions > button {
+    min-height:46px !important;
+    padding:7px 8px !important;
+  }
+  .bridge-meta-row,
+  .bridge-all-row {
+    min-height:45px;
+    padding:7px 8px;
+    gap:8px;
+  }
+  .bridge-meta-type {
+    min-width:52px;
+    max-width:68px;
+    height:20px;
+    padding:0 5px;
+    font-size:8px;
+  }
+  .bridge-all-row .bridge-meta-type {
+    min-width:78px;
+    max-width:78px;
+  }
+  .bridge-meta-copy strong { font-size:11px; }
+  .bridge-meta-copy small { font-size:9px; }
+
+  /* Precise Filters becomes bottom sheet */
+  .filter-panel {
+    position:fixed !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:0 !important;
+    top:auto !important;
+    width:100% !important;
+    max-width:none !important;
+    max-height:80vh !important;
+    border-radius:18px 18px 0 0 !important;
+    overflow:hidden !important;
+    z-index:110 !important;
+    box-shadow:0 -18px 45px rgba(30,29,32,.18) !important;
+  }
+  .filter-panel::before {
+    content:"";
+    display:block;
+    width:36px;
+    height:4px;
+    margin:8px auto 0;
+    border-radius:999px;
+    background:#d5d4d8;
+  }
+  .filter-panel-head {
+    position:sticky !important;
+    top:0 !important;
+    z-index:3 !important;
+    background:#fff !important;
+    padding-top:10px !important;
+  }
+  .filter-body {
+    max-height:calc(80vh - 72px) !important;
+    overflow:auto !important;
+    -webkit-overflow-scrolling:touch;
+  }
+  .tag-grid { grid-template-columns:1fr !important; }
+  .tag-family-items { grid-template-columns:1fr !important; }
+
+  .bridge-list-head { display:none !important; }
+  .track-result {
+    height:58px !important;
+    min-height:58px !important;
+  }
+  .track-result > .track {
+    height:58px !important;
+    min-height:58px !important;
+    grid-template-columns:44px minmax(0,1fr) 40px !important;
+    grid-template-rows:58px !important;
+    padding:0 6px !important;
+  }
+  .bridge-select { display:none !important; }
+  .track-result .art {
+    grid-column:1 !important;
+    width:40px !important;
+    height:40px !important;
+    min-width:40px !important;
+    max-width:40px !important;
+    margin:0 !important;
+  }
+  .track-result .track-main {
+    grid-column:2 !important;
+    margin:0 8px !important;
+  }
+  .track-result .track-album,
+  .bridge-duration,
+  .bridge-added,
+  .bridge-hubs {
+    display:none !important;
+  }
+  .bridge-actions {
+    grid-column:3 !important;
+    width:40px !important;
+    height:58px !important;
+    padding:0 !important;
+    justify-content:center !important;
+  }
+  .bridge-actions .bridge-icon-btn:not(:last-child) { display:none !important; }
+  .bridge-actions .bridge-icon-btn:last-child {
+    width:40px;
+    min-width:40px;
+    height:40px;
+  }
+  .bridge-group-head {
+    min-height:30px;
+    padding:7px 9px;
+    gap:5px;
+  }
+  .bridge-group-head strong { font-size:10px; }
+  .bridge-group-detail {
+    flex:1 1 auto;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    font-size:9px;
+  }
+  .bridge-result-pill {
+    height:18px;
+    padding:0 6px;
+    font-size:8px;
+  }
+
+  .search-box.bridge-recording .input-flow { padding-right:88px !important; }
+  .bridge-live-transcript { inset-right:88px; }
+  .bridge-record-controls { right:6px; gap:4px; }
+  .bridge-record-controls button {
+    width:38px;
+    min-width:38px;
+    height:38px;
+  }
+}
+@media (max-width:390px) {
+  .page { padding-left:6px !important; padding-right:6px !important; }
+  .search-box { gap:3px !important; padding:5px 6px !important; }
+  .search-box > .voice-button,
+  .search-box > .filter-button,
+  .search-box > .search-button {
+    flex-basis:36px !important;
+    width:36px !important;
+    min-width:36px !important;
+    height:36px !important;
+  }
+  .criteria { max-width:45% !important; }
+  .criterion,
+  .bridge-scope-chip { max-width:135px !important; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .suggestions,
+  .filter-panel,
+  .tag-family-items > button.bridge-feedback .tag-add {
+    animation:none !important;
+  }
+}
+
+
+
+
+
+/* ----- Single visible dropdown guarantee ----- */
+.search-area:has(> .suggestions:not([data-bridge-owned="true"])) > .suggestions[data-bridge-owned="true"]{
+  display:none!important;
+}
+.bridge-owned-suggestions .suggestion-heading{
+  display:flex;
+}
+.bridge-live-results-shell{margin-top:14px!important}
+.bridge-live-empty{
+  min-height:82px;padding:16px 12px;display:flex;flex-direction:column;justify-content:center;gap:3px;
+  border-bottom:1px solid var(--secondaryBorder,#dcdce0);color:var(--secondaryContent,#777481)
+}
+.bridge-live-empty strong{font-size:12px;color:var(--primaryDarkContent,#252428)}
+.bridge-live-empty span{font-size:10px}
+.page.bridge-live-filtering .quick-start{display:none!important}
+@media(max-width:760px){
+  .bridge-live-results-shell{margin-top:10px!important}
+}
+
+
+/* =========================================================
+   V66 — one relevance-ranked suggestion list
+   ========================================================= */
+.suggestions.bridge-ranked-mode > button{
+  display:none !important;
+}
+.bridge-ranked-section{
+  display:grid;
+  gap:1px;
+  margin:0;
+  padding:0;
+  border:0;
+}
+.bridge-ranked-row{
+  width:100%;
+  min-height:46px;
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  padding:7px 9px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  text-align:left;
+  color:var(--primaryDarkContent,#252428);
+  cursor:pointer;
+}
+.bridge-ranked-row:hover,
+.bridge-ranked-row.bridge-active{
+  background:var(--primary3XlSoftBg,#f6f7fe)!important;
+}
+.bridge-ranked-row .bridge-meta-type{
+  min-width:64px;
+  max-width:92px;
+}
+.bridge-ranked-row .bridge-meta-copy{
+  display:grid;
+  gap:2px;
+  min-width:0;
+  flex:1;
+}
+.bridge-ranked-row .suggestion-tag-preview{
+  margin-top:3px;
+}
+.bridge-ranked-youtube{
+  align-items:center;
+}
+.bridge-ranked-youtube .youtube-suggestion-thumb{
+  flex:0 0 72px;
+}
+.bridge-global-results .bridge-group-head:not(.alt){
+  background:#f8f8fa;
+}
+@media(max-width:760px){
+  .bridge-ranked-row{
+    min-height:47px;
+    padding:7px 8px;
+    gap:8px;
+  }
+  .bridge-ranked-row .bridge-meta-type{
+    min-width:54px;
+    max-width:76px;
+    height:20px;
+    padding:0 5px;
+    font-size:8px;
+  }
+  .bridge-ranked-section .bridge-ranked-row:nth-child(n+8){
+    display:none!important;
+  }
+}
+
+
+/* V67 — Enter accepts best suggestion; Global stays last */
+.bridge-ranked-row.bridge-default-choice:not(.bridge-active){
+  background:rgba(52,70,228,.035);
+}
+.bridge-ranked-row.bridge-default-choice:not(.bridge-active)::after{
+  content:"Enter";
+  flex:0 0 auto;
+  margin-left:auto;
+  padding:2px 6px;
+  border-radius:999px;
+  background:#f1f2f4;
+  color:#777481;
+  font-size:8px;
+  font-weight:800;
+}
+.bridge-ranked-row:has(.bridge-meta-type:first-child){
+  position:relative;
+}
+.bridge-ranked-row:last-child .bridge-meta-type{
+  background:#f3f3f5;
+  color:#5e5b66;
 }
 </style>
 
@@ -3987,1182 +4729,1423 @@ react/cjs/react-jsx-runtime.production.js:
     })();
   </script>
 
-<style id="v27-filter-outside-close">
-  /* V27 — hide the redundant criteria-count/search-brief component only. */
-  .criteria-summary-trigger,
-  .criteria-summary-panel {
-    display: none !important;
-  }
-</style>
-<script id="v27-filter-outside-close-script">
-(() => {
-  document.addEventListener('click', (event) => {
-    const panel = document.querySelector('.filter-panel');
-    if (!panel) return;
-
-    const target = event.target;
-    if (!(target instanceof Element)) return;
-
-    // Interactions inside Filters, including tag selection/cycling, keep it open.
-    if (panel.contains(target)) return;
-
-    // Clicking the Filters trigger is handled by React itself (toggle behavior).
-    const filterButton = target.closest('.filter-button');
-    if (filterButton) return;
-
-    // Close through the existing React control so state stays in sync.
-    const closeButton = panel.querySelector('.filter-panel-head > button');
-    if (closeButton instanceof HTMLElement) closeButton.click();
-  });
-})();
-</script>
-
-
-
-<style id="v29-search-flow-enhancements">
-  /* V29 — interaction polish only; no contextual/smart suggestion logic. */
-  .suggestions,
-  .filter-panel {
-    transform-origin: top center;
-    animation: v29DropdownIn 120ms ease-out;
-  }
-  @keyframes v29DropdownIn {
-    from { opacity: 0; transform: translateY(-3px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .tag-family-items > button:focus-visible {
-    outline: none;
-    border-color: #aeb7ff;
-    background: #f7f8ff;
-    box-shadow: 0 0 0 3px rgba(52, 70, 228, 0.10);
-  }
-  .tag-family-items > button.v29-query-match strong {
-    color: #2f43de;
-    font-weight: 850;
-  }
-  .tag-family-items > button.v29-feedback .tag-add {
-    animation: v29StateFeedback 180ms ease-out;
-  }
-  @keyframes v29StateFeedback {
-    0% { transform: scale(.92); opacity: .72; }
-    55% { transform: scale(1.08); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  /* Keep the two search layers visually anchored to exactly the same component. */
-  .suggestions,
-  .filter-panel {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .suggestions,
-    .filter-panel,
-    .tag-family-items > button.v29-feedback .tag-add {
-      animation: none !important;
-    }
-  }
-</style>
-<script id="v29-search-flow-enhancements-script">
-(() => {
-  const isVisible = (el) => !!(el && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden');
-
-  const closeFilters = () => {
-    const panel = document.querySelector('.filter-panel');
-    if (!panel) return;
-    const close = panel.querySelector('.filter-panel-head > button');
-    if (close instanceof HTMLElement) close.click();
-  };
-
-  const submitMainSearch = () => {
-    const button = document.querySelector('.search-button');
-    if (!(button instanceof HTMLButtonElement) || button.disabled) return false;
-    button.click();
-    // Keep this explicit so Enter and the arrow always share the same end state.
-    requestAnimationFrame(closeFilters);
-    return true;
-  };
-
-  const visibleFilterTags = () => [...document.querySelectorAll('.filter-panel .tag-family-items > button')]
-    .filter((button) => button instanceof HTMLButtonElement && !button.disabled && isVisible(button));
-
-  const moveFilterFocus = (current, delta) => {
-    const items = visibleFilterTags();
-    if (!items.length) return;
-    let index = items.indexOf(current);
-    if (index < 0) index = delta > 0 ? -1 : 0;
-    index = (index + delta + items.length) % items.length;
-    items[index].focus({ preventScroll: true });
-    items[index].scrollIntoView({ block: 'nearest' });
-  };
-
-  const updateFilterMatches = () => {
-    const input = document.querySelector('.filter-panel .tag-browser-search input');
-    const query = (input?.value || '').trim().toLocaleLowerCase();
-    document.querySelectorAll('.filter-panel .tag-family-items > button').forEach((button) => {
-      const label = button.querySelector('strong')?.textContent?.toLocaleLowerCase() || '';
-      const detail = button.textContent?.toLocaleLowerCase() || '';
-      button.classList.toggle('v29-query-match', !!query && (label.includes(query) || detail.includes(query)));
-    });
-  };
-
-  document.addEventListener('keydown', (event) => {
-    const target = event.target;
-    if (!(target instanceof Element)) return;
-
-    const filterPanel = target.closest('.filter-panel');
-    const filterSearch = target.matches('.tag-browser-search input');
-    const filterTag = target.closest('.tag-family-items > button');
-
-    if (filterPanel) {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        event.stopPropagation();
-        closeFilters();
-        document.querySelector('.filter-button')?.focus?.();
-        return;
-      }
-      if (filterSearch && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
-        event.preventDefault();
-        event.stopPropagation();
-        const items = visibleFilterTags();
-        if (items.length) {
-          const item = event.key === 'ArrowDown' ? items[0] : items[items.length - 1];
-          item.focus({ preventScroll: true });
-          item.scrollIntoView({ block: 'nearest' });
-        }
-        return;
-      }
-      if (filterTag && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
-        event.preventDefault();
-        event.stopPropagation();
-        moveFilterFocus(filterTag, event.key === 'ArrowDown' ? 1 : -1);
-        return;
-      }
-      // Native Enter/Space on a focused tag button already clicks/cycles it.
-      return;
-    }
-
-    const mainInput = target.matches('.search-box input');
-    if (mainInput && event.key === 'Enter' && !event.isComposing) {
-      const suggestions = document.querySelector('.suggestions');
-      const activeSuggestion = suggestions?.querySelector('button.active:not(:disabled)');
-      event.preventDefault();
-      event.stopPropagation();
-      if (activeSuggestion instanceof HTMLButtonElement && isVisible(activeSuggestion)) {
-        activeSuggestion.click();
-      } else {
-        submitMainSearch();
-      }
-    }
-  }, true);
-
-  document.addEventListener('input', (event) => {
-    const target = event.target;
-    if (target instanceof HTMLInputElement && target.matches('.filter-panel .tag-browser-search input')) {
-      requestAnimationFrame(updateFilterMatches);
-    }
-  }, true);
-
-  document.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof Element)) return;
-    const tag = target.closest('.filter-panel .tag-family-items > button');
-    if (tag instanceof HTMLButtonElement) {
-      tag.classList.remove('v29-feedback');
-      void tag.offsetWidth;
-      tag.classList.add('v29-feedback');
-      setTimeout(() => tag.classList.remove('v29-feedback'), 220);
-    }
-  }, true);
-
-  const observer = new MutationObserver(() => updateFilterMatches());
-  observer.observe(document.body, { childList: true, subtree: true });
-  updateFilterMatches();
-})();
-</script>
-
-<style id="v30-smart-suggestions">
-  /* V31 — editorial decision graph: weighted multi-step contextual paths over existing Bridge tags only. */
-  .suggestions > button .recommended-badge { white-space: nowrap; }
-</style>
-
-
 <!-- V32 — ChatGPT-style dictation UX -->
-<style id="v32-chatgpt-dictation-style">
-/* V47: mic-only recording UI. No other search behavior is modified. */
-.search-box.chatgpt-recording {
-  position: relative !important;
-}
 
-/* Hide the real text input visually ONLY while recording.
-   A live transcript mirror occupies the exact same text area. */
-.search-box.chatgpt-recording .input-flow input {
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-.search-box.chatgpt-recording .input-flow {
-  position: relative !important;
-  min-width: 0 !important;
-  padding-right: 92px !important;
-}
-
-.v47-live-transcript {
-  position: absolute;
-  inset: 0 92px 0 0;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: var(--primaryDarkContent,#252428);
-  font: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  pointer-events: none;
-}
-
-.v47-live-transcript.is-placeholder {
-  color: #9b98a1;
-}
-
-/* Only cancel + confirm remain visible, fixed to the far right. */
-.search-box.chatgpt-recording > .voice-button,
-.search-box.chatgpt-recording > .filter-button,
-.search-box.chatgpt-recording > .search-button,
-.search-box.chatgpt-recording > .inline-clear,
-.search-box.chatgpt-recording > .show-suggestions {
-  display: none !important;
-}
-
-.search-box.chatgpt-recording > .chatgpt-dictation {
-  position: absolute !important;
-  top: 50% !important;
-  right: 8px !important;
-  left: auto !important;
-  bottom: auto !important;
-  transform: translateY(-50%) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 6px !important;
-  width: auto !important;
-  height: auto !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  z-index: 50 !important;
-}
-
-.chatgpt-dictation-cancel,
-.chatgpt-dictation-confirm {
-  position: static !important;
-  width: 38px !important;
-  min-width: 38px !important;
-  height: 38px !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border-radius: 9px !important;
-  display: grid !important;
-  place-items: center !important;
-  cursor: pointer;
-}
-
-.chatgpt-dictation-cancel {
-  border: 1px solid #e1e0e4 !important;
-  background: #fff !important;
-  color: #64616a !important;
-}
-
-.chatgpt-dictation-confirm {
-  border: 0 !important;
-  background: #252428 !important;
-  color: #fff !important;
-}
-
-.search-box.chatgpt-recording ~ .suggestions,
-.search-area:has(.search-box.chatgpt-recording) .suggestions,
-.search-area:has(.search-box.chatgpt-recording) .filter-panel {
-  display: none !important;
-}
-</style>
-<script id="v32-chatgpt-dictation-script">
+<script id="bridge-clean-controller">
 (() => {
-  let recognition = null;
-  let activeBox = null;
-  let baseValue = '';
-  let finalTranscript = '';
-  let liveTranscript = '';
-  let finishing = false;
+  const SVG = {"download": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M8.59961 2.20156C8.59961 1.87019 8.33098 1.60156 7.99961 1.60156C7.66824 1.60156 7.39961 1.87019 7.39961 2.20156V9.09243L5.03582 6.58959C4.80829 6.34868 4.42855 6.33783 4.18764 6.56535C3.94673 6.79288 3.93588 7.17263 4.1634 7.41354L7.5634 11.0135C7.67675 11.1336 7.83453 11.2016 7.99961 11.2016C8.16469 11.2016 8.32247 11.1336 8.43582 11.0135L11.8358 7.41354C12.0633 7.17263 12.0525 6.79288 11.8116 6.56535C11.5707 6.33783 11.1909 6.34868 10.9634 6.58959L8.59961 9.09243V2.20156Z\" fill=\"#1E1D20\"/>\n<path d=\"M2.79961 10.2016C2.79961 9.87019 2.53098 9.60156 2.19961 9.60156C1.86824 9.60156 1.59961 9.87019 1.59961 10.2016V12.2016C1.59961 13.4166 2.58458 14.4016 3.79961 14.4016H12.1996C13.4146 14.4016 14.3996 13.4166 14.3996 12.2016V10.2016C14.3996 9.87019 14.131 9.60156 13.7996 9.60156C13.4682 9.60156 13.1996 9.87019 13.1996 10.2016V12.2016C13.1996 12.7538 12.7519 13.2016 12.1996 13.2016H3.79961C3.24732 13.2016 2.79961 12.7538 2.79961 12.2016V10.2016Z\" fill=\"#1E1D20\"/>\n</svg>", "replace": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M7.99981 3.59844C8.97183 3.59844 9.93346 3.64231 10.8828 3.72815C11.1397 3.75138 11.344 3.94989 11.3746 4.20591C11.4739 5.03605 11.541 5.87618 11.5746 6.72503L10.2241 5.37422C9.98982 5.13988 9.60992 5.13984 9.37558 5.37413C9.14124 5.60842 9.1412 5.98832 9.37549 6.22266L11.7749 8.62258C12.0092 8.85691 12.3891 8.85696 12.6234 8.62268L15.024 6.22276C15.2584 5.98848 15.2584 5.60858 15.0241 5.37423C14.7898 5.13989 14.4099 5.13983 14.1756 5.37411L12.7773 6.77202C12.7437 5.85925 12.6729 4.95588 12.5661 4.06343C12.4682 3.24464 11.8121 2.60728 10.9909 2.53303C10.0056 2.44394 9.00796 2.39844 7.99981 2.39844C6.99165 2.39844 5.99397 2.44394 5.00872 2.53303C4.18753 2.60728 3.5314 3.24464 3.43348 4.06343C3.38245 4.49015 3.33962 4.91937 3.30514 5.35093C3.27875 5.68125 3.52513 5.97042 3.85545 5.99681C4.18577 6.0232 4.47494 5.77681 4.50133 5.4465C4.53455 5.03063 4.57583 4.61705 4.62499 4.20591C4.65561 3.94989 4.85991 3.75138 5.11679 3.72815C6.06616 3.64231 7.02778 3.59844 7.99981 3.59844ZM4.22471 7.37444C3.99043 7.14012 3.61056 7.14007 3.37622 7.37433L0.975615 9.7741C0.74126 10.0084 0.741192 10.3883 0.975467 10.6226C1.20974 10.857 1.58964 10.857 1.82399 10.6228L3.22232 9.22494C3.25589 10.1377 3.32676 11.041 3.43348 11.9334C3.5314 12.7522 4.18752 13.3896 5.00872 13.4638C5.99397 13.5529 6.99165 13.5984 7.99981 13.5984C9.00796 13.5984 10.0056 13.5529 10.9909 13.4638C11.8121 13.3896 12.4682 12.7522 12.5661 11.9335C12.6172 11.5064 12.6601 11.0768 12.6946 10.6449C12.7209 10.3146 12.4745 10.0255 12.1442 9.99908C11.8139 9.9727 11.5247 10.2191 11.4984 10.5494C11.4651 10.9656 11.4238 11.3795 11.3746 11.791C11.344 12.047 11.1397 12.2455 10.8828 12.2687C9.93346 12.3546 8.97183 12.3984 7.99981 12.3984C7.02778 12.3984 6.06616 12.3546 5.11679 12.2687C4.85991 12.2455 4.65561 12.047 4.62499 11.791C4.52572 10.9609 4.45862 10.1208 4.42499 9.27194L5.77551 10.6227C6.0098 10.857 6.3897 10.857 6.62404 10.6227C6.85837 10.3884 6.8584 10.0085 6.6241 9.77421L4.22471 7.37444Z\" fill=\"#1E1D20\"/>\n</svg>", "publish": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M8.10087 3.46484C7.03694 3.46484 5.98346 3.67438 5.00071 4.0815C4.0178 4.48866 3.1246 5.08537 2.37239 5.83767C1.62017 6.58992 1.02333 7.483 0.616213 8.46587C0.21943 9.42383 0.0103648 10.4488 4.08832e-06 11.4851C-0.000443204 11.5298 0.0358698 11.5661 0.0806119 11.5661H2.42998C2.42998 10.5022 2.63947 9.44878 3.04659 8.46587C3.45372 7.483 4.05055 6.58992 4.80277 5.83767C5.55498 5.08537 6.44818 4.48866 7.43109 4.0815C8.41384 3.67438 9.46733 3.46484 10.5313 3.46484H8.10087Z\" fill=\"#252428\"/>\n<path d=\"M9.70032 4.08487C10.6544 3.68964 11.6751 3.48063 12.7073 3.46876C12.7565 3.46819 12.7944 3.51176 12.7875 3.56051L12.4665 5.84343C12.4611 5.88158 12.4296 5.91062 12.3912 5.9134C11.7866 5.95716 11.1921 6.09762 10.6304 6.33028C9.94225 6.61525 9.3171 7.03297 8.79051 7.55956C8.26393 8.08614 7.84621 8.7113 7.56124 9.39935C7.28661 10.0624 7.14042 10.7713 7.13018 11.4885C7.12954 11.5332 7.09333 11.5695 7.04858 11.5695H4.69922C4.69922 10.5056 4.90871 9.45216 5.31583 8.46925C5.72295 7.48638 6.31979 6.5933 7.072 5.84104C7.82422 5.08875 8.71741 4.49203 9.70032 4.08487Z\" fill=\"#252428\"/>\n<path d=\"M13.2172 13.9141C13.5053 13.9141 13.7389 13.6805 13.7389 13.3923V10.1992L15.0957 11.6604C15.2918 11.8715 15.6219 11.8838 15.8331 11.6877C16.0442 11.4916 16.0564 11.1615 15.8604 10.9503L13.5995 8.51557C13.5008 8.40925 13.3623 8.34885 13.2172 8.34885C13.0721 8.34885 12.9336 8.40925 12.8349 8.51557L10.574 10.9503C10.3779 11.1615 10.3901 11.4916 10.6013 11.6877C10.8124 11.8838 11.1426 11.8715 11.3386 11.6604L12.6954 10.1992V13.3923C12.6954 13.6805 12.929 13.9141 13.2172 13.9141Z\" fill=\"#1E1D20\"/>\n</svg>", "message": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M2.25 12.7593C2.25 14.3604 3.37341 15.754 4.95746 15.987C6.04357 16.1467 7.14151 16.27 8.25 16.3556V21L12.326 16.924C12.6017 16.6483 12.9738 16.4919 13.3635 16.481C15.2869 16.4274 17.1821 16.2606 19.0425 15.9871C20.6266 15.7542 21.75 14.3606 21.75 12.7595V6.74056C21.75 5.13946 20.6266 3.74583 19.0425 3.51293C16.744 3.17501 14.3926 3 12.0003 3C9.60776 3 7.25612 3.17504 4.95747 3.51302C3.37342 3.74593 2.25 5.13956 2.25 6.74064V12.7593Z\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>", "email": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M21.75 6.75V17.25C21.75 18.4926 20.7426 19.5 19.5 19.5H4.5C3.25736 19.5 2.25 18.4926 2.25 17.25V6.75M21.75 6.75C21.75 5.50736 20.7426 4.5 19.5 4.5H4.5C3.25736 4.5 2.25 5.50736 2.25 6.75M21.75 6.75V6.99271C21.75 7.77405 21.3447 8.49945 20.6792 8.90894L13.1792 13.5243C12.4561 13.9694 11.5439 13.9694 10.8208 13.5243L3.32078 8.90894C2.65535 8.49945 2.25 7.77405 2.25 6.99271V6.75\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>", "move": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M1.5 4C1.5 3.17157 2.17157 2.5 3 2.5H6.58579C6.851 2.5 7.10536 2.60536 7.29289 2.79289L8.70711 4.20711C8.89464 4.39464 9.149 4.5 9.41421 4.5H13C13.8284 4.5 14.5 5.17157 14.5 6V12C14.5 12.8284 13.8284 13.5 13 13.5H3C2.17157 13.5 1.5 12.8284 1.5 12V4Z\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n<path d=\"M8 6.66797L10 8.66797L8 10.668M10 8.66797L6 8.66797\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>", "info": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M7.5 7.5L7.52766 7.48617C7.90974 7.29513 8.33994 7.64023 8.23634 8.05465L7.76366 9.94535C7.66006 10.3598 8.09026 10.7049 8.47234 10.5138L8.5 10.5M14 8C14 11.3137 11.3137 14 8 14C4.68629 14 2 11.3137 2 8C2 4.68629 4.68629 2 8 2C11.3137 2 14 4.68629 14 8ZM8 5.5H8.005V5.505H8V5.5Z\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>", "share": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M10.3996 3.60156C10.3996 2.49699 11.295 1.60156 12.3996 1.60156C13.5042 1.60156 14.3996 2.49699 14.3996 3.60156C14.3996 4.70613 13.5042 5.60156 12.3996 5.60156C11.8351 5.60156 11.3252 5.36766 10.9615 4.99147L5.57468 7.68488C5.59109 7.78803 5.59961 7.8938 5.59961 8.00156C5.59961 8.10935 5.59108 8.21514 5.57467 8.31831L10.9615 11.0117C11.3251 10.6355 11.835 10.4016 12.3996 10.4016C13.5042 10.4016 14.3996 11.297 14.3996 12.4016C14.3996 13.5061 13.5042 14.4016 12.3996 14.4016C11.295 14.4016 10.3996 13.5061 10.3996 12.4016C10.3996 12.2938 10.4081 12.188 10.4245 12.0849L5.03772 9.39147C4.67407 9.76766 4.16415 10.0016 3.59961 10.0016C2.49504 10.0016 1.59961 9.10613 1.59961 8.00156C1.59961 6.89699 2.49504 6.00156 3.59961 6.00156C4.16418 6.00156 4.67411 6.23549 5.03776 6.6117L10.4246 3.91831C10.4081 3.81514 10.3996 3.70935 10.3996 3.60156Z\" fill=\"#29292C\"/>\n</svg>", "trash": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M9.82692 6L9.59615 12M6.40385 12L6.17308 6M3.18157 3.86038C3.94585 3.74496 4.719 3.65657 5.5 3.59622C6.32496 3.53247 7.15869 3.5 8 3.5C8.84131 3.5 9.67504 3.53247 10.5 3.59622C11.281 3.65657 12.0542 3.74496 12.8184 3.86038C13.0464 3.89481 13.2736 3.93165 13.5 3.97086M12.8184 3.86038L12.1065 13.115C12.0464 13.8965 11.3948 14.5 10.611 14.5H5.38905C4.60524 14.5 3.95358 13.8965 3.89346 13.115L3.18157 3.86038M2.5 3.97086C2.72638 3.93165 2.95358 3.89481 3.18157 3.86038M10.5 3.59622V2.98546C10.5 2.19922 9.8929 1.54282 9.10706 1.51768C8.73948 1.50592 8.37043 1.5 8 1.5C7.62957 1.5 7.26052 1.50592 6.89294 1.51768C6.1071 1.54282 5.5 2.19922 5.5 2.98546V3.59622\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>"};
+  const META_FIELDS = ['track','artist','album','label','isrc','catalog','composer','publisher'];
 
-  const icon = (name) => name === 'close'
-    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
-    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const SMART_FALLBACK_GRAPH = {
+    'female lead':['Feminine','Girl Power','Sweet','Energetic','Confident'],
+    'feminine':['Girl Power','Romantic','Sweet'],
+    'girl power':['Energetic','Confident','Up tempo','High Beat'],
+    'energetic':['Up tempo','High Beat','Very High Beat','Dancing'],
+    'trailer':['Massive','Epic','Orchestra','Instrumental','Build Up'],
+    'massive':['Instrumental','Contrasts','Build Up','Explosion'],
+    'epic':['Orchestra','Instrumental','Build Up'],
+    'instrumental':['Contrasts','Build Up','Piano','Orchestra'],
+    'build up':['Explosion','Contrasts','Massive'],
+    'pop':['Electro-Pop','Female Lead','Synth','Energetic'],
+    'electro-pop':['Synth','Energetic','Up tempo'],
+    'nostalgic':['Piano','Synth','Mid tempo','Calm'],
+    'suspense':['Build Up','Contrasts','Instrumental'],
+    'bossa nova':['Laidback / Cool','Sweet','Acoustic Textures','Calm','Portuguese'],
+    'laidback / cool':['Calm','Acoustic Textures','Sweet'],
+    'sweet':['Female Lead','Calm','Laidback / Cool'],
+    'calm':['Acoustic Textures','Low tempo','Laidback / Cool']
+  };
 
-  function inputFor(box) {
-    return box?.querySelector('.input-flow input');
+  /* ---------------------------------------------------------
+     Demo catalog for deterministic prototype behavior.
+     Used for metadata search and guaranteed alternatives.
+     --------------------------------------------------------- */
+  const DEMO = [
+    {title:'Pipornithology',artist:'Chassol',album:'Big Sun',label:'Tricatel',isrc:'FRBDE2600001',catalog:'BDE-CH-001',composer:'Chassol',publisher:'Demo Publishing',duration:'3:18',tags:['instrumental','experimental','cinematic','piano']},
+    {title:'Saudade Azul',artist:'Lia Monte',album:'Maré Baixa',label:'Rio Sketches',isrc:'BRRIE2600002',catalog:'RIO-002',composer:'Lia Monte',publisher:'Rio Songs',duration:'3:12',tags:['bossa nova','female lead','portuguese','sweet','laidback','acoustic textures','calm','60s']},
+    {title:'Soft Summer',artist:'Nina Vale',album:'Sunday Light',label:'June Records',isrc:'GBJUN2600003',catalog:'JUN-003',composer:'Nina Vale',publisher:'June Songs',duration:'2:47',tags:['female lead','sweet','calm','acoustic textures','60s','english','laidback']},
+    {title:'I Heard You Like What You Can’t Have',artist:'Elle Lexxa',album:'Single',label:'Bridge Demo Records',isrc:'FRBDE2600004',catalog:'BDE-EL-001',composer:'Elle Lexxa',publisher:'Bridge Publishing',duration:'3:26',tags:['female lead','girl power','energetic','pop','english','confident']},
+    {title:'Cinematic Rise',artist:'North Atlas',album:'Trailer Works',label:'Frame Music',isrc:'GBFRA2600005',catalog:'FRM-005',composer:'North Atlas',publisher:'Frame Publishing',duration:'2:41',tags:['trailer','massive','instrumental','build up','contrasts']},
+    {title:'Little by Little',artist:'The Marías',album:'CINEMA',label:'Nice Guys',isrc:'USMAR2600006',catalog:'MAR-006',composer:'The Marías',publisher:'Cinema Songs',duration:'2:58',tags:['female lead','laidback','cool','pop','english','calm']},
+    {title:'Golden Solitude',artist:'Bridge Catalog',album:'Quiet Shapes',label:'Bridge Demo Records',isrc:'FRBDE2600007',catalog:'BDE-007',composer:'A. Martin',publisher:'Bridge Publishing',duration:'1:53',tags:['instrumental','piano','calm','acoustic textures','60s']},
+    {title:'Heroic Impact',artist:'Arc Motion',album:'Massive Frames',label:'Frame Music',isrc:'GBFRA2600008',catalog:'FRM-008',composer:'Arc Motion',publisher:'Frame Publishing',duration:'2:16',tags:['trailer','massive','epic','orchestra','instrumental']},
+    {title:'Come Online',artist:'Kid Francescoli',album:'Play Me Again',label:'Alter K',isrc:'FRALT2600009',catalog:'ALT-009',composer:'Kid Francescoli',publisher:'Alter K Publishing',duration:'2:38',tags:['electro pop','synth','up tempo','cool']},
+    {title:'Kiss',artist:'Betty Novallis · Deise Mikhail',album:'Songs I Love',label:'Love Records',isrc:'USLOV2600010',catalog:'LOV-010',composer:'Betty Novallis',publisher:'Love Songs',duration:'4:25',tags:['female lead','romantic','pop','english']},
+    {title:'Glass Horizon',artist:'Mira Vale',album:'Silver Lines',label:'Frame Music',isrc:'GBFRA2600011',catalog:'FRM-011',composer:'Mira Vale',publisher:'Frame Publishing',duration:'3:19',tags:['instrumental','contrasts','piano','build up','calm']},
+    {title:'Bossa Morning',artist:'Clara Nunesque',album:'Rio Sketches',label:'Rio Sketches',isrc:'BRRIE2600012',catalog:'RIO-012',composer:'Clara Nunesque',publisher:'Rio Songs',duration:'2:54',tags:['bossa nova','female lead','portuguese','acoustic textures','laidback','sweet']},
+    {title:'Velvet Afternoon',artist:'June Harper',album:'Soft Focus',label:'June Records',isrc:'GBJUN2600013',catalog:'JUN-013',composer:'June Harper',publisher:'June Songs',duration:'3:05',tags:['female lead','sweet','laidback','calm','60s','english']},
+    {title:'Neon Confidence',artist:'Maya Bloom',album:'Forward',label:'Bloom Records',isrc:'USBLO2600014',catalog:'BLM-014',composer:'Maya Bloom',publisher:'Bloom Songs',duration:'2:51',tags:['female lead','girl power','energetic','confident','up tempo']},
+    {title:'Quiet Coast',artist:'Ana Luz',album:'Mar Azul',label:'Rio Sketches',isrc:'BRRIE2600015',catalog:'RIO-015',composer:'Ana Luz',publisher:'Rio Songs',duration:'3:34',tags:['bossa nova','portuguese','calm','acoustic textures','laidback']},
+    {title:'Contrast Theory',artist:'Frame Unit',album:'Motion',label:'Frame Music',isrc:'GBFRA2600016',catalog:'FRM-016',composer:'Frame Unit',publisher:'Frame Publishing',duration:'2:29',tags:['instrumental','contrasts','trailer','build up']}
+  ];
+
+  const state = {
+    scope: null,             // explicit selection: metadata scope or frozen Global query
+    keyboardIndex: -1,
+    voice: null,
+    liveMetaActive: false,
+    menu: null,
+  };
+
+  const q = (sel, root=document) => root?.querySelector ? root.querySelector(sel) : null;
+  const qa = (sel, root=document) => root?.querySelectorAll ? [...root.querySelectorAll(sel)] : [];
+  const searchArea = () => q('.search-area');
+  const searchBox = () => q('.search-box');
+  const mainInput = () => q('.search-box .input-flow input');
+  const nativeSuggestions = () => qa('.search-area > .suggestions').find(el => el.dataset.bridgeOwned !== 'true') || null;
+  const ownedSuggestions = () => q('.search-area > .suggestions[data-bridge-owned="true"]');
+  const suggestions = () => nativeSuggestions() || ownedSuggestions();
+  const results = () => q('.results:not(.bridge-live-results-shell)');
+
+  const normalize = s => String(s || '').trim().toLowerCase();
+  const normalizeISRC = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g,'');
+
+  function metadataFields(track) {
+    return {
+      track: track.title || '',
+      artist: track.artist || '',
+      album: track.album || '',
+      label: track.label || '',
+      isrc: track.isrc || '',
+      catalog: track.catalog || '',
+      composer: track.composer || '',
+      publisher: track.publisher || '',
+    };
+  }
+
+  function parseMetadataQuery(raw) {
+    raw = String(raw || '').trim();
+    const explicit = raw.match(/^(artist|track|title|album|label|isrc|catalog(?:ue)?|composer|writer|publisher)\s*[:=]\s*(.+)$/i);
+    if (explicit) {
+      return {
+        type: explicit[1].toLowerCase().replace('title','track').replace('catalogue','catalog').replace('writer','composer'),
+        value: explicit[2].trim(),
+      };
+    }
+    if (/^[A-Z]{2}[-\s]?[A-Z0-9]{3}[-\s]?\d{2}[-\s]?\d{5}$/i.test(raw) || /^[A-Z]{2}[A-Z0-9]{3}\d{7}$/i.test(raw)) {
+      return { type:'isrc', value:raw };
+    }
+    return { type:null, value:raw };
+  }
+
+  function fieldMatchScore(type, candidateRaw, queryRaw) {
+    if (!candidateRaw || !queryRaw) return 0;
+    const candidate = type === 'isrc' ? normalizeISRC(candidateRaw) : normalize(candidateRaw);
+    const query = type === 'isrc' ? normalizeISRC(queryRaw) : normalize(queryRaw);
+    if (!candidate || !query) return 0;
+    if (candidate === query) return 300;
+    if (candidate.startsWith(query)) return 190;
+    if (candidate.includes(query)) return 110;
+    return 0;
+  }
+
+  function rankMetadata(raw, forcedType=null) {
+    const parsed = parseMetadataQuery(raw);
+    const type = forcedType || parsed.type;
+    const value = parsed.value;
+    if (!value) return [];
+    return DEMO.map((track, index) => {
+      let best = 0, matchedType = null, matchedValue = null;
+      for (const [field, candidate] of Object.entries(metadataFields(track))) {
+        if (type && field !== type) continue;
+        const score = fieldMatchScore(field, candidate, value);
+        if (score > best) {
+          best = score;
+          matchedType = field;
+          matchedValue = candidate;
+        }
+      }
+      return {...track, score:best, matchedType, matchedValue, index};
+    }).filter(x => x.score > 0)
+      .sort((a,b) => b.score - a.score || a.index - b.index);
+  }
+
+  function metadataSuggestions(raw) {
+    const parsed = parseMetadataQuery(raw);
+    if (!parsed.value || parsed.value.length < 2) return [];
+    const out = [];
+    for (const track of DEMO) {
+      for (const [field, candidate] of Object.entries(metadataFields(track))) {
+        if (parsed.type && field !== parsed.type) continue;
+        const score = fieldMatchScore(field, candidate, parsed.value);
+        if (score) out.push({type:field, value:candidate, score, track});
+      }
+    }
+    const seen = new Set();
+    return out.sort((a,b) => b.score - a.score || a.value.localeCompare(b.value))
+      .filter(item => {
+        const key = `${item.type}|${normalize(item.value)}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0,5);
+  }
+
+  /* ---------------------------------------------------------
+     Scope chip
+     --------------------------------------------------------- */
+  function clearScopeChip() {
+    q('.bridge-scope-chip')?.remove();
   }
 
   function setReactInputValue(input, value) {
     if (!input) return;
-    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')?.set;
     setter ? setter.call(input, value) : (input.value = value);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-    input.dispatchEvent(new Event('change', { bubbles: true }));
+    input.dispatchEvent(new Event('input',{bubbles:true}));
   }
 
-  function combinedTranscript() {
-    const spoken = (finalTranscript + ' ' + liveTranscript).replace(/\s+/g, ' ').trim();
-    return [baseValue.trim(), spoken].filter(Boolean).join(baseValue.trim() && spoken ? ' ' : '');
-  }
-
-  function updateMirror() {
-    const mirror = activeBox?.querySelector('.v47-live-transcript');
-    if (!mirror) return;
-    const value = combinedTranscript();
-    mirror.textContent = value || 'Listening…';
-    mirror.classList.toggle('is-placeholder', !value);
-  }
-
-  function cleanup() {
-    if (!activeBox) return;
-    activeBox.classList.remove('chatgpt-recording');
-    activeBox.querySelector('.v47-live-transcript')?.remove();
-    activeBox.querySelector('.chatgpt-dictation')?.remove();
-    const input = inputFor(activeBox);
-    activeBox = null;
-    recognition = null;
-    finalTranscript = '';
-    liveTranscript = '';
-    finishing = false;
-    requestAnimationFrame(() => input?.focus());
-  }
-
-  function cancelDictation() {
-    try { recognition?.abort(); } catch {}
-    cleanup();
-  }
-
-  function confirmDictation() {
-    if (finishing) return;
-    finishing = true;
-    const box = activeBox;
-    const input = inputFor(box);
-    const value = combinedTranscript();
-    try { recognition?.stop(); } catch {}
-    if (input) setReactInputValue(input, value);
-    cleanup();
-  }
-
-  function renderRecordingUI(box) {
-    const inputFlow = box.querySelector('.input-flow');
-
-    const mirror = document.createElement('div');
-    mirror.className = 'v47-live-transcript';
-    mirror.setAttribute('aria-live', 'polite');
-    mirror.textContent = baseValue || 'Listening…';
-    if (!baseValue) mirror.classList.add('is-placeholder');
-    inputFlow.appendChild(mirror);
-
-    const controls = document.createElement('div');
-    controls.className = 'chatgpt-dictation';
-    controls.innerHTML = `
-      <button type="button" class="chatgpt-dictation-cancel" aria-label="Cancel dictation" title="Cancel">${icon('close')}</button>
-      <button type="button" class="chatgpt-dictation-confirm" aria-label="Finish dictation" title="Finish">${icon('check')}</button>`;
-    controls.querySelector('.chatgpt-dictation-cancel').addEventListener('click', (e) => {
-      e.preventDefault(); e.stopPropagation(); cancelDictation();
-    });
-    controls.querySelector('.chatgpt-dictation-confirm').addEventListener('click', (e) => {
-      e.preventDefault(); e.stopPropagation(); confirmDictation();
-    });
-    box.appendChild(controls);
-  }
-
-  function startDictation(button) {
-    const box = button.closest('.search-box');
-    const input = inputFor(box);
-    if (!box || !input) return;
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
-
-    if (activeBox) cancelDictation();
-
-    activeBox = box;
-    baseValue = input.value || '';
-    finalTranscript = '';
-    liveTranscript = '';
-    finishing = false;
-
-    box.classList.add('chatgpt-recording');
-    renderRecordingUI(box);
-
-    const r = new SpeechRecognition();
-    recognition = r;
-    r.lang = navigator.language?.startsWith('fr') ? 'fr-FR' : 'en-US';
-    r.interimResults = true;
-    r.continuous = true;
-
-    r.onresult = (event) => {
-      liveTranscript = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const piece = event.results[i][0]?.transcript || '';
-        if (event.results[i].isFinal) finalTranscript += piece + ' ';
-        else liveTranscript += piece;
-      }
-      updateMirror();
-    };
-
-    r.onerror = (event) => {
-      if (event.error !== 'aborted') cancelDictation();
-    };
-
-    r.onend = () => {
-      if (!activeBox || finishing) return;
-      try { r.start(); } catch {}
-    };
-
-    try { r.start(); } catch { cancelDictation(); }
-  }
-
-  document.addEventListener('click', (event) => {
-    const button = event.target.closest?.('.voice-button');
-    if (!button) return;
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-    startDictation(button);
-  }, true);
-
-  document.addEventListener('keydown', (event) => {
-    if (!activeBox) return;
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      cancelDictation();
-    } else if (event.key === 'Enter') {
-      event.preventDefault();
-      confirmDictation();
+  function renderScopeChip() {
+    if (!state.scope) {
+      clearScopeChip();
+      return;
     }
-  }, true);
-})();
-</script>
+    const input = mainInput();
+    const flow = input?.closest('.input-flow');
+    if (!input || !flow) return;
 
+    const signature = `${state.scope.type}|${state.scope.value}`;
+    const existing = q('.bridge-scope-chip',flow);
+    if (existing?.dataset.bridgeScopeSignature === signature) return;
+    existing?.remove();
 
+    const chip = document.createElement('span');
+    chip.className = 'bridge-scope-chip';
+    chip.dataset.bridgeScopeSignature = signature;
+    chip.innerHTML = `
+      <span class="bridge-scope-pill">${state.scope.type === 'global' ? 'Global' : state.scope.type}</span>
+      <span class="bridge-scope-value">${state.scope.value}</span>
+      <button type="button" aria-label="Remove metadata scope">×</button>`;
+    flow.insertBefore(chip, input);
 
-<style id="v40-clean-ui">
-/* ==========================================================
-   V40: ONE clean presentation layer on top of the intact V31/V32 app.
-   No search-engine logic is replaced.
-   ========================================================== */
-
-/* --- Suggestions: a single explicit dismissed state --- */
-.search-area.v40-suggestions-dismissed > .suggestions {
-  display: none !important;
-}
-
-/* --- Results: list only; no Tinder/Review controls --- */
-.view-switch,
-.review-experience,
-.review-stage,
-.review-card,
-.review-complete,
-.review-actions,
-.review-footer,
-.show-more,
-.sort-button {
-  display: none !important;
-}
-.results-head p { display:none !important; }
-.results-tools { display:none !important; }
-
-/* Native result groups are exact-group / alternative-group. */
-.result-group {
-  margin-top: 0 !important;
-  border: 0 !important;
-  background: var(--secondarySurface,#fcfcfc) !important;
-}
-.result-group + .result-group { margin-top: 14px !important; }
-.result-group-head {
-  min-height: 34px !important;
-  padding: 7px 8px !important;
-  border: 0 !important;
-  border-bottom: 1px solid var(--secondaryBorder,#dcdce0) !important;
-  border-radius: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 8px !important;
-  background: var(--secondarySurface,#fcfcfc) !important;
-}
-.result-group-head strong {
-  font-size: 11px !important;
-  line-height: 16px !important;
-  font-weight: 700 !important;
-  color: var(--primaryDarkContent,#252428) !important;
-}
-.result-group-head .v40-group-detail {
-  font-size: 10px !important;
-  color: var(--secondaryContent,#777481) !important;
-}
-.alternative-group .result-group-head {
-  background: #fffaf0 !important;
-  border-bottom-color: #f0dfb7 !important;
-}
-.v40-alt-pill {
-  margin-left: auto;
-  height: 20px;
-  padding: 0 7px;
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid #e6d39e;
-  border-radius: 999px;
-  background: #fff3d6;
-  color: #7b5f28;
-  font-size: 9px;
-  font-weight: 750;
-}
-
-/* One Bridge header, placed before the first visible group. */
-.v40-bridge-head {
-  height: 40px;
-  display: grid;
-  grid-template-columns: 24px minmax(150px,2fr) minmax(150px,2fr) 100px minmax(150px,1fr) minmax(150px,1fr) 140px;
-  align-items: center;
-  border-bottom: 1px solid var(--secondaryBorder,#dcdce0);
-  background: var(--secondarySurface,#fcfcfc);
-  color: var(--primaryDarkContent,#252428);
-  font-size: 12px;
-  font-weight: 600;
-}
-.v40-bridge-head > span {
-  min-width:0;
-  padding-left:8px;
-}
-.v40-bridge-head > span:last-child {
-  padding-right:8px;
-  text-align:right;
-}
-
-/* Hide prototype's original 4-column head. */
-.track-head { display:none !important; }
-
-.track-result {
-  height:52px !important;
-  min-height:52px !important;
-  border:0 !important;
-  background:var(--secondarySurface,#fcfcfc) !important;
-  overflow:hidden !important;
-}
-.track-result:hover { background:var(--primary3XlSoftBg,#f6f7fe) !important; }
-
-.track-result > .track {
-  width:100% !important;
-  height:52px !important;
-  min-height:52px !important;
-  padding:0 !important;
-  gap:0 !important;
-  border:0 !important;
-  background:transparent !important;
-  display:grid !important;
-  grid-template-columns:24px minmax(150px,2fr) minmax(150px,2fr) 100px minmax(150px,1fr) minmax(150px,1fr) 140px !important;
-  align-items:center !important;
-}
-.v40-select {
-  grid-column:1 !important;
-  width:14px !important;
-  height:14px !important;
-  margin-left:8px !important;
-  accent-color:#2f43de;
-}
-.track-result .art {
-  grid-column:2 !important;
-  grid-row:1 !important;
-  width:40px !important;
-  min-width:40px !important;
-  max-width:40px !important;
-  height:40px !important;
-  min-height:40px !important;
-  max-height:40px !important;
-  aspect-ratio:1/1 !important;
-  margin-left:8px !important;
-  border-radius:4px !important;
-  overflow:hidden !important;
-}
-.track-result .art,
-.track-result .art img,
-.track-result .art svg {
-  object-fit:cover !important;
-}
-.track-result .art img {
-  width:40px !important;
-  height:40px !important;
-  max-width:40px !important;
-  max-height:40px !important;
-  display:block !important;
-}
-.track-result .track-main {
-  grid-column:2 !important;
-  grid-row:1 !important;
-  min-width:0 !important;
-  margin-left:56px !important;
-  margin-right:8px !important;
-  display:grid !important;
-  gap:1px !important;
-}
-.track-result .track-main strong {
-  font-size:12px !important;
-  line-height:16px !important;
-  font-weight:700 !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-}
-.track-result .track-main span {
-  font-size:10px !important;
-  line-height:14px !important;
-  color:var(--secondaryContent,#777481) !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-}
-.track-result .track-album {
-  grid-column:3 !important;
-  grid-row:1 !important;
-  height:52px !important;
-  padding:0 8px !important;
-  display:flex !important;
-  align-items:center !important;
-  min-width:0 !important;
-}
-.track-result .track-album strong {
-  font-size:12px !important;
-  font-weight:400 !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-}
-.track-result .track-album > span { display:none !important; }
-.track-result .track-music,
-.track-result .match { display:none !important; }
-
-.v40-duration,.v40-added,.v40-hubs,.v40-actions {
-  height:52px;
-  min-width:0;
-  padding:0 8px;
-  display:flex;
-  align-items:center;
-  color:var(--primaryDarkContent,#252428);
-  font-size:12px;
-}
-.v40-duration { grid-column:4; }
-.v40-added {
-  grid-column:5;
-  flex-direction:column;
-  align-items:flex-start;
-  justify-content:center;
-  line-height:15px;
-}
-.v40-added small {
-  font-size:10px;
-  color:var(--secondaryContent,#777481);
-}
-.v40-hubs { grid-column:6; }
-.v40-actions {
-  grid-column:7;
-  justify-content:flex-end;
-  padding-right:8px;
-  gap:0;
-}
-.v40-icon-btn {
-  width:32px;
-  min-width:32px;
-  height:32px;
-  padding:0;
-  border:0;
-  border-radius:6px;
-  background:transparent;
-  color:var(--primaryDarkContent,#252428);
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-}
-.v40-icon-btn:hover { background:var(--neutralSoftBg,#f7f7f8); }
-.v40-icon-btn svg {
-  display:block !important;
-  max-width:20px;
-  max-height:20px;
-}
-
-/* Precise Filters stays above Results and preserves its existing UX. */
-.filter-panel { z-index:31 !important; }
-.suggestions { z-index:30 !important; }
-
-@media (max-width:900px) {
-  .v40-bridge-head { display:none !important; }
-  .track-result,
-  .track-result > .track {
-    height:58px !important;
-    min-height:58px !important;
+    chip.querySelector('button').addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const previous = state.scope;
+      state.scope = null;
+      clearScopeChip();
+      clearLiveMetadataResults();
+      setReactInputValue(input, previous.value || '');
+      input.focus();
+    });
   }
-  .track-result > .track {
-    grid-template-columns:24px minmax(0,1fr) 48px !important;
+
+  function chooseMetadataScope(type, value) {
+    state.scope = {type, value};
+    renderScopeChip();
+    setReactInputValue(mainInput(), '');
+    removeUnifiedSection();
+    renderMetadataSearch(type, value, true);
+    mainInput()?.focus();
   }
-  .track-result .art { grid-column:2 !important; }
-  .track-result .track-main { grid-column:2 !important; }
-  .track-result .track-album,
-  .v40-duration,
-  .v40-added,
-  .v40-hubs { display:none !important; }
-  .v40-actions {
-    grid-column:3 !important;
-    height:58px;
-    padding:0 4px;
+
+  function freezeGlobalSearch(value) {
+    if (!value) return;
+    state.scope = {type:'global', value};
+    renderScopeChip();
+    setReactInputValue(mainInput(), '');
+    removeUnifiedSection();
+    renderGlobalSearch(value, true);
+    mainInput()?.focus();
   }
-  .v40-actions .v40-icon-btn:not(:last-child) { display:none !important; }
 
-  .search-box.chatgpt-recording {
-    grid-template-columns:minmax(0,1fr) 34px 34px 38px 40px !important;
-    gap:4px !important;
+  /* ---------------------------------------------------------
+     ONE suggestion list — ranked across all candidate types
+     --------------------------------------------------------- */
+  function removeUnifiedSection(root=document) {
+    qa('.bridge-ranked-section, .bridge-unified-section',root).forEach(el=>el.remove());
   }
-}
-</style>
 
+  function currentCriterionLabels() {
+    return qa('.search-box .criterion').map(el => {
+      const tag = el.matches('.tag-criterion')
+        ? q('.criterion-main > span:nth-child(2)',el)
+        : q('strong',el);
+      return (tag?.textContent || '').trim();
+    }).filter(Boolean);
+  }
 
-<script id="v40-clean-ui-script">
-(() => {
-  const SVG = {"download": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M8.59961 2.20156C8.59961 1.87019 8.33098 1.60156 7.99961 1.60156C7.66824 1.60156 7.39961 1.87019 7.39961 2.20156V9.09243L5.03582 6.58959C4.80829 6.34868 4.42855 6.33783 4.18764 6.56535C3.94673 6.79288 3.93588 7.17263 4.1634 7.41354L7.5634 11.0135C7.67675 11.1336 7.83453 11.2016 7.99961 11.2016C8.16469 11.2016 8.32247 11.1336 8.43582 11.0135L11.8358 7.41354C12.0633 7.17263 12.0525 6.79288 11.8116 6.56535C11.5707 6.33783 11.1909 6.34868 10.9634 6.58959L8.59961 9.09243V2.20156Z\" fill=\"#1E1D20\"/>\n<path d=\"M2.79961 10.2016C2.79961 9.87019 2.53098 9.60156 2.19961 9.60156C1.86824 9.60156 1.59961 9.87019 1.59961 10.2016V12.2016C1.59961 13.4166 2.58458 14.4016 3.79961 14.4016H12.1996C13.4146 14.4016 14.3996 13.4166 14.3996 12.2016V10.2016C14.3996 9.87019 14.131 9.60156 13.7996 9.60156C13.4682 9.60156 13.1996 9.87019 13.1996 10.2016V12.2016C13.1996 12.7538 12.7519 13.2016 12.1996 13.2016H3.79961C3.24732 13.2016 2.79961 12.7538 2.79961 12.2016V10.2016Z\" fill=\"#1E1D20\"/>\n</svg>", "replace": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M7.99981 3.59844C8.97183 3.59844 9.93346 3.64231 10.8828 3.72815C11.1397 3.75138 11.344 3.94989 11.3746 4.20591C11.4739 5.03605 11.541 5.87618 11.5746 6.72503L10.2241 5.37422C9.98982 5.13988 9.60992 5.13984 9.37558 5.37413C9.14124 5.60842 9.1412 5.98832 9.37549 6.22266L11.7749 8.62258C12.0092 8.85691 12.3891 8.85696 12.6234 8.62268L15.024 6.22276C15.2584 5.98848 15.2584 5.60858 15.0241 5.37423C14.7898 5.13989 14.4099 5.13983 14.1756 5.37411L12.7773 6.77202C12.7437 5.85925 12.6729 4.95588 12.5661 4.06343C12.4682 3.24464 11.8121 2.60728 10.9909 2.53303C10.0056 2.44394 9.00796 2.39844 7.99981 2.39844C6.99165 2.39844 5.99397 2.44394 5.00872 2.53303C4.18753 2.60728 3.5314 3.24464 3.43348 4.06343C3.38245 4.49015 3.33962 4.91937 3.30514 5.35093C3.27875 5.68125 3.52513 5.97042 3.85545 5.99681C4.18577 6.0232 4.47494 5.77681 4.50133 5.4465C4.53455 5.03063 4.57583 4.61705 4.62499 4.20591C4.65561 3.94989 4.85991 3.75138 5.11679 3.72815C6.06616 3.64231 7.02778 3.59844 7.99981 3.59844ZM4.22471 7.37444C3.99043 7.14012 3.61056 7.14007 3.37622 7.37433L0.975615 9.7741C0.74126 10.0084 0.741192 10.3883 0.975467 10.6226C1.20974 10.857 1.58964 10.857 1.82399 10.6228L3.22232 9.22494C3.25589 10.1377 3.32676 11.041 3.43348 11.9334C3.5314 12.7522 4.18752 13.3896 5.00872 13.4638C5.99397 13.5529 6.99165 13.5984 7.99981 13.5984C9.00796 13.5984 10.0056 13.5529 10.9909 13.4638C11.8121 13.3896 12.4682 12.7522 12.5661 11.9335C12.6172 11.5064 12.6601 11.0768 12.6946 10.6449C12.7209 10.3146 12.4745 10.0255 12.1442 9.99908C11.8139 9.9727 11.5247 10.2191 11.4984 10.5494C11.4651 10.9656 11.4238 11.3795 11.3746 11.791C11.344 12.047 11.1397 12.2455 10.8828 12.2687C9.93346 12.3546 8.97183 12.3984 7.99981 12.3984C7.02778 12.3984 6.06616 12.3546 5.11679 12.2687C4.85991 12.2455 4.65561 12.047 4.62499 11.791C4.52572 10.9609 4.45862 10.1208 4.42499 9.27194L5.77551 10.6227C6.0098 10.857 6.3897 10.857 6.62404 10.6227C6.85837 10.3884 6.8584 10.0085 6.6241 9.77421L4.22471 7.37444Z\" fill=\"#1E1D20\"/>\n</svg>", "publish": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M8.10087 3.46484C7.03694 3.46484 5.98346 3.67438 5.00071 4.0815C4.0178 4.48866 3.1246 5.08537 2.37239 5.83767C1.62017 6.58992 1.02333 7.483 0.616213 8.46587C0.21943 9.42383 0.0103648 10.4488 4.08832e-06 11.4851C-0.000443204 11.5298 0.0358698 11.5661 0.0806119 11.5661H2.42998C2.42998 10.5022 2.63947 9.44878 3.04659 8.46587C3.45372 7.483 4.05055 6.58992 4.80277 5.83767C5.55498 5.08537 6.44818 4.48866 7.43109 4.0815C8.41384 3.67438 9.46733 3.46484 10.5313 3.46484H8.10087Z\" fill=\"#252428\"/>\n<path d=\"M9.70032 4.08487C10.6544 3.68964 11.6751 3.48063 12.7073 3.46876C12.7565 3.46819 12.7944 3.51176 12.7875 3.56051L12.4665 5.84343C12.4611 5.88158 12.4296 5.91062 12.3912 5.9134C11.7866 5.95716 11.1921 6.09762 10.6304 6.33028C9.94225 6.61525 9.3171 7.03297 8.79051 7.55956C8.26393 8.08614 7.84621 8.7113 7.56124 9.39935C7.28661 10.0624 7.14042 10.7713 7.13018 11.4885C7.12954 11.5332 7.09333 11.5695 7.04858 11.5695H4.69922C4.69922 10.5056 4.90871 9.45216 5.31583 8.46925C5.72295 7.48638 6.31979 6.5933 7.072 5.84104C7.82422 5.08875 8.71741 4.49203 9.70032 4.08487Z\" fill=\"#252428\"/>\n<path d=\"M13.2172 13.9141C13.5053 13.9141 13.7389 13.6805 13.7389 13.3923V10.1992L15.0957 11.6604C15.2918 11.8715 15.6219 11.8838 15.8331 11.6877C16.0442 11.4916 16.0564 11.1615 15.8604 10.9503L13.5995 8.51557C13.5008 8.40925 13.3623 8.34885 13.2172 8.34885C13.0721 8.34885 12.9336 8.40925 12.8349 8.51557L10.574 10.9503C10.3779 11.1615 10.3901 11.4916 10.6013 11.6877C10.8124 11.8838 11.1426 11.8715 11.3386 11.6604L12.6954 10.1992V13.3923C12.6954 13.6805 12.929 13.9141 13.2172 13.9141Z\" fill=\"#1E1D20\"/>\n</svg>", "message": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M2.25 12.7593C2.25 14.3604 3.37341 15.754 4.95746 15.987C6.04357 16.1467 7.14151 16.27 8.25 16.3556V21L12.326 16.924C12.6017 16.6483 12.9738 16.4919 13.3635 16.481C15.2869 16.4274 17.1821 16.2606 19.0425 15.9871C20.6266 15.7542 21.75 14.3606 21.75 12.7595V6.74056C21.75 5.13946 20.6266 3.74583 19.0425 3.51293C16.744 3.17501 14.3926 3 12.0003 3C9.60776 3 7.25612 3.17504 4.95747 3.51302C3.37342 3.74593 2.25 5.13956 2.25 6.74064V12.7593Z\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>", "email": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M21.75 6.75V17.25C21.75 18.4926 20.7426 19.5 19.5 19.5H4.5C3.25736 19.5 2.25 18.4926 2.25 17.25V6.75M21.75 6.75C21.75 5.50736 20.7426 4.5 19.5 4.5H4.5C3.25736 4.5 2.25 5.50736 2.25 6.75M21.75 6.75V6.99271C21.75 7.77405 21.3447 8.49945 20.6792 8.90894L13.1792 13.5243C12.4561 13.9694 11.5439 13.9694 10.8208 13.5243L3.32078 8.90894C2.65535 8.49945 2.25 7.77405 2.25 6.99271V6.75\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>", "move": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M1.5 4C1.5 3.17157 2.17157 2.5 3 2.5H6.58579C6.851 2.5 7.10536 2.60536 7.29289 2.79289L8.70711 4.20711C8.89464 4.39464 9.149 4.5 9.41421 4.5H13C13.8284 4.5 14.5 5.17157 14.5 6V12C14.5 12.8284 13.8284 13.5 13 13.5H3C2.17157 13.5 1.5 12.8284 1.5 12V4Z\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n<path d=\"M8 6.66797L10 8.66797L8 10.668M10 8.66797L6 8.66797\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>", "info": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M7.5 7.5L7.52766 7.48617C7.90974 7.29513 8.33994 7.64023 8.23634 8.05465L7.76366 9.94535C7.66006 10.3598 8.09026 10.7049 8.47234 10.5138L8.5 10.5M14 8C14 11.3137 11.3137 14 8 14C4.68629 14 2 11.3137 2 8C2 4.68629 4.68629 2 8 2C11.3137 2 14 4.68629 14 8ZM8 5.5H8.005V5.505H8V5.5Z\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>", "share": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M10.3996 3.60156C10.3996 2.49699 11.295 1.60156 12.3996 1.60156C13.5042 1.60156 14.3996 2.49699 14.3996 3.60156C14.3996 4.70613 13.5042 5.60156 12.3996 5.60156C11.8351 5.60156 11.3252 5.36766 10.9615 4.99147L5.57468 7.68488C5.59109 7.78803 5.59961 7.8938 5.59961 8.00156C5.59961 8.10935 5.59108 8.21514 5.57467 8.31831L10.9615 11.0117C11.3251 10.6355 11.835 10.4016 12.3996 10.4016C13.5042 10.4016 14.3996 11.297 14.3996 12.4016C14.3996 13.5061 13.5042 14.4016 12.3996 14.4016C11.295 14.4016 10.3996 13.5061 10.3996 12.4016C10.3996 12.2938 10.4081 12.188 10.4245 12.0849L5.03772 9.39147C4.67407 9.76766 4.16415 10.0016 3.59961 10.0016C2.49504 10.0016 1.59961 9.10613 1.59961 8.00156C1.59961 6.89699 2.49504 6.00156 3.59961 6.00156C4.16418 6.00156 4.67411 6.23549 5.03776 6.6117L10.4246 3.91831C10.4081 3.81514 10.3996 3.70935 10.3996 3.60156Z\" fill=\"#29292C\"/>\n</svg>", "trash": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M9.82692 6L9.59615 12M6.40385 12L6.17308 6M3.18157 3.86038C3.94585 3.74496 4.719 3.65657 5.5 3.59622C6.32496 3.53247 7.15869 3.5 8 3.5C8.84131 3.5 9.67504 3.53247 10.5 3.59622C11.281 3.65657 12.0542 3.74496 12.8184 3.86038C13.0464 3.89481 13.2736 3.93165 13.5 3.97086M12.8184 3.86038L12.1065 13.115C12.0464 13.8965 11.3948 14.5 10.611 14.5H5.38905C4.60524 14.5 3.95358 13.8965 3.89346 13.115L3.18157 3.86038M2.5 3.97086C2.72638 3.93165 2.95358 3.89481 3.18157 3.86038M10.5 3.59622V2.98546C10.5 2.19922 9.8929 1.54282 9.10706 1.51768C8.73948 1.50592 8.37043 1.5 8 1.5C7.62957 1.5 7.26052 1.50592 6.89294 1.51768C6.1071 1.54282 5.5 2.19922 5.5 2.98546V3.59622\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>"};
+  function activeTagCriteria() {
+    return qa('.search-box .tag-criterion').map(el => {
+      const label = q('.criterion-main > span:nth-child(2)',el)?.textContent?.trim() || '';
+      const weight = el.classList.contains('weight-exclude')
+        ? 'exclude'
+        : el.classList.contains('weight-should')
+          ? 'should'
+          : 'must';
+      return {label,weight};
+    }).filter(x=>x.label);
+  }
 
+  function fallbackSmartLabels() {
+    const active = currentCriterionLabels();
+    const activeNorm = new Set(active.map(normalize));
+    const scores = new Map();
+
+    active.forEach(label => {
+      const next = SMART_FALLBACK_GRAPH[normalize(label)] || [];
+      next.forEach((candidate,index) => {
+        if (activeNorm.has(normalize(candidate))) return;
+        scores.set(candidate, (scores.get(candidate) || 0) + (10-index));
+      });
+    });
+
+    if (!scores.size && active.length) {
+      ['Energetic','Calm','Instrumental','Female Lead','Up tempo','Contrasts']
+        .forEach((candidate,index) => {
+          if (!activeNorm.has(normalize(candidate))) scores.set(candidate,6-index);
+        });
+    }
+
+    return [...scores.entries()]
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,6)
+      .map(([label])=>label);
+  }
+
+  function fallbackHostNeeded() {
+    const raw = mainInput()?.value.trim() || '';
+    if (raw.length >= 2) return true;
+    if (state.scope) return false;
+    return currentCriterionLabels().length > 0;
+  }
+
+  function syncSuggestionHost() {
+    const area = searchArea();
+    if (!area) return null;
+
+    const native = nativeSuggestions();
+    let owned = ownedSuggestions();
+
+    if (native) {
+      owned?.remove();
+      return native;
+    }
+
+    if (!fallbackHostNeeded()) {
+      owned?.remove();
+      return null;
+    }
+
+    if (!owned) {
+      owned = document.createElement('div');
+      owned.className = 'suggestions bridge-owned-suggestions';
+      owned.dataset.bridgeOwned = 'true';
+      owned.id = 'bridge-owned-search-suggestions';
+      owned.setAttribute('role','listbox');
+      owned.innerHTML = '<div class="suggestion-heading"><span>Suggestions</span><span><kbd>↑</kbd><kbd>↓</kbd> navigate · <kbd>↵</kbd> select</span></div>';
+      area.appendChild(owned);
+    }
+    return owned;
+  }
+
+  function addTagThroughNativeSearch(label) {
+    const input = mainInput();
+    if (!input) return;
+
+    setReactInputValue(input,label);
+    input.focus();
+
+    let attempts = 0;
+    const tryNative = () => {
+      attempts += 1;
+      const dd = nativeSuggestions();
+      const native = dd ? [...dd.children].filter(el => el.tagName === 'BUTTON') : [];
+      const exact = native.find(button => normalize(q('.suggestion-title-line strong',button)?.textContent || button.textContent).includes(normalize(label)));
+      if (exact) {
+        exact.click();
+        requestAnimationFrame(() => {
+          setReactInputValue(input,'');
+          clearLiveMetadataResults();
+          openSuggestions();
+          syncRankedDropdown();
+        });
+        return;
+      }
+      if (attempts < 8) requestAnimationFrame(tryNative);
+    };
+    requestAnimationFrame(tryNative);
+  }
+
+  function lexicalSuggestionScore(label, raw) {
+    const l = normalize(label);
+    const r = normalize(raw);
+    if (!l || !r) return 0;
+    if (l === r) return 260;
+    if (l.startsWith(r)) return 185;
+    if (l.split(/\s+/).some(token=>token.startsWith(r))) return 145;
+    if (l.includes(r)) return 105;
+    return 0;
+  }
+
+  function nativeTypeLabel(button) {
+    const em = q('em',button)?.textContent?.trim() || '';
+    if (/matching tags/i.test(em)) return 'Tags';
+    if (/bridge tag/i.test(em)) return 'Tag';
+    if (/ai prompt/i.test(em)) return 'Prompt';
+    if (/similarity/i.test(em)) return 'Similarity';
+    if (em) return em;
+    if (button.classList.contains('youtube-suggestion')) return 'Similarity';
+    if (q('.suggestion-icon.tagbundle',button)) return 'Tags';
+    if (q('.suggestion-icon.prompt',button)) return 'Prompt';
+    return 'Suggestion';
+  }
+
+  function nativeCandidates(host, raw) {
+    if (!host || host.dataset.bridgeOwned === 'true') return [];
+    return [...host.children]
+      .filter(el => el.tagName === 'BUTTON' && !el.disabled)
+      .map((button,index) => {
+        const label = q('.suggestion-title-line strong',button)?.textContent?.trim()
+          || q('strong',button)?.textContent?.trim()
+          || button.textContent?.trim()
+          || 'Suggestion';
+        const detail = q('small',button)?.textContent?.trim() || '';
+        const typeLabel = nativeTypeLabel(button);
+        const recommended = !!q('.recommended-badge',button);
+        const base = 118 - index*4;
+        const score = base
+          + lexicalSuggestionScore(label,raw)
+          + (recommended ? 48 : 0)
+          + (typeLabel === 'Tag' ? 22 : typeLabel === 'Tags' ? 16 : typeLabel === 'Similarity' ? 10 : 0);
+
+        return {
+          kind:'native',
+          label,
+          detail,
+          typeLabel,
+          score,
+          source:button,
+          preview:q('.suggestion-tag-preview',button)?.cloneNode(true) || null,
+          thumb:q('.youtube-suggestion-thumb',button)?.cloneNode(true) || null
+        };
+      });
+  }
+
+  function metadataCandidates(raw) {
+    if (String(raw||'').trim().length < 2) return [];
+    const fieldBoost = {
+      isrc:34, track:28, artist:26, album:18, catalog:16,
+      label:12, composer:12, publisher:10
+    };
+    return metadataSuggestions(raw).map(item => ({
+      kind:'metadata',
+      label:item.value,
+      detail:item.type === 'artist' ? 'Artist' : `${item.track.title} · ${item.track.artist}`,
+      typeLabel:item.type,
+      score:item.score + (fieldBoost[item.type] || 0),
+      item
+    }));
+  }
+
+  function fallbackCandidates(raw, host) {
+    const hasNative = host && host.dataset.bridgeOwned !== 'true'
+      && [...host.children].some(el=>el.tagName==='BUTTON' && !el.disabled);
+    if (hasNative) return [];
+    return fallbackSmartLabels().map((label,index)=>({
+      kind:'fallback',
+      label,
+      detail:'Suggested from your current criteria',
+      typeLabel:'Tag',
+      score:116 - index*5 + lexicalSuggestionScore(label,raw)
+    }));
+  }
+
+  function rankedCandidates(host, raw) {
+    const rawValue = String(raw || '').trim();
+    const candidates = [
+      ...nativeCandidates(host,rawValue),
+      ...metadataCandidates(rawValue),
+      ...fallbackCandidates(rawValue,host)
+    ];
+
+    const seen = new Set();
+    const ranked = candidates
+      .sort((a,b)=>b.score-a.score)
+      .filter(candidate => {
+        const key = `${normalize(candidate.typeLabel)}|${normalize(candidate.label)}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+    // Reserve the last slot for the literal Global interpretation.
+    // It never competes in the relevance ranking.
+    const interpreted = ranked.slice(0, rawValue ? 9 : 10);
+
+    if (rawValue) {
+      interpreted.push({
+        kind:'global',
+        label:rawValue,
+        detail:'Search everywhere exactly as typed',
+        typeLabel:'Global',
+        score:-1
+      });
+    }
+
+    return interpreted;
+  }
+
+  function candidateRow(candidate) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'bridge-ranked-row';
+    button.setAttribute('role','option');
+
+    if (candidate.thumb) {
+      button.appendChild(candidate.thumb);
+      button.classList.add('bridge-ranked-youtube');
+    } else {
+      const type = document.createElement('span');
+      type.className = 'bridge-meta-type';
+      type.textContent = candidate.typeLabel;
+      button.appendChild(type);
+    }
+
+    const copy = document.createElement('span');
+    copy.className = 'bridge-meta-copy';
+    const strong = document.createElement('strong');
+    strong.textContent = candidate.label;
+    const small = document.createElement('small');
+    small.textContent = candidate.detail || candidate.typeLabel;
+    copy.append(strong,small);
+    if (candidate.preview) copy.appendChild(candidate.preview);
+    button.appendChild(copy);
+
+    button.addEventListener('pointerdown',event=>event.preventDefault());
+    button.addEventListener('click',event=>{
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (candidate.kind === 'native') {
+        clearLiveMetadataResults();
+        candidate.source.click();
+        state.keyboardIndex=-1;
+        requestAnimationFrame(()=>{
+          mainInput()?.focus();
+          openSuggestions();
+          syncRankedDropdown();
+        });
+        return;
+      }
+      if (candidate.kind === 'metadata') {
+        chooseMetadataScope(candidate.item.type,candidate.item.value);
+        return;
+      }
+      if (candidate.kind === 'fallback') {
+        addTagThroughNativeSearch(candidate.label);
+        return;
+      }
+      if (candidate.kind === 'global') {
+        freezeGlobalSearch(candidate.label);
+      }
+    });
+
+    return button;
+  }
+
+  function syncRankedDropdown() {
+    const raw = mainInput()?.value.trim() || '';
+    const host = syncSuggestionHost();
+    if (!host) return;
+
+    if (state.scope && !raw) {
+      removeUnifiedSection(host);
+      host.classList.remove('bridge-ranked-mode');
+      if (host.dataset.bridgeOwned === 'true') host.remove();
+      return;
+    }
+
+    const heading = q(':scope > .suggestion-heading',host);
+    const headingLabel = q('span:first-child',heading);
+    if (headingLabel) headingLabel.textContent = 'Suggestions';
+
+    const candidates = rankedCandidates(host,raw);
+    const signature = JSON.stringify({
+      raw,
+      scope:state.scope ? [state.scope.type,state.scope.value] : null,
+      candidates:candidates.map(c=>[c.kind,c.typeLabel,c.label,Math.round(c.score)])
+    });
+
+    const existing = q(':scope > .bridge-ranked-section',host);
+    if (existing?.dataset.bridgeSignature === signature) {
+      host.classList.toggle('bridge-ranked-mode',candidates.length>0);
+      tuneMobileSuggestionCount();
+      return;
+    }
+
+    existing?.remove();
+
+    if (!candidates.length) {
+      host.classList.remove('bridge-ranked-mode');
+      if (host.dataset.bridgeOwned === 'true') host.remove();
+      return;
+    }
+
+    host.classList.add('bridge-ranked-mode');
+    const section = document.createElement('div');
+    section.className = 'bridge-ranked-section';
+    section.dataset.bridgeSignature = signature;
+    candidates.forEach((candidate,index)=>{
+      const row = candidateRow(candidate);
+      if (index === 0) row.classList.add('bridge-default-choice');
+      section.appendChild(row);
+    });
+    host.appendChild(section);
+    tuneMobileSuggestionCount();
+  }
+
+  function visibleChoices() {
+    const dd = suggestions();
+    if (!dd || getComputedStyle(dd).display === 'none') return [];
+    const ranked = qa(':scope > .bridge-ranked-section > .bridge-ranked-row',dd)
+      .filter(el=>getComputedStyle(el).display!=='none');
+    if (ranked.length) return ranked;
+    return qa(':scope > button',dd)
+      .filter(el => !el.disabled && getComputedStyle(el).display !== 'none');
+  }
+
+  function clearKeyboardActive() {
+    visibleChoices().forEach(el => el.classList.remove('bridge-active'));
+    state.keyboardIndex = -1;
+  }
+
+  function setKeyboardActive(index) {
+    const choices = visibleChoices();
+    if (!choices.length) return;
+    state.keyboardIndex = (index + choices.length) % choices.length;
+    choices.forEach(el => {
+      el.classList.remove('bridge-active');
+      el.classList.remove('bridge-default-choice');
+    });
+    const active = choices[state.keyboardIndex];
+    active.classList.add('bridge-active');
+    active.scrollIntoView({block:'nearest'});
+  }
+
+  function openSuggestions() {
+    const area = searchArea();
+    if (!area) return;
+    area.classList.remove('bridge-dismissed');
+    requestAnimationFrame(syncRankedDropdown);
+  }
+
+  function closeSuggestions() {
+    searchArea()?.classList.add('bridge-dismissed');
+    clearKeyboardActive();
+  }
+
+  function tuneMobileSuggestionCount() {
+    if (!matchMedia('(max-width:760px)').matches) return;
+    const dd = suggestions();
+    if (!dd) return;
+    qa(':scope > .bridge-ranked-section > .bridge-ranked-row',dd)
+      .forEach((el,index)=>el.style.display=index<7?'':'none');
+  }
+
+  /* ---------------------------------------------------------
+     Results — deterministic 10, metadata live + native search
+     --------------------------------------------------------- */
   const MORE = '<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M3 10a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM8.5 10a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM15.5 8.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" fill="currentColor"/></svg>';
 
-  // ------------------------------------------------------------------
-  // Suggestions: ONE click-out rule. We don't alter suggestion logic.
-  // ------------------------------------------------------------------
-  document.addEventListener('pointerdown', (event) => {
-    document.querySelectorAll('.search-area').forEach((area) => {
-      const dropdown = area.querySelector(':scope > .suggestions');
-      if (!dropdown) return;
-      if (!dropdown.contains(event.target)) {
-        area.classList.add('v40-suggestions-dismissed');
-      }
-    });
-  }, true);
+  function iconButton(label, svg, cls='') {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `bridge-icon-btn ${cls}`.trim();
+    button.setAttribute('aria-label',label);
+    button.setAttribute('title',label);
+    button.innerHTML = svg;
+    return button;
+  }
 
-  document.addEventListener('input', (event) => {
-    const input = event.target.closest?.('.search-box .input-flow input');
-    if (!input) return;
-    input.closest('.search-area')?.classList.remove('v40-suggestions-dismissed');
-  }, true);
-
-  document.addEventListener('focusin', (event) => {
-    const input = event.target.closest?.('.search-box .input-flow input');
-    if (!input) return;
-    input.closest('.search-area')?.classList.remove('v40-suggestions-dismissed');
-  }, true);
-
-  // ------------------------------------------------------------------
-  // Results: preserve React's exact/alternative classification and
-  // its ranking. Only present the first 10 native ranked rows.
-  // ------------------------------------------------------------------
-  function durationFor(title) {
+  function hashHue(value) {
     let n = 0;
-    for (const c of (title || 'Track')) n = (n * 31 + c.charCodeAt(0)) >>> 0;
-    const seconds = 118 + (n % 155);
-    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2,'0')}`;
+    for (const c of value) n = (n * 31 + c.charCodeAt(0)) >>> 0;
+    return n % 360;
   }
 
-  function iconButton(label, svg) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'v40-icon-btn';
-    b.setAttribute('aria-label', label);
-    b.setAttribute('title', label);
-    b.innerHTML = svg;
-    return b;
+  function demoArtwork(title) {
+    const hue = hashHue(title);
+    return `<div class="art" style="background:hsl(${hue} 24% 28%);display:grid;place-items:center;color:#fff">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 7.5v9l7-4.5-7-4.5Z"/></svg>
+    </div>`;
   }
 
-  function decorateRow(row) {
-    if (row.dataset.v40Decorated === '1') return;
-    const track = row.querySelector(':scope > .track');
+  function demoRow(track) {
+    const row = document.createElement('div');
+    row.className = 'track-result bridge-demo-row';
+    row.innerHTML = `<div class="track">
+      <input type="checkbox" class="bridge-select" aria-label="Select ${track.title}">
+      ${demoArtwork(track.title)}
+      <div class="track-main"><strong>${track.title}</strong><span>${track.artist}</span></div>
+      <div class="track-album"><strong>${track.album || ''}</strong></div>
+      <div class="bridge-duration">${track.duration || '3:00'}</div>
+      <div class="bridge-added"><span>${track.label || 'Demo catalog'}</span><small>${track.isrc || ''}</small></div>
+      <div class="bridge-hubs"></div>
+      <div class="bridge-actions"></div>
+    </div>`;
+    const hubs = q('.bridge-hubs',row);
+    hubs.appendChild(iconButton('Publish on hubs',SVG.publish));
+    const actions = q('.bridge-actions',row);
+    actions.appendChild(iconButton('Share',SVG.share));
+    actions.appendChild(iconButton('Track information',SVG.info));
+    actions.appendChild(iconButton('More options',MORE,'bridge-more'));
+    return row;
+  }
+
+  function fallbackRank(raw) {
+    const terms = normalize(raw).split(/[^a-z0-9]+/).filter(x => x.length > 2);
+    return DEMO.map((track,index) => {
+      const hay = normalize([
+        track.title,track.artist,track.album,track.label,track.isrc,
+        track.catalog,track.composer,track.publisher,...track.tags
+      ].join(' '));
+      let score = 0;
+      for (const term of terms) {
+        if (hay.includes(term)) score += 6;
+        for (const tag of track.tags) {
+          const nt = normalize(tag);
+          if (nt.includes(term) || term.includes(nt)) score += 2;
+        }
+      }
+      return {...track, score, index};
+    }).sort((a,b) => b.score - a.score || a.index - b.index);
+  }
+
+  function criterionMatchesTrack(track,label) {
+    const wanted = normalize(label);
+    if (!wanted) return false;
+    const pieces = wanted.split(/\s*\/\s*|\s*·\s*/).filter(Boolean);
+    return track.tags.some(tag => {
+      const t = normalize(tag);
+      return pieces.some(piece =>
+        t === piece ||
+        t.includes(piece) ||
+        piece.includes(t) ||
+        (piece.includes('60') && t.includes('60')) ||
+        (piece === 'laidback' && t === 'cool')
+      );
+    });
+  }
+
+  function criterionIsKnown(label) {
+    return DEMO.some(track=>criterionMatchesTrack(track,label));
+  }
+
+  function activeCriteriaScore(track) {
+    let score = 0;
+    for (const criterion of activeTagCriteria()) {
+      const known = criterionIsKnown(criterion.label);
+      if (!known) continue;
+      const match = criterionMatchesTrack(track,criterion.label);
+      if (criterion.weight === 'must' && !match) return {valid:false,score:-999};
+      if (criterion.weight === 'exclude' && match) return {valid:false,score:-999};
+      if (criterion.weight === 'must' && match) score += 46;
+      if (criterion.weight === 'should' && match) score += 24;
+    }
+    return {valid:true,score};
+  }
+
+  function scopeAllowsTrack(track) {
+    if (!state.scope) return true;
+
+    if (state.scope.type === 'global') {
+      return globalTrackScore(track,state.scope.value) > 0;
+    }
+
+    const candidate = metadataFields(track)[state.scope.type];
+    return fieldMatchScore(state.scope.type,candidate,state.scope.value) > 0;
+  }
+
+  function globalTrackScore(track,raw) {
+    const query = String(raw||'').trim();
+    if (!query) return 0;
+
+    let best = 0;
+    for (const [field,value] of Object.entries(metadataFields(track))) {
+      const fieldScore = fieldMatchScore(field,value,query);
+      const boost = field === 'track' ? 28
+        : field === 'artist' ? 26
+        : field === 'isrc' ? 34
+        : field === 'album' ? 16
+        : field === 'catalog' ? 15
+        : 10;
+      if (fieldScore) best = Math.max(best,fieldScore+boost);
+    }
+
+    for (const tag of track.tags) {
+      const tagScore = fieldMatchScore('tag',tag,query);
+      if (tagScore) best = Math.max(best,tagScore+24);
+    }
+
+    const terms = normalize(query).split(/[^a-z0-9]+/).filter(term=>term.length>=2);
+    if (terms.length > 1) {
+      const hay = normalize([
+        track.title,track.artist,track.album,track.label,track.isrc,
+        track.catalog,track.composer,track.publisher,...track.tags
+      ].join(' '));
+      const matched = terms.filter(term=>hay.includes(term)).length;
+      if (matched) best += matched*16;
+      if (matched === terms.length) best += 28;
+    }
+
+    return best;
+  }
+
+  function rankGlobal(raw) {
+    return DEMO.map((track,index)=>{
+      if (!scopeAllowsTrack(track)) return null;
+      const queryScore = globalTrackScore(track,raw);
+      if (!queryScore) return null;
+      const criteria = activeCriteriaScore(track);
+      if (!criteria.valid) return null;
+      return {...track,score:queryScore+criteria.score,index};
+    }).filter(Boolean)
+      .sort((a,b)=>b.score-a.score || a.index-b.index);
+  }
+
+  function clearLiveMetadataResults() {
+    q('.bridge-live-results-shell')?.remove();
+    q('.page')?.classList.remove('bridge-live-filtering');
+    state.liveMetaActive = false;
+  }
+
+  function createLiveResultsShell() {
+    clearLiveMetadataResults();
+    const area = searchArea();
+    const page = q('.page');
+    if (!area || !page) return null;
+
+    const shell = document.createElement('section');
+    shell.className = 'results bridge-live-results-shell';
+    area.insertAdjacentElement('afterend',shell);
+    page.classList.add('bridge-live-filtering');
+    state.liveMetaActive = true;
+    return shell;
+  }
+
+  function appendGroup(host, title, detail, pill, rows, alt=false) {
+    if (!rows.length) return;
+    const head = document.createElement('div');
+    head.className = `bridge-group-head ${alt ? 'alt' : ''}`;
+    head.innerHTML = `<strong>${title}</strong><span class="bridge-group-detail">${detail}</span><span class="bridge-result-pill">${pill}</span>`;
+    host.appendChild(head);
+    rows.forEach(track => host.appendChild(demoRow(track)));
+  }
+
+  function renderMetadataSearch(type, value, frozen=false) {
+    if (!value) {
+      clearLiveMetadataResults();
+      return;
+    }
+
+    const root = createLiveResultsShell();
+    if (!root) return;
+
+    const container = document.createElement('div');
+    container.className = 'bridge-results-live';
+
+    const header = document.createElement('div');
+    header.className = 'bridge-list-head';
+    header.innerHTML = '<span></span><span>Track</span><span>Album</span><span>Duration</span><span>Added</span><span>Hubs</span><span></span>';
+    container.appendChild(header);
+
+    const exact = rankMetadata(value,type)
+      .filter(track=>activeCriteriaScore(track).valid)
+      .slice(0,10);
+
+    if (exact.length) {
+      appendGroup(
+        container,
+        frozen ? (type ? `${type} matches` : 'Metadata matches') : 'Live metadata results',
+        `${exact.length} ${exact.length===1?'title':'titles'} matching ${type ? `${type}: ${value}` : `“${value}”`}`,
+        frozen ? (type || 'Metadata') : 'Live · Metadata',
+        exact,
+        false
+      );
+    } else {
+      const empty = document.createElement('div');
+      empty.className = 'bridge-live-empty';
+      empty.innerHTML = `<strong>No metadata match yet</strong><span>Keep typing or choose a Smart Suggestion above.</span>`;
+      container.appendChild(empty);
+    }
+
+    // Alternatives belong to a validated/frozen search, not to the live keystroke preview.
+    if (frozen) {
+      const used = new Set(exact.map(x => x.title));
+      const alternatives = fallbackRank(value).filter(x => !used.has(x.title)).slice(0,Math.max(0,10-exact.length));
+      if (alternatives.length) {
+        appendGroup(container,'Suggested alternatives',`${alternatives.length} closest available ${alternatives.length===1?'title':'titles'}`,'Not a 100% match',alternatives,true);
+      }
+    }
+
+    root.appendChild(container);
+  }
+
+  function renderGlobalSearch(value, frozen=false) {
+    if (!value) {
+      clearLiveMetadataResults();
+      return;
+    }
+
+    const root = createLiveResultsShell();
+    if (!root) return;
+
+    const container = document.createElement('div');
+    container.className = 'bridge-results-live bridge-global-results';
+
+    const header = document.createElement('div');
+    header.className = 'bridge-list-head';
+    header.innerHTML = '<span></span><span>Track</span><span>Album</span><span>Duration</span><span>Added</span><span>Hubs</span><span></span>';
+    container.appendChild(header);
+
+    const matches = rankGlobal(value).slice(0,10);
+
+    if (matches.length) {
+      appendGroup(
+        container,
+        frozen ? 'Global search' : 'Live results',
+        `${matches.length} ${matches.length===1?'title':'titles'} matching “${value}” across your current search`,
+        frozen ? 'Global' : 'Live',
+        matches,
+        false
+      );
+    } else {
+      const empty = document.createElement('div');
+      empty.className = 'bridge-live-empty';
+      empty.innerHTML = `<strong>No live match yet</strong><span>Keep typing or choose one of the suggestions above.</span>`;
+      container.appendChild(empty);
+    }
+
+    // Only a validated Global search gets alternatives.
+    if (frozen) {
+      const used = new Set(matches.map(x=>x.title));
+      const alternatives = fallbackRank(value)
+        .filter(x=>!used.has(x.title))
+        .slice(0,Math.max(0,10-matches.length));
+      if (alternatives.length) {
+        appendGroup(
+          container,
+          'Suggested alternatives',
+          `${alternatives.length} closest available ${alternatives.length===1?'title':'titles'}`,
+          'Not a 100% match',
+          alternatives,
+          true
+        );
+      }
+    }
+
+    root.appendChild(container);
+  }
+
+  function decorateNativeRow(row) {
+    if (row.dataset.bridgeDecorated === '1') return;
+    const track = q(':scope > .track',row);
     if (!track) return;
 
-    const main = track.querySelector(':scope > .track-main');
-    const title = main?.querySelector('strong')?.textContent?.trim() || 'Track';
-    const album = track.querySelector(':scope > .track-album');
+    const title = q(':scope > .track-main strong',track)?.textContent?.trim() || 'Track';
+    const album = q(':scope > .track-album',track);
     const year = album?.querySelector('span')?.textContent?.trim() || '2026';
 
     const select = document.createElement('input');
     select.type = 'checkbox';
-    select.className = 'v40-select';
-    select.setAttribute('aria-label', `Select ${title}`);
+    select.className = 'bridge-select';
+    select.setAttribute('aria-label',`Select ${title}`);
     track.prepend(select);
 
     const duration = document.createElement('div');
-    duration.className = 'v40-duration';
-    duration.textContent = durationFor(title);
+    duration.className = 'bridge-duration';
+    let n=0; for (const c of title) n=(n*31+c.charCodeAt(0))>>>0;
+    const sec=118+(n%155);
+    duration.textContent=`${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
 
     const added = document.createElement('div');
-    added.className = 'v40-added';
+    added.className = 'bridge-added';
     added.innerHTML = `<span>${year}</span><small>Bridge Search</small>`;
 
     const hubs = document.createElement('div');
-    hubs.className = 'v40-hubs';
-    hubs.appendChild(iconButton('Publish on hubs', SVG.publish));
+    hubs.className = 'bridge-hubs';
+    hubs.appendChild(iconButton('Publish on hubs',SVG.publish));
 
     const actions = document.createElement('div');
-    actions.className = 'v40-actions';
-    actions.appendChild(iconButton('Share', SVG.share));
-    actions.appendChild(iconButton('Track information', SVG.info));
-    actions.appendChild(iconButton('More options', MORE));
+    actions.className = 'bridge-actions';
+    actions.appendChild(iconButton('Share',SVG.share));
+    actions.appendChild(iconButton('Track information',SVG.info));
+    actions.appendChild(iconButton('More options',MORE,'bridge-more'));
 
-    track.append(duration, added, hubs, actions);
-    row.dataset.v40Decorated = '1';
+    track.append(duration,added,hubs,actions);
+    row.dataset.bridgeDecorated='1';
   }
 
-  function normalizeHeading(group, alternative, count) {
-    const head = group.querySelector(':scope > .result-group-head');
-    if (!head) return;
-    if (head.dataset.v40Count === String(count)) return;
-
-    head.innerHTML = '';
-    const strong = document.createElement('strong');
-    strong.textContent = alternative ? 'Suggested alternatives' : 'Perfect matches';
-    head.appendChild(strong);
-
-    const detail = document.createElement('span');
-    detail.className = 'v40-group-detail';
-    detail.textContent = alternative
-      ? `${count} ${count === 1 ? 'title' : 'titles'} · not a 100% match`
-      : `${count} ${count === 1 ? 'title' : 'titles'} matching all required criteria`;
-    head.appendChild(detail);
-
-    if (alternative) {
-      const pill = document.createElement('span');
-      pill.className = 'v40-alt-pill';
-      pill.textContent = 'Alternative';
-      head.appendChild(pill);
+  function ensureNativeHeader(firstGroup) {
+    if (!firstGroup) {
+      qa('.bridge-list-head.native').forEach(x=>x.remove());
+      return;
     }
-    head.dataset.v40Count = String(count);
-  }
 
-  function ensureHeader(firstGroup) {
-    document.querySelectorAll('.v40-bridge-head').forEach(h => h.remove());
-    if (!firstGroup) return;
-    const list = firstGroup.querySelector(':scope > .track-list');
+    const list = q(':scope > .track-list',firstGroup);
     if (!list) return;
-    const head = document.createElement('div');
-    head.className = 'v40-bridge-head';
-    head.innerHTML = '<span></span><span>Track</span><span>Album</span><span>Duration</span><span>Added</span><span>Hubs</span><span></span>';
-    list.before(head);
+
+    const current = q(':scope > .bridge-list-head.native',firstGroup);
+    qa('.bridge-list-head.native').forEach(x => {
+      if (x !== current) x.remove();
+    });
+
+    if (current) return;
+
+    const header = document.createElement('div');
+    header.className='bridge-list-head native';
+    header.innerHTML='<span></span><span>Track</span><span>Album</span><span>Duration</span><span>Added</span><span>Hubs</span><span></span>';
+    list.before(header);
   }
 
-  function enhanceResults() {
-    const exactGroup = document.querySelector('.result-group.exact-group');
-    const altGroup = document.querySelector('.result-group.alternative-group');
+  function normalizeGroupHeading(group, isAlt, count) {
+    const head = q(':scope > .result-group-head',group);
+    if (!head) return;
+    const signature = `${isAlt?'alt':'exact'}:${count}`;
+    if (head.dataset.bridgeHeadingSignature === signature) return;
 
-    const exactRows = exactGroup ? [...exactGroup.querySelectorAll(':scope .track-list > .track-result')] : [];
-    const altRows = altGroup ? [...altGroup.querySelectorAll(':scope .track-list > .track-result')] : [];
+    head.className = `bridge-group-head ${isAlt?'alt':''}`;
+    head.innerHTML = `<strong>${isAlt?'Suggested alternatives':'Perfect matches'}</strong>
+      <span class="bridge-group-detail">${isAlt ? `${count} closest available ${count===1?'title':'titles'}` : `${count} ${count===1?'title':'titles'} matching all required criteria`}</span>
+      <span class="bridge-result-pill">${isAlt?'Not a 100% match':'Perfect'}</span>`;
+    head.dataset.bridgeHeadingSignature = signature;
+  }
 
-    // The app already ranks the rows. Keep that order and cap the combined list at 10.
-    const exactShown = exactRows.slice(0, 10);
-    const remaining = Math.max(0, 10 - exactShown.length);
-    const altShown = altRows.slice(0, remaining);
+  function enhanceNativeResults() {
+    if (state.liveMetaActive) return;
+    const root = results();
+    if (!root) return;
 
-    exactRows.forEach(r => r.style.display = exactShown.includes(r) ? '' : 'none');
-    altRows.forEach(r => r.style.display = altShown.includes(r) ? '' : 'none');
+    const exactGroup = q('.result-group.exact-group',root);
+    const altGroup = q('.result-group.alternative-group',root);
+    const exactRows = exactGroup ? qa(':scope .track-list > .track-result',exactGroup) : [];
+    const altRows = altGroup ? qa(':scope .track-list > .track-result',altGroup) : [];
 
-    exactShown.forEach(decorateRow);
-    altShown.forEach(decorateRow);
+    const exactShown = exactRows.slice(0,10);
+    const remaining = Math.max(0,10-exactShown.length);
+    const altShown = altRows.slice(0,remaining);
+
+    exactRows.forEach(row => row.style.display = exactShown.includes(row) ? '' : 'none');
+    altRows.forEach(row => row.style.display = altShown.includes(row) ? '' : 'none');
+
+    exactShown.forEach(decorateNativeRow);
+    altShown.forEach(decorateNativeRow);
 
     if (exactGroup) {
       exactGroup.style.display = exactShown.length ? '' : 'none';
-      if (exactShown.length) normalizeHeading(exactGroup, false, exactShown.length);
+      if (exactShown.length) normalizeGroupHeading(exactGroup,false,exactShown.length);
     }
     if (altGroup) {
       altGroup.style.display = altShown.length ? '' : 'none';
-      if (altShown.length) normalizeHeading(altGroup, true, altShown.length);
+      if (altShown.length) normalizeGroupHeading(altGroup,true,altShown.length);
     }
 
-    const first = exactShown.length ? exactGroup : (altShown.length ? altGroup : null);
-    ensureHeader(first);
+    const total = exactShown.length + altShown.length;
+    if (total < 10) {
+      let demoGroup = q('.bridge-native-fallback',root);
+      const used = new Set([...exactShown,...altShown].map(row => q('.track-main strong',row)?.textContent?.trim()).filter(Boolean));
+      const query = mainInput()?.value || '';
+      const demos = fallbackRank(query).filter(track => !used.has(track.title)).slice(0,10-total);
+      const signature = JSON.stringify({
+        query,
+        used:[...used].sort(),
+        demos:demos.map(track=>track.title)
+      });
+
+      if (demos.length) {
+        if (demoGroup?.dataset.bridgeFallbackSignature !== signature) {
+          demoGroup?.remove();
+          demoGroup = document.createElement('div');
+          demoGroup.className='bridge-native-fallback';
+          demoGroup.dataset.bridgeFallbackSignature = signature;
+          appendGroup(demoGroup,'Suggested alternatives',`${demos.length} closest available ${demos.length===1?'title':'titles'}`,'Not a 100% match',demos,true);
+          root.appendChild(demoGroup);
+        }
+      } else {
+        demoGroup?.remove();
+      }
+    } else {
+      q('.bridge-native-fallback',root)?.remove();
+    }
+
+    ensureNativeHeader(exactShown.length ? exactGroup : (altShown.length ? altGroup : q('.bridge-native-fallback',root)));
   }
 
-  let scheduled = false;
-  const scheduleEnhance = () => {
-    if (scheduled) return;
-    scheduled = true;
-    requestAnimationFrame(() => {
-      scheduled = false;
-      enhanceResults();
-    });
-  };
+  /* ---------------------------------------------------------
+     Options menu
+     --------------------------------------------------------- */
+  function closeMenu() {
+    state.menu?.remove();
+    state.menu=null;
+  }
 
-  // Only observe DOM additions/removals from React. No attribute observer,
-  // so this cannot create the feedback loops seen in V37/V38.
-  const observer = new MutationObserver(scheduleEnhance);
-  observer.observe(document.getElementById('root') || document.body, {
-    subtree: true,
-    childList: true
-  });
+  function openMenu(button) {
+    closeMenu();
+    const menu=document.createElement('div');
+    menu.className='bridge-options-menu';
+    const items=[
+      ['download','Download'],['replace','Replace audio'],['publish','Publish on hubs'],
+      ['message','Message'],['email','Send by email'],['move','Move to folder'],
+      ['info','Track information'],['share','Share'],['divider',''],['trash','Delete','danger']
+    ];
+    menu.innerHTML=items.map(item => item[0]==='divider'
+      ? '<div class="bridge-option-divider"></div>'
+      : `<button type="button" class="bridge-option ${item[2]||''}">${SVG[item[0]]}<span>${item[1]}</span></button>`).join('');
+    document.body.appendChild(menu);
+    const r=button.getBoundingClientRect(), w=210;
+    menu.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+'px';
+    const h=menu.offsetHeight||370;
+    menu.style.top=(r.bottom+6+h>innerHeight ? Math.max(8,r.top-h-6) : r.bottom+6)+'px';
+    state.menu=menu;
+  }
 
-  window.addEventListener('load', scheduleEnhance);
-  scheduleEnhance();
-})();
-</script>
+  /* ---------------------------------------------------------
+     Voice — ONE implementation
+     --------------------------------------------------------- */
+  function stopVoice(commit) {
+    const voice=state.voice;
+    if (!voice) return;
+    voice.finishing=true;
+    try { commit ? voice.recognition.stop() : voice.recognition.abort(); } catch {}
+    if (commit) setReactInputValue(voice.input, voice.value());
+    voice.box.classList.remove('bridge-recording');
+    q('.bridge-live-transcript',voice.box)?.remove();
+    q('.bridge-record-controls',voice.box)?.remove();
+    state.voice=null;
+    requestAnimationFrame(()=>voice.input.focus());
+  }
 
+  function startVoice(button) {
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if (!SR) return;
 
-<script id="v49-results-fallback">
-(() => {
-  function getGroups() {
-    return {
-      exact: document.querySelector('.result-group.exact-group'),
-      alt: document.querySelector('.result-group.alternative-group')
+    const box=button.closest('.search-box');
+    const input=q('.input-flow input',box);
+    if (!box||!input) return;
+    if (state.voice) stopVoice(false);
+
+    const base=input.value||'';
+    let finalText='', interimText='';
+    const value=()=>[base.trim(),(finalText+' '+interimText).replace(/\s+/g,' ').trim()].filter(Boolean).join(' ');
+
+    box.classList.add('bridge-recording');
+
+    const mirror=document.createElement('div');
+    mirror.className='bridge-live-transcript placeholder';
+    mirror.textContent=base||'Listening…';
+    q('.input-flow',box).appendChild(mirror);
+
+    const controls=document.createElement('div');
+    controls.className='bridge-record-controls';
+    controls.innerHTML=`
+      <button type="button" class="bridge-record-cancel" aria-label="Cancel recording">
+        <svg viewBox="0 0 20 20" width="16" height="16"><path d="M5.4 5.4l9.2 9.2m0-9.2-9.2 9.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+      <button type="button" class="bridge-record-confirm" aria-label="Validate recording">
+        <svg viewBox="0 0 20 20" width="16" height="16"><path d="M4.4 10.4l3.3 3.3 7.9-8.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>`;
+    box.appendChild(controls);
+
+    const recognition=new SR();
+    recognition.lang=navigator.language?.startsWith('fr')?'fr-FR':'en-US';
+    recognition.interimResults=true;
+    recognition.continuous=true;
+
+    state.voice={box,input,recognition,finishing:false,value};
+
+    recognition.onresult=event=>{
+      interimText='';
+      for(let i=event.resultIndex;i<event.results.length;i++){
+        const part=event.results[i][0]?.transcript||'';
+        if(event.results[i].isFinal) finalText+=part+' ';
+        else interimText+=part;
+      }
+      const live=value();
+      mirror.textContent=live||'Listening…';
+      mirror.classList.toggle('placeholder',!live);
     };
+    recognition.onerror=event=>{
+      if(event.error!=='aborted') stopVoice(false);
+    };
+    recognition.onend=()=>{
+      if(!state.voice||state.voice.finishing) return;
+      try { recognition.start(); } catch { stopVoice(true); }
+    };
+
+    q('.bridge-record-cancel',controls).onclick=event=>{event.preventDefault();event.stopPropagation();stopVoice(false)};
+    q('.bridge-record-confirm',controls).onclick=event=>{event.preventDefault();event.stopPropagation();stopVoice(true)};
+
+    try { recognition.start(); } catch { stopVoice(false); }
   }
 
-  function visibleRows(group) {
-    if (!group) return [];
-    return [...group.querySelectorAll('.track-result')].filter(r => r.style.display !== 'none');
+  /* ---------------------------------------------------------
+     Precise Filter helpers
+     --------------------------------------------------------- */
+  function closeFilters() {
+    const panel=q('.filter-panel');
+    const close=q('.filter-panel-head > button',panel);
+    close?.click();
   }
-
-  function allRows(group) {
-    if (!group) return [];
-    return [...group.querySelectorAll('.track-result')];
+  function visibleFilterTags() {
+    return qa('.filter-panel .tag-family-items > button').filter(button =>
+      !button.disabled && button.getClientRects().length && getComputedStyle(button).visibility!=='hidden'
+    );
   }
-
-  function ensureFallback() {
-    const { exact, alt } = getGroups();
-    if (!exact && !alt) return;
-
-    const exactVisible = visibleRows(exact);
-    const altVisible = visibleRows(alt);
-
-    // Existing UX already has enough titles: leave it completely untouched.
-    if (exactVisible.length + altVisible.length >= 10) return;
-
-    const exactAll = allRows(exact);
-    const altAll = allRows(alt);
-
-    // Preserve the ranking produced by the existing engine.
-    const exactShown = exactAll.slice(0, 10);
-    const remaining = Math.max(0, 10 - exactShown.length);
-    const altShown = altAll.slice(0, remaining);
-
-    exactAll.forEach(r => {
-      r.style.display = exactShown.includes(r) ? '' : 'none';
-    });
-
-    altAll.forEach(r => {
-      r.style.display = altShown.includes(r) ? '' : 'none';
-    });
-
-    // If the engine produced zero exact matches, make the alternative section explicit.
-    if (exact && exactShown.length === 0) {
-      exact.style.display = 'none';
-    }
-
-    if (alt) {
-      alt.style.display = altShown.length ? '' : 'none';
-
-      if (altShown.length) {
-        const head = alt.querySelector('.result-group-head');
-        if (head) {
-          head.innerHTML = `
-            <strong>Suggested alternatives</strong>
-            <span class="v49-alt-copy">${altShown.length} ${altShown.length === 1 ? 'title' : 'titles'} · closest available matches</span>
-            <span class="v49-alt-pill">Not a 100% match</span>
-          `;
-        }
-      }
-    }
-
-    // Last-resort fallback:
-    // if React has no rows at all in the alternative group, reuse its ranked exact rows
-    // as alternatives rather than displaying an empty result state.
-    if (exactShown.length === 0 && altShown.length === 0 && exactAll.length) {
-      if (alt) {
-        const list = alt.querySelector('.track-list');
-        exactAll.slice(0, 10).forEach(row => {
-          const clone = row.cloneNode(true);
-          clone.style.display = '';
-          list?.appendChild(clone);
-        });
-        alt.style.display = '';
-        const head = alt.querySelector('.result-group-head');
-        if (head) {
-          head.innerHTML = `
-            <strong>Suggested alternatives</strong>
-            <span class="v49-alt-copy">Closest available titles</span>
-            <span class="v49-alt-pill">Not a 100% match</span>
-          `;
-        }
-      }
-    }
-  }
-
-  let scheduled = false;
-  function schedule() {
-    if (scheduled) return;
-    scheduled = true;
-    requestAnimationFrame(() => {
-      scheduled = false;
-      ensureFallback();
+  function updateFilterMatches() {
+    const input=q('.filter-panel .tag-browser-search input');
+    const query=normalize(input?.value);
+    qa('.filter-panel .tag-family-items > button').forEach(button=>{
+      const text=normalize(button.textContent);
+      button.classList.toggle('bridge-query-match',!!query&&text.includes(query));
     });
   }
 
-  const root = document.getElementById('root') || document.body;
-  const observer = new MutationObserver(schedule);
-  observer.observe(root, { childList: true, subtree: true });
+  /* ---------------------------------------------------------
+     Unified events — NO duplicate listeners elsewhere
+     --------------------------------------------------------- */
 
-  window.addEventListener('load', schedule);
-  schedule();
-})();
-</script>
-
-
-<script id="v50-guaranteed-results">
-(() => {
-  const DEMO = [
-    {title:'I Heard You Like What You Can’t Have',artist:'Elle Lexxa',album:'Single',duration:'3:26',tags:['female','girl power','energetic','pop','english']},
-    {title:'Cinematic Rise',artist:'North Atlas',album:'Trailer Works',duration:'2:41',tags:['trailer','massive','instrumental','build up','contrasts']},
-    {title:'Little by Little',artist:'The Marías',album:'CINEMA',duration:'2:58',tags:['female','laidback','cool','pop','english','calm']},
-    {title:'Golden Solitude',artist:'Bridge Catalog',album:'Quiet Shapes',duration:'1:53',tags:['instrumental','piano','calm','acoustic','60s']},
-    {title:'Saudade Azul',artist:'Lia Monte',album:'Maré Baixa',duration:'3:12',tags:['bossa nova','female','portuguese','sweet voice','laidback','acoustic']},
-    {title:'Soft Summer',artist:'Nina Vale',album:'Sunday Light',duration:'2:47',tags:['female','sweet voice','calm','acoustic','60s','english']},
-    {title:'Heroic Impact',artist:'Arc Motion',album:'Massive Frames',duration:'2:16',tags:['trailer','massive','epic','orchestra','instrumental']},
-    {title:'Come Online',artist:'Kid Francescoli',album:'Play Me Again',duration:'2:38',tags:['electro pop','synth','up tempo','cool']},
-    {title:'Kiss',artist:'Betty Novallis · Deise Mikhail',album:'Songs I Love',duration:'4:25',tags:['female','romantic','pop','english']},
-    {title:'Glass Horizon',artist:'Mira Vale',album:'Silver Lines',duration:'3:19',tags:['instrumental','contrasts','piano','build up','calm']},
-    {title:'Bossa Morning',artist:'Clara Nunesque',album:'Rio Sketches',duration:'2:54',tags:['bossa nova','female','portuguese','acoustic','laidback','sweet voice']},
-    {title:'Velvet Afternoon',artist:'June Harper',album:'Soft Focus',duration:'3:05',tags:['female','sweet voice','laidback','calm','60s','english']},
-    {title:'Neon Confidence',artist:'Maya Bloom',album:'Forward',duration:'2:51',tags:['female','girl power','energetic','confident','up tempo']},
-    {title:'Quiet Coast',artist:'Ana Luz',album:'Mar Azul',duration:'3:34',tags:['bossa nova','portuguese','calm','acoustic','laidback']},
-    {title:'Contrast Theory',artist:'Frame Unit',album:'Motion',duration:'2:29',tags:['instrumental','contrasts','trailer','build up']}
-  ];
-
-  function currentTerms(){
-    const input = document.querySelector('.search-box .input-flow input');
-    const text = (input?.value || '').toLowerCase();
-    const chips = [...document.querySelectorAll('.chip,.token,.selected-tag')]
-      .map(x => x.textContent.toLowerCase()).join(' ');
-    return (text+' '+chips).split(/[^a-z0-9]+/).filter(x=>x.length>2);
-  }
-
-  function rankDemo(){
-    const terms = currentTerms();
-    return DEMO.map((t,i)=>{
-      const hay = [t.title,t.artist,t.album,...t.tags].join(' ').toLowerCase();
-      let score = 0;
-      for(const term of terms){
-        if(hay.includes(term)) score += 5;
-        for(const tag of t.tags){
-          if(tag.includes(term) || term.includes(tag)) score += 2;
-        }
-      }
-      if(!terms.length) score = DEMO.length-i;
-      return {...t,score,i};
-    }).sort((a,b)=>b.score-a.score || a.i-b.i).slice(0,10);
-  }
-
-  function ensureAltGroup(container){
-    let group = container.querySelector('.result-group.alternative-group');
-    if(group) return group;
-    group = document.createElement('div');
-    group.className = 'result-group alternative-group';
-    group.innerHTML = `
-      <div class="result-group-head">
-        <strong>Suggested alternatives</strong>
-        <span class="v49-alt-copy">Closest available matches</span>
-        <span class="v49-alt-pill">Not a 100% match</span>
-      </div>
-      <div class="track-list"></div>`;
-    container.appendChild(group);
-    return group;
-  }
-
-  function makeRow(t){
-    const row = document.createElement('div');
-    row.className = 'track-result v50-demo-row';
-    row.innerHTML = `
-      <div class="track">
-        <input type="checkbox" class="v40-select" aria-label="Select ${t.title}">
-        <div class="art" style="width:40px;height:40px;min-width:40px;max-width:40px;aspect-ratio:1/1;border-radius:4px;background:#252428;display:grid;place-items:center;color:#fff;">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 7.5v9l7-4.5-7-4.5Z"/></svg>
-        </div>
-        <div class="track-main"><strong>${t.title}</strong><span>${t.artist}</span></div>
-        <div class="track-album"><strong>${t.album}</strong></div>
-        <div class="v40-duration">${t.duration}</div>
-        <div class="v40-added"><span>Demo catalog</span><small>Bridge Search</small></div>
-        <div class="v40-hubs"></div>
-        <div class="v40-actions"></div>
-      </div>`;
-    return row;
-  }
-
-  function guaranteedFill(){
-    const results = document.querySelector('.results');
-    if(!results) return;
-
-    let body = results.querySelector('.result-groups,.results-groups,.results-list');
-    if(!body){
-      // fallback to the common parent holding result groups
-      body = results;
+  // Click-out: only outside entire search area. Internal metadata clicks stay usable.
+  document.addEventListener('pointerdown', event => {
+    const area=searchArea();
+    if (area && !area.contains(event.target)) {
+      closeSuggestions();
+      const panel=q('.filter-panel');
+      if (panel) closeFilters();
     }
-
-    const existingVisible = [...results.querySelectorAll('.track-result')]
-      .filter(r => r.style.display !== 'none');
-
-    if(existingVisible.length >= 10) return;
-
-    const group = ensureAltGroup(body);
-    const list = group.querySelector('.track-list');
-    if(!list) return;
-
-    // remove prior generated rows before recomputing
-    list.querySelectorAll('.v50-demo-row').forEach(r=>r.remove());
-
-    const needed = 10 - existingVisible.length;
-    const usedTitles = new Set(existingVisible.map(r =>
-      r.querySelector('.track-main strong')?.textContent?.trim()
-    ).filter(Boolean));
-
-    const candidates = rankDemo().filter(t => !usedTitles.has(t.title)).slice(0,needed);
-    candidates.forEach(t => list.appendChild(makeRow(t)));
-
-    if(candidates.length){
-      group.style.display = '';
-      const head = group.querySelector('.result-group-head');
-      if(head){
-        head.innerHTML = `
-          <strong>Suggested alternatives</strong>
-          <span class="v49-alt-copy">${candidates.length} ${candidates.length===1?'title':'titles'} · closest available matches</span>
-          <span class="v49-alt-pill">Not a 100% match</span>`;
-      }
-    }
-  }
-
-  let timer;
-  function schedule(){
-    clearTimeout(timer);
-    timer = setTimeout(guaranteedFill, 80);
-  }
-
-  document.addEventListener('input', schedule, true);
-  document.addEventListener('click', schedule, true);
-  document.addEventListener('keydown', e => {
-    if(e.key === 'Enter') setTimeout(guaranteedFill, 100);
+    if (state.menu && !event.target.closest('.bridge-options-menu') && !event.target.closest('.bridge-more')) closeMenu();
   }, true);
 
-  const root = document.getElementById('root') || document.body;
-  const obs = new MutationObserver(schedule);
-  obs.observe(root,{subtree:true,childList:true});
+  // Main input: one ranked suggestion list + Global Live filter.
+  document.addEventListener('input', event => {
+    const target=event.target;
+    if (target.matches?.('.search-box .input-flow input')) {
+      const raw=target.value.trim();
 
-  window.addEventListener('load',()=>setTimeout(guaranteedFill,120));
+      if (raw) {
+        openSuggestions();
+        state.keyboardIndex=-1;
+      } else if (!state.scope) {
+        closeSuggestions();
+      }
+
+      if (raw.length >= 3) {
+        // Until the user explicitly chooses a suggestion, raw text is a
+        // temporary Global Live filter across metadata + tags, layered on
+        // top of all already-selected explicit criteria.
+        renderGlobalSearch(raw,false);
+      } else if (state.scope) {
+        // Keep the previously validated explicit selection visible until
+        // the new raw query reaches the live threshold.
+        if (state.scope.type === 'global') {
+          renderGlobalSearch(state.scope.value,true);
+        } else {
+          renderMetadataSearch(state.scope.type,state.scope.value,true);
+        }
+      } else {
+        clearLiveMetadataResults();
+      }
+
+      closeFilters();
+      return;
+    }
+    if (target.matches?.('.filter-panel .tag-browser-search input')) {
+      requestAnimationFrame(updateFilterMatches);
+    }
+  }, true);
+
+  document.addEventListener('focusin', event => {
+    if (!event.target.matches?.('.search-box .input-flow input')) return;
+    const raw=event.target.value.trim();
+    if (raw || !state.scope) openSuggestions();
+  }, true);
+
+  // Keyboard owns the ranked suggestions; Enter accepts the first choice by default.
+  document.addEventListener('keydown', event => {
+    const target=event.target;
+    if (!(target instanceof Element)) return;
+
+    const panel=target.closest('.filter-panel');
+    if (panel) {
+      const search=target.matches('.tag-browser-search input');
+      const tag=target.closest('.tag-family-items > button');
+      if (event.key==='Escape') {
+        event.preventDefault(); event.stopPropagation();
+        closeFilters(); q('.filter-button')?.focus?.(); return;
+      }
+      const items=visibleFilterTags();
+      if (search && (event.key==='ArrowDown'||event.key==='ArrowUp')) {
+        event.preventDefault(); event.stopPropagation();
+        const item=event.key==='ArrowDown'?items[0]:items[items.length-1];
+        item?.focus({preventScroll:true}); item?.scrollIntoView({block:'nearest'}); return;
+      }
+      if (tag && (event.key==='ArrowDown'||event.key==='ArrowUp')) {
+        event.preventDefault(); event.stopPropagation();
+        let index=items.indexOf(tag);
+        index=(index+(event.key==='ArrowDown'?1:-1)+items.length)%items.length;
+        items[index]?.focus({preventScroll:true}); items[index]?.scrollIntoView({block:'nearest'}); return;
+      }
+      return;
+    }
+
+    if (!target.matches('.search-box .input-flow input')) return;
+
+    if (event.key==='Backspace' && !target.value) {
+      const criteria = qa('.search-box .criterion');
+      const last = criteria[criteria.length-1];
+      const remove = last ? q('.criterion-remove',last) : null;
+
+      if (remove) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        remove.click();
+        state.keyboardIndex=-1;
+        requestAnimationFrame(() => {
+          target.focus();
+          openSuggestions();
+          syncRankedDropdown();
+        });
+        return;
+      }
+
+      if (state.scope) {
+        event.preventDefault();
+        event.stopPropagation();
+        const previous=state.scope;
+        state.scope=null;
+        clearScopeChip();
+        clearLiveMetadataResults();
+        setReactInputValue(target,previous.value||'');
+        target.focus();
+        return;
+      }
+    }
+
+    const choices=visibleChoices();
+    if (event.key==='ArrowDown' && choices.length) {
+      event.preventDefault(); event.stopPropagation();
+      openSuggestions(); setKeyboardActive(state.keyboardIndex+1); return;
+    }
+    if (event.key==='ArrowUp' && choices.length) {
+      event.preventDefault(); event.stopPropagation();
+      openSuggestions(); setKeyboardActive(state.keyboardIndex<=0?choices.length-1:state.keyboardIndex-1); return;
+    }
+    if (event.key==='Enter' && !event.isComposing) {
+      const raw=target.value.trim();
+
+      if (choices.length) {
+        event.preventDefault();
+        event.stopPropagation();
+        const index = state.keyboardIndex >= 0 ? state.keyboardIndex : 0;
+        choices[index]?.click();
+        clearKeyboardActive();
+        return;
+      }
+
+      // Defensive fallback: if React has not rendered the dropdown yet,
+      // Global is the only safe interpretation.
+      if (raw) {
+        event.preventDefault();
+        event.stopPropagation();
+        freezeGlobalSearch(raw);
+        return;
+      }
+    }
+    if (event.key==='Escape') closeSuggestions();
+  }, true);
+
+  // Main search arrow mirrors Enter: validate the best interpretation.
+  document.addEventListener('click', event => {
+    const button=event.target.closest?.('.search-button');
+    if (button) {
+      const raw=mainInput()?.value.trim();
+      if (raw) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        const choices=visibleChoices();
+        if (choices.length) {
+          const index = state.keyboardIndex >= 0 ? state.keyboardIndex : 0;
+          choices[index]?.click();
+          clearKeyboardActive();
+        } else {
+          freezeGlobalSearch(raw);
+        }
+        return;
+      }
+    }
+
+    const nativeSuggestion=event.target.closest?.('.suggestions:not([data-bridge-owned="true"]) > button');
+    if (nativeSuggestion) {
+      clearLiveMetadataResults();
+      state.keyboardIndex=-1;
+      requestAnimationFrame(() => {
+        mainInput()?.focus();
+        openSuggestions();
+        syncRankedDropdown();
+      });
+    }
+
+    const filterTag=event.target.closest?.('.filter-panel .tag-family-items > button');
+    if (filterTag) {
+      filterTag.classList.remove('bridge-feedback');
+      void filterTag.offsetWidth;
+      filterTag.classList.add('bridge-feedback');
+      setTimeout(()=>filterTag.classList.remove('bridge-feedback'),220);
+    }
+
+    const voice=event.target.closest?.('.voice-button');
+    if (voice) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      startVoice(voice);
+      return;
+    }
+
+    const more=event.target.closest?.('.bridge-more');
+    if (more) {
+      event.preventDefault();
+      event.stopPropagation();
+      openMenu(more);
+    }
+  }, true);
+
+  // MutationObserver is presentation-only: inject metadata after React redraw,
+  // enhance result rows, never dispatches input/keyboard events.
+  let scheduled=false;
+  const observer=new MutationObserver(()=>{
+    if (scheduled) return;
+    scheduled=true;
+    requestAnimationFrame(()=>{
+      scheduled=false;
+      if (state.scope) renderScopeChip();
+
+      const raw=mainInput()?.value.trim() || '';
+      if (raw || !state.scope) {
+        syncRankedDropdown();
+      } else {
+        ownedSuggestions()?.remove();
+      }
+
+      tuneMobileSuggestionCount();
+      enhanceNativeResults();
+      updateFilterMatches();
+    });
+  });
+  observer.observe(q('#root')||document.body,{subtree:true,childList:true});
+
+  window.addEventListener('resize',()=> {
+    tuneMobileSuggestionCount();
+    const raw=mainInput()?.value.trim() || '';
+    if (raw || !state.scope) syncRankedDropdown();
+  });
+  window.addEventListener('load',()=>{
+    enhanceNativeResults();
+    updateFilterMatches();
+  });
 })();
 </script>
 
