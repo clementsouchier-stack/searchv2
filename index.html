@@ -188,73 +188,6 @@
   color:#777481;
 }
 
-/* ----- Voice recording: live text mirror + controls at far right ----- */
-.search-box.bridge-recording {
-  position:relative !important;
-}
-.search-box.bridge-recording .input-flow {
-  position:relative !important;
-  min-width:0 !important;
-  padding-right:92px !important;
-}
-.search-box.bridge-recording .input-flow input {
-  opacity:0 !important;
-  pointer-events:none !important;
-}
-.bridge-live-transcript {
-  position:absolute;
-  inset:0 92px 0 0;
-  min-width:0;
-  display:flex;
-  align-items:center;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-  color:var(--primaryDarkContent,#252428);
-  pointer-events:none;
-}
-.bridge-live-transcript.placeholder { color:#9b98a1; }
-.search-box.bridge-recording > .voice-button,
-.search-box.bridge-recording > .filter-button,
-.search-box.bridge-recording > .search-button {
-  display:none !important;
-}
-.bridge-record-controls {
-  position:absolute;
-  top:50%;
-  right:8px;
-  transform:translateY(-50%);
-  display:flex;
-  align-items:center;
-  gap:6px;
-  z-index:50;
-}
-.bridge-record-controls button {
-  position:static;
-  width:38px;
-  min-width:38px;
-  height:38px;
-  padding:0;
-  margin:0;
-  border-radius:9px;
-  display:grid;
-  place-items:center;
-}
-.bridge-record-cancel {
-  border:1px solid #e1e0e4;
-  background:#fff;
-  color:#64616a;
-}
-.bridge-record-confirm {
-  border:0;
-  background:#252428;
-  color:#fff;
-}
-.search-area:has(.search-box.bridge-recording) > .suggestions,
-.search-area:has(.search-box.bridge-recording) > .filter-panel {
-  display:none !important;
-}
-
 /* ----- Results: Bridge list ----- */
 .bridge-results-live {
   margin-top:14px;
@@ -696,15 +629,6 @@
     padding:0 6px;
     font-size:8px;
   }
-
-  .search-box.bridge-recording .input-flow { padding-right:88px !important; }
-  .bridge-live-transcript { inset-right:88px; }
-  .bridge-record-controls { right:6px; gap:4px; }
-  .bridge-record-controls button {
-    width:38px;
-    min-width:38px;
-    height:38px;
-  }
 }
 @media (max-width:390px) {
   .page { padding-left:6px !important; padding-right:6px !important; }
@@ -759,6 +683,7 @@
 .suggestions.bridge-ranked-mode > button{
   display:none !important;
 }
+.suggestions.bridge-suppress-suggestions{display:none!important}
 .bridge-ranked-section{
   display:grid;
   gap:1px;
@@ -846,6 +771,506 @@
 .bridge-ranked-row:last-child .bridge-meta-type{
   background:#f3f3f5;
   color:#5e5b66;
+}
+
+
+/* =========================================================
+   V68 — Product feedback consolidation
+   ========================================================= */
+
+/* Search composer — one line by default, max two lines when needed.
+   All validated methods stay inside the composer. */
+.search-box{
+  width:100%!important;
+  min-height:52px!important;
+  height:auto!important;
+  max-height:84px!important;
+  display:flex!important;
+  align-items:center!important;
+  flex-wrap:nowrap!important;
+  gap:7px!important;
+  padding:6px 7px!important;
+  overflow:visible!important;
+}
+.search-box>svg{
+  flex:0 0 22px!important;
+  width:22px!important;
+  height:22px!important;
+  align-self:center!important;
+  margin:0!important;
+}
+.search-box>.input-flow{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  width:auto!important;
+  min-height:32px!important;
+  max-height:68px!important;
+  display:flex!important;
+  align-items:center!important;
+  align-content:flex-start!important;
+  flex-wrap:wrap!important;
+  gap:4px!important;
+  padding:0!important;
+  margin:0!important;
+  overflow-x:hidden!important;
+  overflow-y:visible!important;
+  scrollbar-width:none!important;
+  scroll-behavior:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior:contain!important;
+  touch-action:pan-y!important;
+}
+.search-box>.input-flow::-webkit-scrollbar{display:none!important}
+.search-box.bridge-composer-overflow>.input-flow{
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+  scroll-behavior:smooth!important;
+  scrollbar-gutter:stable both-edges;
+}
+
+/* Every validated search method stays visible inside the search component. */
+.search-box .criterion,
+.search-box .criterion.mobile-collapsed{
+  display:inline-flex!important;
+  flex:0 0 auto!important;
+  min-height:32px!important;
+  height:32px!important;
+  max-width:190px!important;
+  margin:0!important;
+  align-items:center!important;
+}
+.search-box .source-criterion{
+  max-width:260px!important;
+}
+.search-box .smart-criterion{
+  max-width:210px!important;
+}
+.search-box .criteria-toggle{
+  display:none!important;
+}
+.search-box .criterion-main{
+  min-height:32px!important;
+  height:32px!important;
+  padding-top:0!important;
+  padding-bottom:0!important;
+  display:flex!important;
+  align-items:center!important;
+}
+.search-box .criterion-main>span:nth-child(2),
+.search-box .smart-criterion>strong,
+.search-box .source-copy>strong{
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.search-box .criterion-main>span:nth-child(2){max-width:105px!important}
+.search-box .source-copy{
+  min-width:0!important;
+  max-width:160px!important;
+}
+.search-box .source-copy>small{
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.search-box .youtube-chip-thumb{
+  width:26px!important;
+  min-width:26px!important;
+  height:26px!important;
+}
+.search-box .youtube-chip-thumb img{
+  width:26px!important;
+  height:26px!important;
+  object-fit:cover!important;
+}
+
+.search-box .input-flow input{
+  flex:1 1 145px!important;
+  min-width:105px!important;
+  width:auto!important;
+  height:32px!important;
+  min-height:32px!important;
+  padding-top:0!important;
+  padding-bottom:0!important;
+  margin:0!important;
+  line-height:32px!important;
+  align-self:center!important;
+}
+
+.search-box>.voice-button,
+.search-box>.filter-button,
+.search-box>.search-button{
+  flex:0 0 auto!important;
+  align-self:center!important;
+  margin:0!important;
+}
+.search-box>.voice-button{
+  width:38px!important;
+  min-width:38px!important;
+  height:38px!important;
+}
+.search-box>.filter-button{
+  min-width:38px!important;
+  height:38px!important;
+}
+.search-box>.search-button{
+  width:40px!important;
+  min-width:40px!important;
+  height:40px!important;
+}
+.keyboard-hint{display:none!important}
+
+/* Ranked dropdown: no visible distinction between Smart and Metadata sections. */
+.bridge-ranked-row .bridge-meta-type{
+  text-transform:capitalize;
+}
+.bridge-ranked-row:has(.bridge-meta-type){
+  border:0!important;
+}
+.bridge-ranked-row:last-child{
+  margin-top:5px;
+  border-top:1px solid #ececef!important;
+  border-radius:0 0 9px 9px;
+  padding-top:10px;
+}
+.bridge-ranked-row:last-child .bridge-meta-type{
+  background:#f3f3f5!important;
+  color:#5e5b66!important;
+}
+/* Similarity is unmistakable when a YouTube reference is present. */
+.bridge-ranked-youtube{
+  min-height:56px!important;
+  background:#f8f8ff!important;
+  border:1px solid #e0e2ff!important;
+}
+.bridge-ranked-youtube .bridge-meta-copy small{color:#626fae}
+
+/* Only a compact explanation of tags is shown per result. */
+.bridge-match-tags{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:3px;
+  margin-top:1px;
+  overflow:hidden;
+}
+.bridge-match-tags i,
+.bridge-match-tags b{
+  flex:0 0 auto;
+  max-width:92px;
+  height:14px;
+  padding:0 4px;
+  border-radius:4px;
+  background:#f1f1f4;
+  color:#74717b;
+  display:inline-flex;
+  align-items:center;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:7.5px;
+  line-height:14px;
+  font-style:normal;
+  font-weight:700;
+}
+.bridge-match-tags b{background:#e9eaf0;color:#5e5b66}
+.track-result,
+.track-result > .track,
+.bridge-duration,.bridge-added,.bridge-hubs,.bridge-actions{
+  min-height:58px!important;
+  height:58px!important;
+}
+
+/* Keep the previous compact interpretation treatment. */
+.interpretation{display:none!important}
+
+@media(max-width:760px){
+  .search-box{
+    min-height:52px!important;
+    height:auto!important;
+    max-height:82px!important;
+    gap:4px!important;
+    padding:6px!important;
+  }
+  .search-box>svg{
+    flex-basis:20px!important;
+    width:20px!important;
+    height:20px!important;
+  }
+  .search-box>.input-flow{
+    min-height:32px!important;
+    max-height:66px!important;
+    gap:4px!important;
+  }
+  .search-box .criterion,
+  .search-box .criterion.mobile-collapsed{
+    min-height:31px!important;
+    height:31px!important;
+    max-width:145px!important;
+  }
+  .search-box .source-criterion{max-width:195px!important}
+  .search-box .smart-criterion{max-width:160px!important}
+  .search-box .criterion-main{
+    min-height:31px!important;
+    height:31px!important;
+  }
+  .search-box .criterion-main>span:nth-child(2){max-width:82px!important}
+  .search-box .source-copy{max-width:105px!important}
+  .search-box .youtube-chip-thumb,
+  .search-box .youtube-chip-thumb img{
+    width:25px!important;
+    min-width:25px!important;
+    height:25px!important;
+  }
+  .search-box .input-flow input{
+    flex:1 1 86px!important;
+    min-width:68px!important;
+    height:31px!important;
+    min-height:31px!important;
+    line-height:31px!important;
+    font-size:16px!important;
+  }
+  .search-box>.voice-button,
+  .search-box>.filter-button{
+    width:36px!important;
+    min-width:36px!important;
+    height:36px!important;
+    padding:0!important;
+  }
+  .search-box>.filter-button span{display:none!important}
+  .search-box>.search-button{
+    width:38px!important;
+    min-width:38px!important;
+    height:38px!important;
+    padding:0!important;
+  }
+
+  .bridge-match-tags i:nth-of-type(n+3){display:none}
+  .track-result,
+  .track-result > .track,
+  .bridge-actions{
+    height:62px!important;
+    min-height:62px!important;
+  }
+}
+
+
+/* =========================================================
+   VOICE SESSION — single authoritative recording state
+   The session survives React re-renders of the composer.
+   ========================================================= */
+.search-box.bridge-recording{
+  position:relative!important;
+  min-height:52px!important;
+  height:52px!important;
+  max-height:52px!important;
+  flex-wrap:nowrap!important;
+  align-items:center!important;
+  overflow:visible!important;
+}
+.search-box.bridge-recording>.input-flow{
+  position:relative!important;
+  flex:1 1 auto!important;
+  min-width:0!important;
+  width:auto!important;
+  height:38px!important;
+  min-height:38px!important;
+  max-height:38px!important;
+  flex-wrap:nowrap!important;
+  overflow:hidden!important;
+  padding:0!important;
+}
+.search-box.bridge-recording .input-flow input{
+  opacity:0!important;
+  pointer-events:none!important;
+  caret-color:transparent!important;
+}
+.search-box.bridge-recording>.voice-button,
+.search-box.bridge-recording>.filter-button,
+.search-box.bridge-recording>.search-button,
+.search-box.bridge-recording>[data-bridge-voice-hidden="true"]{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+.bridge-live-transcript{
+  position:absolute!important;
+  inset:0!important;
+  min-width:0!important;
+  display:flex!important;
+  align-items:center!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+  color:var(--primaryDarkContent,#252428)!important;
+  pointer-events:none!important;
+}
+.bridge-live-transcript.placeholder{color:#9b98a1!important}
+.bridge-record-controls{
+  position:static!important;
+  inset:auto!important;
+  transform:none!important;
+  flex:0 0 auto!important;
+  margin:0 0 0 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  z-index:60!important;
+}
+.bridge-record-controls button{
+  position:static!important;
+  width:38px!important;
+  min-width:38px!important;
+  height:38px!important;
+  padding:0!important;
+  margin:0!important;
+  border-radius:9px!important;
+  display:grid!important;
+  place-items:center!important;
+  cursor:pointer!important;
+}
+.bridge-record-cancel{
+  border:1px solid #e1e0e4!important;
+  background:#fff!important;
+  color:#64616a!important;
+}
+.bridge-record-confirm{
+  border:0!important;
+  background:#252428!important;
+  color:#fff!important;
+}
+.search-area:has(.search-box.bridge-recording)>.suggestions,
+.search-area:has(.search-box.bridge-recording)>.filter-panel{
+  display:none!important;
+}
+@media(max-width:760px){
+  .search-box.bridge-recording>.input-flow{
+    height:36px!important;
+    min-height:36px!important;
+    max-height:36px!important;
+  }
+  .bridge-record-controls{gap:4px!important}
+  .bridge-record-controls button{
+    width:36px!important;
+    min-width:36px!important;
+    height:36px!important;
+  }
+}
+
+/* V72 Global Live is an explicit preview state */
+.bridge-live-results-shell.bridge-global-preview{
+  border:1px solid #e4e5ee;
+  border-radius:12px;
+  overflow:hidden;
+  background:#fff;
+}
+.bridge-global-live-banner{
+  min-height:34px;
+  padding:7px 9px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  border-bottom:1px solid #ececf0;
+  background:#f7f8ff;
+}
+.bridge-global-live-banner strong{font-size:11px;color:#3446e4}
+.bridge-global-live-banner span{font-size:10px;color:#777481}
+.bridge-global-live-banner .bridge-live-dot{
+  width:6px;height:6px;border-radius:50%;background:#3446e4;flex:0 0 6px;
+}
+
+/* V72 Year / Period suggestions use the normal ranked-list language */
+.bridge-ranked-row.bridge-date-row .bridge-meta-type{
+  background:#f5f0ff;color:#7052a8;
+}
+
+/* V76 — combined explicit interpretation */
+.bridge-meta-type-combined{
+  background:#17171a!important;
+  color:#fff!important;
+}
+.bridge-ranked-row:has(.bridge-meta-type-combined){
+  background:#fafafa!important;
+}
+.bridge-ranked-row:has(.bridge-meta-type-combined) .bridge-meta-copy strong{
+  font-weight:800!important;
+}
+
+
+/* =========================================================
+   V82 — ONE RESULT RENDERER
+   Native React result groups are hidden data sources only.
+   ========================================================= */
+.page.bridge-results-controlled .results:not(.bridge-live-results-shell){
+  display:none!important;
+}
+
+.bridge-controlled-results-shell{
+  width:100%;
+  margin-top:14px;
+  padding:0;
+  border:0;
+  background:transparent;
+}
+
+.bridge-controlled-results-shell.bridge-global-preview{
+  margin-top:12px;
+}
+
+.bridge-controlled-results-shell .bridge-list-head{
+  margin:0!important;
+}
+
+.bridge-controlled-results-shell .track-result{
+  margin:0!important;
+}
+
+.bridge-alternative-separator{
+  min-height:31px;
+  margin:0;
+  padding:7px 10px;
+  border-top:1px solid #e6e6ea;
+  border-bottom:1px solid #eeeeF1;
+  background:#fafafa;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:#777481;
+}
+
+.bridge-alternative-separator strong{
+  font-size:9px;
+  line-height:16px;
+  font-weight:800;
+  color:#5f5c65;
+}
+
+.bridge-alternative-separator span{
+  font-size:8px;
+  line-height:16px;
+  color:#96939c;
+}
+
+.bridge-alternative-separator span::before{
+  content:"·";
+  margin-right:7px;
+  color:#b0adb5;
+}
+
+.page.bridge-live-filtering .quick-start{
+  display:none!important;
+}
+
+@media(max-width:760px){
+  .bridge-controlled-results-shell{
+    margin-top:10px;
+  }
+  .bridge-alternative-separator{
+    min-height:29px;
+    padding:6px 8px;
+  }
 }
 </style>
 
@@ -4735,6 +5160,7 @@ react/cjs/react-jsx-runtime.production.js:
 (() => {
   const SVG = {"download": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M8.59961 2.20156C8.59961 1.87019 8.33098 1.60156 7.99961 1.60156C7.66824 1.60156 7.39961 1.87019 7.39961 2.20156V9.09243L5.03582 6.58959C4.80829 6.34868 4.42855 6.33783 4.18764 6.56535C3.94673 6.79288 3.93588 7.17263 4.1634 7.41354L7.5634 11.0135C7.67675 11.1336 7.83453 11.2016 7.99961 11.2016C8.16469 11.2016 8.32247 11.1336 8.43582 11.0135L11.8358 7.41354C12.0633 7.17263 12.0525 6.79288 11.8116 6.56535C11.5707 6.33783 11.1909 6.34868 10.9634 6.58959L8.59961 9.09243V2.20156Z\" fill=\"#1E1D20\"/>\n<path d=\"M2.79961 10.2016C2.79961 9.87019 2.53098 9.60156 2.19961 9.60156C1.86824 9.60156 1.59961 9.87019 1.59961 10.2016V12.2016C1.59961 13.4166 2.58458 14.4016 3.79961 14.4016H12.1996C13.4146 14.4016 14.3996 13.4166 14.3996 12.2016V10.2016C14.3996 9.87019 14.131 9.60156 13.7996 9.60156C13.4682 9.60156 13.1996 9.87019 13.1996 10.2016V12.2016C13.1996 12.7538 12.7519 13.2016 12.1996 13.2016H3.79961C3.24732 13.2016 2.79961 12.7538 2.79961 12.2016V10.2016Z\" fill=\"#1E1D20\"/>\n</svg>", "replace": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M7.99981 3.59844C8.97183 3.59844 9.93346 3.64231 10.8828 3.72815C11.1397 3.75138 11.344 3.94989 11.3746 4.20591C11.4739 5.03605 11.541 5.87618 11.5746 6.72503L10.2241 5.37422C9.98982 5.13988 9.60992 5.13984 9.37558 5.37413C9.14124 5.60842 9.1412 5.98832 9.37549 6.22266L11.7749 8.62258C12.0092 8.85691 12.3891 8.85696 12.6234 8.62268L15.024 6.22276C15.2584 5.98848 15.2584 5.60858 15.0241 5.37423C14.7898 5.13989 14.4099 5.13983 14.1756 5.37411L12.7773 6.77202C12.7437 5.85925 12.6729 4.95588 12.5661 4.06343C12.4682 3.24464 11.8121 2.60728 10.9909 2.53303C10.0056 2.44394 9.00796 2.39844 7.99981 2.39844C6.99165 2.39844 5.99397 2.44394 5.00872 2.53303C4.18753 2.60728 3.5314 3.24464 3.43348 4.06343C3.38245 4.49015 3.33962 4.91937 3.30514 5.35093C3.27875 5.68125 3.52513 5.97042 3.85545 5.99681C4.18577 6.0232 4.47494 5.77681 4.50133 5.4465C4.53455 5.03063 4.57583 4.61705 4.62499 4.20591C4.65561 3.94989 4.85991 3.75138 5.11679 3.72815C6.06616 3.64231 7.02778 3.59844 7.99981 3.59844ZM4.22471 7.37444C3.99043 7.14012 3.61056 7.14007 3.37622 7.37433L0.975615 9.7741C0.74126 10.0084 0.741192 10.3883 0.975467 10.6226C1.20974 10.857 1.58964 10.857 1.82399 10.6228L3.22232 9.22494C3.25589 10.1377 3.32676 11.041 3.43348 11.9334C3.5314 12.7522 4.18752 13.3896 5.00872 13.4638C5.99397 13.5529 6.99165 13.5984 7.99981 13.5984C9.00796 13.5984 10.0056 13.5529 10.9909 13.4638C11.8121 13.3896 12.4682 12.7522 12.5661 11.9335C12.6172 11.5064 12.6601 11.0768 12.6946 10.6449C12.7209 10.3146 12.4745 10.0255 12.1442 9.99908C11.8139 9.9727 11.5247 10.2191 11.4984 10.5494C11.4651 10.9656 11.4238 11.3795 11.3746 11.791C11.344 12.047 11.1397 12.2455 10.8828 12.2687C9.93346 12.3546 8.97183 12.3984 7.99981 12.3984C7.02778 12.3984 6.06616 12.3546 5.11679 12.2687C4.85991 12.2455 4.65561 12.047 4.62499 11.791C4.52572 10.9609 4.45862 10.1208 4.42499 9.27194L5.77551 10.6227C6.0098 10.857 6.3897 10.857 6.62404 10.6227C6.85837 10.3884 6.8584 10.0085 6.6241 9.77421L4.22471 7.37444Z\" fill=\"#1E1D20\"/>\n</svg>", "publish": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M8.10087 3.46484C7.03694 3.46484 5.98346 3.67438 5.00071 4.0815C4.0178 4.48866 3.1246 5.08537 2.37239 5.83767C1.62017 6.58992 1.02333 7.483 0.616213 8.46587C0.21943 9.42383 0.0103648 10.4488 4.08832e-06 11.4851C-0.000443204 11.5298 0.0358698 11.5661 0.0806119 11.5661H2.42998C2.42998 10.5022 2.63947 9.44878 3.04659 8.46587C3.45372 7.483 4.05055 6.58992 4.80277 5.83767C5.55498 5.08537 6.44818 4.48866 7.43109 4.0815C8.41384 3.67438 9.46733 3.46484 10.5313 3.46484H8.10087Z\" fill=\"#252428\"/>\n<path d=\"M9.70032 4.08487C10.6544 3.68964 11.6751 3.48063 12.7073 3.46876C12.7565 3.46819 12.7944 3.51176 12.7875 3.56051L12.4665 5.84343C12.4611 5.88158 12.4296 5.91062 12.3912 5.9134C11.7866 5.95716 11.1921 6.09762 10.6304 6.33028C9.94225 6.61525 9.3171 7.03297 8.79051 7.55956C8.26393 8.08614 7.84621 8.7113 7.56124 9.39935C7.28661 10.0624 7.14042 10.7713 7.13018 11.4885C7.12954 11.5332 7.09333 11.5695 7.04858 11.5695H4.69922C4.69922 10.5056 4.90871 9.45216 5.31583 8.46925C5.72295 7.48638 6.31979 6.5933 7.072 5.84104C7.82422 5.08875 8.71741 4.49203 9.70032 4.08487Z\" fill=\"#252428\"/>\n<path d=\"M13.2172 13.9141C13.5053 13.9141 13.7389 13.6805 13.7389 13.3923V10.1992L15.0957 11.6604C15.2918 11.8715 15.6219 11.8838 15.8331 11.6877C16.0442 11.4916 16.0564 11.1615 15.8604 10.9503L13.5995 8.51557C13.5008 8.40925 13.3623 8.34885 13.2172 8.34885C13.0721 8.34885 12.9336 8.40925 12.8349 8.51557L10.574 10.9503C10.3779 11.1615 10.3901 11.4916 10.6013 11.6877C10.8124 11.8838 11.1426 11.8715 11.3386 11.6604L12.6954 10.1992V13.3923C12.6954 13.6805 12.929 13.9141 13.2172 13.9141Z\" fill=\"#1E1D20\"/>\n</svg>", "message": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M2.25 12.7593C2.25 14.3604 3.37341 15.754 4.95746 15.987C6.04357 16.1467 7.14151 16.27 8.25 16.3556V21L12.326 16.924C12.6017 16.6483 12.9738 16.4919 13.3635 16.481C15.2869 16.4274 17.1821 16.2606 19.0425 15.9871C20.6266 15.7542 21.75 14.3606 21.75 12.7595V6.74056C21.75 5.13946 20.6266 3.74583 19.0425 3.51293C16.744 3.17501 14.3926 3 12.0003 3C9.60776 3 7.25612 3.17504 4.95747 3.51302C3.37342 3.74593 2.25 5.13956 2.25 6.74064V12.7593Z\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>", "email": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M21.75 6.75V17.25C21.75 18.4926 20.7426 19.5 19.5 19.5H4.5C3.25736 19.5 2.25 18.4926 2.25 17.25V6.75M21.75 6.75C21.75 5.50736 20.7426 4.5 19.5 4.5H4.5C3.25736 4.5 2.25 5.50736 2.25 6.75M21.75 6.75V6.99271C21.75 7.77405 21.3447 8.49945 20.6792 8.90894L13.1792 13.5243C12.4561 13.9694 11.5439 13.9694 10.8208 13.5243L3.32078 8.90894C2.65535 8.49945 2.25 7.77405 2.25 6.99271V6.75\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>", "move": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M1.5 4C1.5 3.17157 2.17157 2.5 3 2.5H6.58579C6.851 2.5 7.10536 2.60536 7.29289 2.79289L8.70711 4.20711C8.89464 4.39464 9.149 4.5 9.41421 4.5H13C13.8284 4.5 14.5 5.17157 14.5 6V12C14.5 12.8284 13.8284 13.5 13 13.5H3C2.17157 13.5 1.5 12.8284 1.5 12V4Z\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n<path d=\"M8 6.66797L10 8.66797L8 10.668M10 8.66797L6 8.66797\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>", "info": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M7.5 7.5L7.52766 7.48617C7.90974 7.29513 8.33994 7.64023 8.23634 8.05465L7.76366 9.94535C7.66006 10.3598 8.09026 10.7049 8.47234 10.5138L8.5 10.5M14 8C14 11.3137 11.3137 14 8 14C4.68629 14 2 11.3137 2 8C2 4.68629 4.68629 2 8 2C11.3137 2 14 4.68629 14 8ZM8 5.5H8.005V5.505H8V5.5Z\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>", "share": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M10.3996 3.60156C10.3996 2.49699 11.295 1.60156 12.3996 1.60156C13.5042 1.60156 14.3996 2.49699 14.3996 3.60156C14.3996 4.70613 13.5042 5.60156 12.3996 5.60156C11.8351 5.60156 11.3252 5.36766 10.9615 4.99147L5.57468 7.68488C5.59109 7.78803 5.59961 7.8938 5.59961 8.00156C5.59961 8.10935 5.59108 8.21514 5.57467 8.31831L10.9615 11.0117C11.3251 10.6355 11.835 10.4016 12.3996 10.4016C13.5042 10.4016 14.3996 11.297 14.3996 12.4016C14.3996 13.5061 13.5042 14.4016 12.3996 14.4016C11.295 14.4016 10.3996 13.5061 10.3996 12.4016C10.3996 12.2938 10.4081 12.188 10.4245 12.0849L5.03772 9.39147C4.67407 9.76766 4.16415 10.0016 3.59961 10.0016C2.49504 10.0016 1.59961 9.10613 1.59961 8.00156C1.59961 6.89699 2.49504 6.00156 3.59961 6.00156C4.16418 6.00156 4.67411 6.23549 5.03776 6.6117L10.4246 3.91831C10.4081 3.81514 10.3996 3.70935 10.3996 3.60156Z\" fill=\"#29292C\"/>\n</svg>", "trash": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M9.82692 6L9.59615 12M6.40385 12L6.17308 6M3.18157 3.86038C3.94585 3.74496 4.719 3.65657 5.5 3.59622C6.32496 3.53247 7.15869 3.5 8 3.5C8.84131 3.5 9.67504 3.53247 10.5 3.59622C11.281 3.65657 12.0542 3.74496 12.8184 3.86038C13.0464 3.89481 13.2736 3.93165 13.5 3.97086M12.8184 3.86038L12.1065 13.115C12.0464 13.8965 11.3948 14.5 10.611 14.5H5.38905C4.60524 14.5 3.95358 13.8965 3.89346 13.115L3.18157 3.86038M2.5 3.97086C2.72638 3.93165 2.95358 3.89481 3.18157 3.86038M10.5 3.59622V2.98546C10.5 2.19922 9.8929 1.54282 9.10706 1.51768C8.73948 1.50592 8.37043 1.5 8 1.5C7.62957 1.5 7.26052 1.50592 6.89294 1.51768C6.1071 1.54282 5.5 2.19922 5.5 2.98546V3.59622\" stroke=\"#1E1D20\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>"};
   const META_FIELDS = ['track','artist','album','label','isrc','catalog','composer','publisher'];
+  const BRIDGE_TAG_DICTIONARY = [{"name":"African","id":"e32f116e-a416-4ecf-bfc9-15b23d4c51b7","category":"Genre","family":"African","aliases":["African","Africain","World"]},{"name":"African Pop","id":"961457f8-ff38-44ee-adc8-62899b5f3b37","category":"Genre","family":"African","aliases":["African Pop","Pop africaine"]},{"name":"African Traditional","id":"dab3b8be-8049-468c-a6ce-9febbef09f73","category":"Genre","family":"African","aliases":["African Traditional","Africain traditionnel","World"]},{"name":"Afrobeat (Nigeria)","id":"cf66eabe-3719-4aa6-8604-02470b8e9a44","category":"Genre","family":"African","aliases":["Afrobeat (Nigeria)","Afrobeat (Nigéria)","Nigerian","World"]},{"name":"Afrobeats","id":"bab3385e-16e9-4052-93e4-0ffdd581063b","category":"Genre","family":"African","aliases":["Afrobeats","Afro-house"]},{"name":"Amapiano","id":"b48fa2c7-9779-4f48-b76a-ce1ec113171c","category":"Genre","family":"African","aliases":["Amapiano","Kwaito","South Africa","South African"]},{"name":"Bongo Flava","id":"ef1cdb13-d530-4c46-8528-5f637b4226a5","category":"Genre","family":"African","aliases":["Bongo Flava","Tanzania","Tanzanian","World"]},{"name":"Coladera","id":"d81b176c-db7f-4cc6-aa2b-683dbcdb4c19","category":"Genre","family":"African","aliases":["Coladera","Coladeira","Cape Verde","Cabo Verde","Cape Verdean","World"]},{"name":"Ethio-Jazz","id":"2fe89e15-6938-4962-a4ba-fc093fcc015a","category":"Genre","family":"African","aliases":["Ethio-Jazz","Ethiopian","Ethiopia"]},{"name":"Gqom","id":"31cbe700-9664-489e-a5e8-bb0a4db8d054","category":"Genre","family":"African","aliases":["Gqom","Igqomu","Sgubhu","G.Q.O.M"]},{"name":"Highlife","id":"7d7ea396-6dfd-47ae-8c88-3881b8f40ac1","category":"Genre","family":"African","aliases":["Highlife","Ghana","Ghanaian"]},{"name":"Kizomba","id":"e83c8000-81e9-4454-afaf-d462b6a55d56","category":"Genre","family":"African","aliases":["Kizomba","Angola","Angolan"]},{"name":"Kuduro","id":"9df9e9ed-c701-4bfb-b8b4-75c09910ea92","category":"Genre","family":"African","aliases":["Kuduro","Kuduru"]},{"name":"Maloya","id":"39a0343f-15e6-4b8a-9aab-ca8059bedd87","category":"Genre","family":"African","aliases":["Maloya","Reunion","Réunion","World"]},{"name":"Marrabenta","id":"3add4efd-9b25-479e-a2e4-9be595d9968f","category":"Genre","family":"African","aliases":["Marrabenta","Mozambican","Mozambique"]},{"name":"Morna","id":"4abcc0f7-c3d0-4327-af81-664f2deb431b","category":"Genre","family":"African","aliases":["Morna","Cape Verde","Cabo Verde","Cape Verdean"]},{"name":"Ndombolo","id":"2e3f906d-896b-49c5-a514-99cb4f10e091","category":"Genre","family":"African","aliases":["Ndombolo","Dombolo","Congo","Congolese","Kongolese"]},{"name":"Sega","id":"3ecd19ea-e4d9-4940-8174-a133a63d3383","category":"Genre","family":"African","aliases":["Sega","Séga","Mauritius","Mauritian","World"]},{"name":"Asian","id":"a89d063c-ece8-4793-a76c-7454f0b25acc","category":"Genre","family":"Asian","aliases":["Asian","Asiatique"]},{"name":"Asian Pop","id":"42cea4de-8dcb-46d2-b225-5d0acfa70035","category":"Genre","family":"Asian","aliases":["Asian Pop","Pop asiatique"]},{"name":"Asian Traditional","id":"7ec0cedc-22be-4f1f-a958-0ca1ab04df17","category":"Genre","family":"Asian","aliases":["Asian Traditional","Asiatique traditionnel","World"]},{"name":"Chinese Traditional","id":"06d1be54-3887-43da-867d-94aaa20ca628","category":"Genre","family":"Asian","aliases":["Chinese Traditional","Chinois traditionnel","China","World"]},{"name":"C-Pop","id":"e5fb5d14-fcd7-408a-ae85-9603a7779376","category":"Genre","family":"Asian","aliases":["C-Pop","Cpop","Chinese pop"]},{"name":"Indian Bollywood Pop","id":"789b7a83-bced-44ba-841a-a3aebc52ecf0","category":"Genre","family":"Asian","aliases":["Indian Bollywood Pop","Bollywood indienne pop"]},{"name":"Indian Traditional","id":"be601f8f-25e3-4e2b-876f-b1b21165d356","category":"Genre","family":"Asian","aliases":["Indian Traditional","Indien traditionnel","World"]},{"name":"Japanese Traditional","id":"6d305e01-acdf-4834-a1ef-f2713b76f0b0","category":"Genre","family":"Asian","aliases":["Japanese Traditional","Japonais traditionnel","World"]},{"name":"Jpop","id":"1aac6867-206c-412d-bf19-9de73de81a07","category":"Genre","family":"Asian","aliases":["Jpop","J-pop","Japanese pop"]},{"name":"K-Pop","id":"bdaf54c0-21fd-43b4-b940-a64ca1aef21c","category":"Genre","family":"Asian","aliases":["K-Pop","Kpop","Korean","Korean Pop"]},{"name":"Acoustic Blues","id":"702ad013-321f-4df9-a152-24d3a51913ff","category":"Genre","family":"Blues","aliases":["Acoustic Blues","Blues acoustique"]},{"name":"Blues","id":"ea72335b-991f-4f53-b6c0-214c4b635790","category":"Genre","family":"Blues","aliases":["Blues"]},{"name":"Chicago Blues","id":"0d42eaa4-2070-492f-bc33-22651412a36f","category":"Genre","family":"Blues","aliases":["Chicago Blues","Chicago blues","Blues"]},{"name":"Delta Blues","id":"8b875a64-9299-4edc-b129-949742d2a1f4","category":"Genre","family":"Blues","aliases":["Delta Blues","Delta blues","Mississippi blues","Blues"]},{"name":"Electric Blues","id":"0542a2a1-2eeb-496d-a5f8-c5853a13fb64","category":"Genre","family":"Blues","aliases":["Electric Blues","Blues électrique","Blues"]},{"name":"Memphis Blues","id":"0019efc7-f589-4bb9-9bbe-752c4df29da5","category":"Genre","family":"Blues","aliases":["Memphis Blues","Memphis blues","Blues"]},{"name":"New Orleans Blues","id":"e06916c5-329f-47d5-91b8-798b33572afc","category":"Genre","family":"Blues","aliases":["New Orleans Blues","Louisiana blues","Blues"]},{"name":"Swamp Blues","id":"32be19bb-52f3-483e-8cd2-f0a243fd7d8f","category":"Genre","family":"Blues","aliases":["Swamp Blues","Swamp blues","Blues"]},{"name":"Brazilian Funk","id":"1656d66f-51c4-4ea4-a330-5963b10aec1b","category":"Genre","family":"Brazil","aliases":["Brazilian Funk","Brazilian funk","Funk carioca"]},{"name":"Batucada","id":"95b4a2f5-2f73-478e-a9a6-85ff29014a35","category":"Genre","family":"Brazil","aliases":["Batucada","Bateria","Carnaval","Carnival"]},{"name":"Bossa Nova","id":"41667802-4908-46a3-a0aa-2b1625d07012","category":"Genre","family":"Brazil","aliases":["Bossa Nova","Bossa nova","bossa"]},{"name":"Brazil","id":"3cd92cfe-a31d-4c7a-8c65-9eff41c1f57f","category":"Genre","family":"Brazil","aliases":["Brazil","Brésil"]},{"name":"Brazilian Hip-Hop","id":"163cbb85-0122-45af-8e24-a7ab19aa191b","category":"Genre","family":"Brazil","aliases":["Brazilian Hip-Hop","Hip-hop brésilien"]},{"name":"Capoeira","id":"014cc603-8346-4b8f-a160-eb9a3df52318","category":"Genre","family":"Brazil","aliases":["Capoeira"]},{"name":"Forró","id":"139ccc71-41fe-42f3-b2e4-69b670d5fc9f","category":"Genre","family":"Brazil","aliases":["Forró","Forro"]},{"name":"Pop / MPB","id":"f739903c-e7a1-4229-ae3a-8dff5b4f944e","category":"Genre","family":"Brazil","aliases":["Pop / MPB","Musica popular brazileira"]},{"name":"Samba","id":"69cd793f-e017-4098-b6c3-b5eddd19981c","category":"Genre","family":"Brazil","aliases":["Samba"]},{"name":"Baroque (1600 - 1750)","id":"8a223f13-e884-473e-8346-eca4516b90ae","category":"Genre","family":"Classical","aliases":["Baroque (1600 - 1750)","Rococo","Roccoco","Late Baroque"]},{"name":"Canticle","id":"b51fb493-8820-48ed-b18f-c9dfeadf14d0","category":"Genre","family":"Classical","aliases":["Canticle","Cantique","Psalm"]},{"name":"Chamber","id":"57414b10-9fda-488d-a67a-6f22c6c8a865","category":"Genre","family":"Classical","aliases":["Chamber","Musique de chambre","Chambre"]},{"name":"Choral","id":"9a200d0f-41d6-4a75-a40d-abc92a247f01","category":"Genre","family":"Classical","aliases":["Choral"]},{"name":"Classical","id":"af956553-3009-4f5c-9a9d-fb4312e00ecc","category":"Genre","family":"Classical","aliases":["Classical","Classique"]},{"name":"Classical (1750-1800)","id":"eb760d8c-b3f8-48b1-970c-f40bd1f24b6c","category":"Genre","family":"Classical","aliases":["Classical (1750-1800)","Classique (1750-1800)"]},{"name":"Contemporary (1950 -)","id":"56040671-9f05-44f9-8d60-574ad36af6de","category":"Genre","family":"Classical","aliases":["Contemporary (1950 -)","Contemporain (1950 -)"]},{"name":"Impressionist","id":"681be050-8a45-4dc0-a06b-c6dc93903ac3","category":"Genre","family":"Classical","aliases":["Impressionist","Impressionniste","Impressionism"]},{"name":"Medieval / Renaissance","id":"4901113d-bc5a-43d4-b2a8-e93fe09088f2","category":"Genre","family":"Classical","aliases":["Medieval / Renaissance","Médiéval / Renaissance","Middle-age","Middle-ages"]},{"name":"Minimalist / Repetitive","id":"1866aaef-9230-4a69-a3e8-eb3cb9cfeea1","category":"Genre","family":"Classical","aliases":["Minimalist / Repetitive","Minimaliste / Répétitif"]},{"name":"Modern (1900 - 1950)","id":"49c95dee-bf33-411d-b061-b7561ba237d5","category":"Genre","family":"Classical","aliases":["Modern (1900 - 1950)","Moderne (1900 - 1950)"]},{"name":"Neo Classical","id":"21641766-b39c-472c-8245-61c1315c17f9","category":"Genre","family":"Classical","aliases":["Neo Classical","Néo-classique","Neoclassic","Neoclassicism","Neo classic"]},{"name":"Opera","id":"bdb02813-69df-4e30-ba5c-1247357c46da","category":"Genre","family":"Classical","aliases":["Opera","Opéra"]},{"name":"Operetta / Bouffe","id":"f98923de-5842-4b55-a1a8-1f45b3b3634b","category":"Genre","family":"Classical","aliases":["Operetta / Bouffe","Opérette / Bouffe"]},{"name":"Piano Solo","id":"db3b93e0-c868-4b6b-a03f-a6ff4ce1c548","category":"Genre","family":"Classical","aliases":["Piano Solo","Piano solo"]},{"name":"Romantic (1810 - 1900)","id":"5d53c1ce-7932-4968-b837-885e5314d8ae","category":"Genre","family":"Classical","aliases":["Romantic (1810 - 1900)","Romantique (1810 - 1900)","Romantism"]},{"name":"Symphonic","id":"bb165381-9278-4ecf-8804-c4bdedb8e0c6","category":"Genre","family":"Classical","aliases":["Symphonic","Symphonique","Symphony","Symphonism","Symphonies"]},{"name":"Waltz","id":"98770c4c-cc42-46a3-8dfc-d1012d27dad9","category":"Genre","family":"Classical","aliases":["Waltz","Valse","Ballroom","Austria","Austrian","Vienna"]},{"name":"Americana","id":"4bf3757d-6c2d-403c-bdfc-9ba0449f4fba","category":"Genre","family":"Folk / Country","aliases":["Americana"]},{"name":"Folk","id":"c8bac238-a2ce-4ea0-b412-1b8fd39a5043","category":"Genre","family":"Folk / Country","aliases":["Folk"]},{"name":"Bluegrass","id":"b534ff12-86d8-4f93-8d58-0aae76c77deb","category":"Genre","family":"Folk / Country","aliases":["Bluegrass"]},{"name":"Country","id":"ece265a5-ac01-40f9-a0db-788caf9c792f","category":"Genre","family":"Folk / Country","aliases":["Country"]},{"name":"Honky Tonk","id":"ddeb5bb6-cbf2-4341-9c72-497d169b3f12","category":"Genre","family":"Folk / Country","aliases":["Honky Tonk","boogie woogie"]},{"name":"Disco","id":"359d500f-ae14-4eb4-af20-7c743bc9362a","category":"Genre","family":"Disco","aliases":["Disco"]},{"name":"Chiptune / 8-bit","id":"6c52fa13-a8b4-49f7-9e3c-daea8ae2021b","category":"Genre","family":"Electronic","aliases":["Chiptune / 8-bit","Chip","Chip music"]},{"name":"Ambient","id":"9cd2d0a0-656c-4efb-92e3-52ca838f252b","category":"Genre","family":"Electronic","aliases":["Ambient","Ambiant"]},{"name":"Big Beat","id":"a3b6d967-a2e9-4a35-93c8-3bda37225797","category":"Genre","family":"Electronic","aliases":["Big Beat","Big beat"]},{"name":"Bootleg / Mashup","id":"7d161f72-2a9c-48ad-ba50-b2d178c1c5fa","category":"Genre","family":"Electronic","aliases":["Bootleg / Mashup","Mesh","Bastard Pop"]},{"name":"Breakbeat","id":"f69d6ca1-489f-49ba-b208-9e162996d567","category":"Genre","family":"Electronic","aliases":["Breakbeat"]},{"name":"Drum & Bass / Jungle","id":"c45bb837-0551-4ec5-be5b-8b3e54dfa2ce","category":"Genre","family":"Electronic","aliases":["Drum & Bass / Jungle","Drum ‘n’ Bass","Dnb","D'N'B","Drum and bass"]},{"name":"Dub-Electro","id":"4de11887-eb2d-42b7-b90a-d74cf9a5fc26","category":"Genre","family":"Electronic","aliases":["Dub-Electro"]},{"name":"Dubstep","id":"ff8dc648-47b1-4ddf-b6b1-97f76e13f36b","category":"Genre","family":"Electronic","aliases":["Dubstep","Brostep"]},{"name":"EDM / Dance","id":"bd7c5454-fcfc-49da-b97a-57efab4eccfc","category":"Genre","family":"Electronic","aliases":["EDM / Dance"]},{"name":"Electro","id":"d855ff85-c65d-47cc-a92a-2ada90203e64","category":"Genre","family":"Electronic","aliases":["Electro","Électro"]},{"name":"Electro-Swing","id":"11c8ea4f-293a-408c-9b50-6e1a218874eb","category":"Genre","family":"Electronic","aliases":["Electro-Swing","Électro-Swing","Swing House"]},{"name":"Electronica","id":"63cdc630-fef2-4d21-a5f3-536ce878e8d1","category":"Genre","family":"Electronic","aliases":["Electronica","Électronica"]},{"name":"Experimental","id":"8f4a08b3-af5d-43ac-ba53-d2d4d1411304","category":"Genre","family":"Electronic","aliases":["Experimental","Expérimental"]},{"name":"Future Bass","id":"b9a7fe43-6cd3-4fac-bd91-0f5f2e71c4aa","category":"Genre","family":"Electronic","aliases":["Future Bass","Future basse"]},{"name":"House","id":"b4d5f10f-310c-4720-8fd4-2a8a2d28f470","category":"Genre","family":"Electronic","aliases":["House","Deep house","Tech house"]},{"name":"Industrial","id":"0c0df6ce-1f77-46ba-879a-d246249c1330","category":"Genre","family":"Electronic","aliases":["Industrial","Industriel","Noise"]},{"name":"Lo-fi / Chillhop","id":"f0432fce-96c9-4e29-ad28-a5c307e6787b","category":"Genre","family":"Electronic","aliases":["Lo-fi / Chillhop","Lo-Fi / Chillhop","Lofi","Low-fi"]},{"name":"Nu-Disco","id":"9219f3e5-4afb-4637-8f9b-b85a8231e3d1","category":"Genre","family":"Electronic","aliases":["Nu-Disco","New-disco"]},{"name":"Techno","id":"6e0faac1-1d9f-4342-87d8-197f46f00a4e","category":"Genre","family":"Electronic","aliases":["Techno","Tech","Hard tech","Industrial"]},{"name":"Trance","id":"4e524e40-6cd3-430c-a73e-a87998083188","category":"Genre","family":"Electronic","aliases":["Trance"]},{"name":"Downtempo / Trip-Hop","id":"f755726d-7409-45d7-b7cc-224c40281b03","category":"Genre","family":"Electronic","aliases":["Downtempo / Trip-Hop"]},{"name":"IDM","id":"a7c1c913-482d-42b8-a60f-57bbcca3ff4e","category":"Genre","family":"Electronic","aliases":["IDM","Intelligent dance music"]},{"name":"Synthwave","id":"d8365550-d6fd-45db-a1e2-05aaf68dcad7","category":"Genre","family":"Electronic","aliases":["Synthwave","Retrowave","Future synth","Synthpop"]},{"name":"UK Garage / Two Step","id":"bc56dc45-4b48-422e-82ea-9210ccb162a2","category":"Genre","family":"Electronic","aliases":["UK Garage / Two Step","2-step"]},{"name":"Celtic","id":"ec3027a7-f07a-4ec5-8a13-996beed5becb","category":"Genre","family":"European","aliases":["Celtic","Celtique","Irish"]},{"name":"Eastern European","id":"fd7a8d82-ed03-4c18-822e-2afb4b8d84d4","category":"Genre","family":"European","aliases":["Eastern European","Europe de l'Est","Slavic"]},{"name":"European Traditional","id":"78e1d93a-684d-4624-ac20-fe9f90537009","category":"Genre","family":"European","aliases":["European Traditional","Européen traditionnel"]},{"name":"French Traditional","id":"93d99b47-ba5d-49d5-9b3e-61d80415e950","category":"Genre","family":"European","aliases":["French Traditional","Français traditionnel"]},{"name":"German Traditional","id":"81d83f56-6fa1-48d8-98a5-a05039ddccf1","category":"Genre","family":"European","aliases":["German Traditional","Allemand traditionnel"]},{"name":"Greek Traditional","id":"fc965843-6ad4-42a3-81df-cda94a861e39","category":"Genre","family":"European","aliases":["Greek Traditional","Grec traditionnel"]},{"name":"Gypsy","id":"382b23a2-57f9-426c-95d4-37e24f82b182","category":"Genre","family":"European","aliases":["Gypsy","Tzigane"]},{"name":"Italian Traditional","id":"6346cf6c-8e9c-468a-a64e-6f4f4433bb08","category":"Genre","family":"European","aliases":["Italian Traditional","Italien traditionnel"]},{"name":"Jewish Traditional","id":"3cb1669f-6fa9-486f-a9bf-beed0c9c4dcb","category":"Genre","family":"European","aliases":["Jewish Traditional","Juif traditionnel","Orthodox","European Traditional"]},{"name":"Klezmer - Balkan","id":"2c4c887d-3943-4304-af31-b2bd58ddaa37","category":"Genre","family":"European","aliases":["Klezmer - Balkan","Klezmer - Balkans","Balkanic","Ashkenazi"]},{"name":"Polka","id":"a61ac065-68cd-47ea-8d07-a17d44a64ad2","category":"Genre","family":"European","aliases":["Polka"]},{"name":"Portugal - Fado","id":"2145f406-096c-46cd-a631-6f913e684832","category":"Genre","family":"European","aliases":["Portugal - Fado"]},{"name":"Russian Traditional","id":"e44aa2ac-530f-49fd-b561-3fb662165e4f","category":"Genre","family":"European","aliases":["Russian Traditional","Russe traditionnel"]},{"name":"Spanish - Flamenco","id":"6abc9e83-3912-4f9d-8c90-634522c04708","category":"Genre","family":"European","aliases":["Spanish - Flamenco","Espagnol - Flamenco"]},{"name":"Electro-Funk","id":"5ebeca93-48d8-45f4-aa8b-17ea36e303db","category":"Genre","family":"Funk","aliases":["Electro-Funk","Électro-Funk"]},{"name":"Funk","id":"383359ef-bb29-4345-895b-c54e53ecba6e","category":"Genre","family":"Funk","aliases":["Funk"]},{"name":"P-Funk","id":"19e0070e-bf8b-4f85-94a2-8000bcc26c30","category":"Genre","family":"Funk","aliases":["P-Funk","Parliament"]},{"name":"Gospel","id":"cb48e7bf-a85e-4a6d-82bb-31ee365503d2","category":"Genre","family":"Gospel","aliases":["Gospel","Spiritual","Spirituals"]},{"name":"Acid Jazz","id":"9949e518-4492-401b-8728-b019aee9fbba","category":"Genre","family":"Jazz","aliases":["Acid Jazz","Club Jazz","Psychedelic Jazz","Groove Jazz"]},{"name":"Bebop / Traditional","id":"f5d02f97-d6ee-44a8-af0a-09d3dc68075b","category":"Genre","family":"Jazz","aliases":["Bebop / Traditional","Bebop / Traditionnel"]},{"name":"Dixieland / Ragtime","id":"c75fb4b8-7c2f-4665-b416-68d2c1586b33","category":"Genre","family":"Jazz","aliases":["Dixieland / Ragtime","Dixie","Hot Jazz"]},{"name":"Electro-Jazz","id":"54d865da-774d-4a1f-a1ba-adf5d4bd6f45","category":"Genre","family":"Jazz","aliases":["Electro-Jazz","Électro-Jazz"]},{"name":"Free / Avant-Garde","id":"4c48981d-3048-4cd1-8508-f0fc9a90f66f","category":"Genre","family":"Jazz","aliases":["Free / Avant-Garde","Free Jazz / Avant-Garde"]},{"name":"Fusion","id":"54745c72-a187-440d-8665-f3032e48ceca","category":"Genre","family":"Jazz","aliases":["Fusion"]},{"name":"Gypsy / Manouche","id":"6261f853-77e5-4ab9-8df3-c45c1f728584","category":"Genre","family":"Jazz","aliases":["Gypsy / Manouche"]},{"name":"Jazz","id":"66bc0b72-3a6e-4e9c-a9f3-2d2a83513f96","category":"Genre","family":"Jazz","aliases":["Jazz"]},{"name":"Jazz Pop / Light Jazz","id":"ead6cf27-3eee-44e4-9156-14c2fd36f6ef","category":"Genre","family":"Jazz","aliases":["Jazz Pop / Light Jazz","Jazz pop / Light jazz"]},{"name":"Latin Jazz","id":"ecc86526-0a3f-4df1-937f-6655b4a7e6bc","category":"Genre","family":"Jazz","aliases":["Latin Jazz","Jazz latino"]},{"name":"New Orleans","id":"dac0a406-fdf1-4e66-bc99-fb781c1abd1c","category":"Genre","family":"Jazz","aliases":["New Orleans"]},{"name":"Piano Solo Jazz","id":"7a2a06f5-aa79-4ca8-a302-1f5db479b19d","category":"Genre","family":"Jazz","aliases":["Piano Solo Jazz"]},{"name":"Swing / Big Band","id":"4ea88280-2602-4409-9ec7-d62d4de6cdc5","category":"Genre","family":"Jazz","aliases":["Swing / Big Band"]},{"name":"Andean","id":"81b762f6-b5a0-4c82-8866-641491d5ed36","category":"Genre","family":"Latin / Caribbean","aliases":["Andean","Andin"]},{"name":"Bachata","id":"cdeb9e5e-0460-4917-b6ed-7027512b9d9a","category":"Genre","family":"Latin / Caribbean","aliases":["Bachata","Dominica","Dominican"]},{"name":"Bolero","id":"59bd3226-d1be-40ce-befa-8899f26c9b2b","category":"Genre","family":"Latin / Caribbean","aliases":["Bolero","Boléro"]},{"name":"Bouyon","id":"dd640013-2d6a-4626-9326-2c54047d634d","category":"Genre","family":"Latin / Caribbean","aliases":["Bouyon"]},{"name":"Calypso","id":"dfdbea5c-2a53-42b8-b20c-e1bfdca44d7c","category":"Genre","family":"Latin / Caribbean","aliases":["Calypso","Trinidadian","Trinidad"]},{"name":"Caribbean","id":"b8e3b899-b0b5-4922-aa29-8b034012ab1c","category":"Genre","family":"Latin / Caribbean","aliases":["Caribbean","Caraïbes","Creole"]},{"name":"Cha-cha-cha","id":"9afde1a1-bbd9-4dc0-954a-dc5deb515983","category":"Genre","family":"Latin / Caribbean","aliases":["Cha-cha-cha"]},{"name":"Compas","id":"a49d6d2a-6740-4388-9fc9-73c7ccd33b4a","category":"Genre","family":"Latin / Caribbean","aliases":["Compas","Kompa","Konpa"]},{"name":"Cuban","id":"6083ea7d-cd99-4b41-8ec2-733c5a337654","category":"Genre","family":"Latin / Caribbean","aliases":["Cuban","Cubain"]},{"name":"Cumbia","id":"06a0772c-71b1-4fd4-a41c-05d979a0b582","category":"Genre","family":"Latin / Caribbean","aliases":["Cumbia"]},{"name":"French Antilles","id":"3927415e-2fb4-4872-8428-338186767db2","category":"Genre","family":"Latin / Caribbean","aliases":["French Antilles","Antilles françaises","Martinique","Guadeloupe"]},{"name":"Latin","id":"09dd5cf4-0a2c-4ff4-9522-8bc0ec1d5125","category":"Genre","family":"Latin / Caribbean","aliases":["Latin"]},{"name":"Mambo","id":"7ae2b2c5-a19e-4589-81f0-59b3c56e41a1","category":"Genre","family":"Latin / Caribbean","aliases":["Mambo"]},{"name":"Merengue","id":"d555c56f-0e8e-47ca-89dd-8b4513d232f3","category":"Genre","family":"Latin / Caribbean","aliases":["Merengue","Dominica","Dominican"]},{"name":"Mexican","id":"92547d43-1a18-45c5-bacf-2071bfea9ecc","category":"Genre","family":"Latin / Caribbean","aliases":["Mexican","Mexicain"]},{"name":"Nuyorican Style","id":"2a1ad4df-afe1-43e8-a896-3f2d32b82a11","category":"Genre","family":"Latin / Caribbean","aliases":["Nuyorican Style","Style nuyoricain"]},{"name":"Reggaeton","id":"8e83262a-c9ce-4365-96c8-7d6cfd1803b4","category":"Genre","family":"Latin / Caribbean","aliases":["Reggaeton"]},{"name":"Salsa","id":"88f56552-25b8-4c26-8434-ab627075b5ee","category":"Genre","family":"Latin / Caribbean","aliases":["Salsa"]},{"name":"Shatta","id":"dd15d643-f183-474a-a3f1-84e90dd5fbe7","category":"Genre","family":"Latin / Caribbean","aliases":["Shatta"]},{"name":"Tango","id":"ec5b2225-86de-442d-ac94-c855b25e6212","category":"Genre","family":"Latin / Caribbean","aliases":["Tango","Argentina","Argentinian","Milonga"]},{"name":"Vallenato","id":"dab78e52-5bc9-4c13-8107-ac3c8bc2a60c","category":"Genre","family":"Latin / Caribbean","aliases":["Vallenato","Colombia","Colombian"]},{"name":"Zouk","id":"5fd480e4-c06c-4634-bb5a-9035120b0b38","category":"Genre","family":"Latin / Caribbean","aliases":["Zouk","Guadeloupe"]},{"name":"Arabic Traditional","id":"6123b63f-118d-4bf5-aeb1-052aa8e02682","category":"Genre","family":"Middle East / Arabic","aliases":["Arabic Traditional","Arabe traditionnel"]},{"name":"Middle East / Arabic","id":"70b41003-aa02-4261-a6cf-fdf63718d6e5","category":"Genre","family":"Middle East / Arabic","aliases":["Middle East / Arabic","Moyen-Orient / Arabe","Middle Eastern"]},{"name":"Raï","id":"159bdcbc-689e-4dd0-90d1-b8f29cc872e1","category":"Genre","family":"Middle East / Arabic","aliases":["Raï"]},{"name":"Action / Adventure","id":"228c514b-70c5-41de-a98a-0186fc8c2906","category":"Genre","family":"Movie Score","aliases":["Action / Adventure","Action / Aventure","High-Energy","Heroic Quest"]},{"name":"Ambient / Atmosphere","id":"879d6d39-29b3-4e2b-99f0-0a8e6185dd40","category":"Genre","family":"Movie Score","aliases":["Ambient / Atmosphere","Ambiance / Atmosphère","Textural","Soundscape","Spatial"]},{"name":"Anime / Manga","id":"347b1873-1718-4825-abb9-f71165b282eb","category":"Genre","family":"Movie Score","aliases":["Anime / Manga","Cartoon","Anime","Animated","Cartoonesque"]},{"name":"Blaxploitation","id":"cbf7bf79-2ec0-4ecb-909a-705dcbf53e45","category":"Genre","family":"Movie Score","aliases":["Blaxploitation","Funk Crime","Soul Action","Black Power"]},{"name":"Comedy","id":"7849b10d-89bc-4375-aaf3-53fcaf3fde59","category":"Genre","family":"Movie Score","aliases":["Comedy","Comédie","Lighthearted","Humorous","Playful"]},{"name":"Comedy Drama","id":"f5310f5e-c8cc-4a06-9039-14d2a1d14b38","category":"Genre","family":"Movie Score","aliases":["Comedy Drama","Comédie drame","Dramedy","bittersweet comedy","Heartfelt"]},{"name":"Documentary","id":"c363ca18-3d38-40d0-a7ca-24533c9f8192","category":"Genre","family":"Movie Score","aliases":["Documentary","Documentaire","Factual","Observational","Reportage"]},{"name":"Dramedy","id":"4c7b8610-bb0c-486d-b82d-ccbd02da57c9","category":"Genre","family":"Movie Score","aliases":["Dramedy"]},{"name":"Drama","id":"4242c7cc-2a9a-4294-ad60-bf638d2f64be","category":"Genre","family":"Movie Score","aliases":["Drama","Drame","Emotional","Character-Driven"]},{"name":"Erotic","id":"8a01b5cb-7cee-4b76-8b1c-fbc47686b083","category":"Genre","family":"Movie Score","aliases":["Erotic","Érotique","Sensual","Intimate","Sultry","Porn"]},{"name":"Horror","id":"6cf57668-0964-4d2d-a60a-b89db3fde7bf","category":"Genre","family":"Movie Score","aliases":["Horror","Horreur","Scare","Scary","Dreadful","Macabre"]},{"name":"Movie Score","id":"c95a7ebc-ac28-4b15-98b0-b241dcf06b8b","category":"Genre","family":"Movie Score","aliases":["Movie Score","Musique de film","Orchestral","Cinematic Underscore","Film","Cinema"]},{"name":"Musical Comedy","id":"a44935bf-6702-4afc-9de2-a47c6702a334","category":"Genre","family":"Movie Score","aliases":["Musical Comedy","Comédie musicale","Song-Driven","Showtune","Farce"]},{"name":"Peplum","id":"964f616e-583e-4bac-a644-3cc42f203193","category":"Genre","family":"Movie Score","aliases":["Peplum","Péplum","Sword-and-Sandals","Epic","Antiquity","Mythic","Antique"]},{"name":"Road Movie","id":"ba1c04a7-61b0-4ad2-aa5b-d3ee06b60244","category":"Genre","family":"Movie Score","aliases":["Road Movie","Road-Movie","Travel","Journey","Wanderer"]},{"name":"Romantic Comedy","id":"3e7bbcd9-bf47-4e8f-b866-cc8212de744c","category":"Genre","family":"Movie Score","aliases":["Romantic Comedy","Comédie romantique","Rom-Com","Romance","Love"]},{"name":"SciFi / Fantastic","id":"a6bc3d41-2cd8-4763-a869-eff66335936f","category":"Genre","family":"Movie Score","aliases":["SciFi / Fantastic","Science-fiction / Fantastique","Futuristic","Cosmic","Otherworldly","Science-fiction"]},{"name":"Silent Movie","id":"1550c086-a95c-455d-8bd8-ef2c6b1d4e41","category":"Genre","family":"Movie Score","aliases":["Silent Movie","Film muet","Early Cinema","Silent film"]},{"name":"Spying","id":"a10b46a7-4350-4770-b155-e0d33dc06e70","category":"Genre","family":"Movie Score","aliases":["Spying","Espionnage","Espionage","Secret Agent","Covert"]},{"name":"Thriller","id":"2dd1afdc-0db1-42c4-a23d-4594fd66f447","category":"Genre","family":"Movie Score","aliases":["Thriller","Suspense","Tension-Driven","Edge-of-Seat"]},{"name":"Trailer","id":"dd0ac309-3a6f-486e-b4b0-4400676ebb0a","category":"Genre","family":"Movie Score","aliases":["Trailer","Bande-annonce","Promo","Teaser","Preview"]},{"name":"War","id":"967b235b-1623-4702-8e52-dddba031a605","category":"Genre","family":"Movie Score","aliases":["War","Guerre","Military","Battlefield","Combat"]},{"name":"Western","id":"4ebd9ebe-6d60-434c-81c1-af5de4fb742e","category":"Genre","family":"Movie Score","aliases":["Western","Occidental","Frontier","Outlaw","Americana"]},{"name":"Alternative Pop","id":"e4299fda-ce3e-4bf2-af56-c1f002eb7d79","category":"Genre","family":"Pop","aliases":["Alternative Pop","Pop alternative","Pop"]},{"name":"Easy Listening","id":"fa08a04f-829b-4a0e-a6c2-4148806bc8d8","category":"Genre","family":"Pop","aliases":["Easy Listening","Middle of the road","Beautiful music"]},{"name":"Electro-Pop","id":"4711764f-d196-41fb-b19c-f1c426193384","category":"Genre","family":"Pop","aliases":["Electro-Pop","Électro-Pop"]},{"name":"Hyperpop","id":"5c7fd4f1-c983-422b-a686-8455374e911d","category":"Genre","family":"Pop","aliases":["Hyperpop","Maximalist","Pop"]},{"name":"Indie Pop","id":"148189e9-2879-40d0-9d3c-b39529ed7c06","category":"Genre","family":"Pop","aliases":["Indie Pop","Pop"]},{"name":"Music for Children","id":"d2d9719b-103c-40b9-adf6-4b935a1b3b61","category":"Genre","family":"Pop","aliases":["Music for Children","Musique pour enfants","Kids"]},{"name":"Pop","id":"bf9b8af5-4969-46e1-8f65-63809a04aa79","category":"Genre","family":"Pop","aliases":["Pop"]},{"name":"Pop Rock","id":"4ead861b-7d77-4319-9ee1-04050a397f2a","category":"Genre","family":"Pop","aliases":["Pop Rock","Pop rock"]},{"name":"Pop Waltz","id":"b50c7123-37e5-408d-becd-f07729c32127","category":"Genre","family":"Pop","aliases":["Pop Waltz","Valse Pop"]},{"name":"Slow / Ballad","id":"088da216-3a8d-4bc9-9195-7c4e6c25907c","category":"Genre","family":"Pop","aliases":["Slow / Ballad","Slow / Ballade"]},{"name":"Synthpop","id":"584a9c5f-4a5f-44e9-8895-12938e912320","category":"Genre","family":"Pop","aliases":["Synthpop"]},{"name":"Dancehall","id":"23483f4f-9cab-4b74-b3c6-549422611c15","category":"Genre","family":"Reggae / Jamaica","aliases":["Dancehall"]},{"name":"Dub","id":"ebf6c4d4-38fc-43ca-9981-871a95cd78f2","category":"Genre","family":"Reggae / Jamaica","aliases":["Dub"]},{"name":"Reggae","id":"c6ff59ed-b612-466e-9679-621a72da74d3","category":"Genre","family":"Reggae / Jamaica","aliases":["Reggae"]},{"name":"Rocksteady","id":"dee1a76e-57f8-4bd8-821b-0ae98156ad55","category":"Genre","family":"Reggae / Jamaica","aliases":["Rocksteady"]},{"name":"Roots","id":"3a782a3f-b745-4be9-8ba1-94760a53efe1","category":"Genre","family":"Reggae / Jamaica","aliases":["Roots"]},{"name":"Ska","id":"4490deaa-8519-4dfb-95f2-492fb827bf62","category":"Genre","family":"Reggae / Jamaica","aliases":["Ska"]},{"name":"Cold Wave","id":"dc42eaf5-e019-422a-92e4-2a92f7cb0bf1","category":"Genre","family":"Rock","aliases":["Cold Wave","Cold wave","Dark Wave"]},{"name":"Electro-Rock","id":"8cf8997b-ded4-420a-87a3-cbe875bc355e","category":"Genre","family":"Rock","aliases":["Electro-Rock","Électro-Rock"]},{"name":"Exp / Post-Rock","id":"33f9a8da-f28f-4c6c-993f-c95b60787355","category":"Genre","family":"Rock","aliases":["Exp / Post-Rock","Exp / Post-rock","Experimental rock"]},{"name":"Gothic","id":"eb32f147-802f-47f8-8262-852dec1157fd","category":"Genre","family":"Rock","aliases":["Gothic","Gothique"]},{"name":"Grunge","id":"1465f7d4-afac-4e53-9844-d2fd3828c453","category":"Genre","family":"Rock","aliases":["Grunge"]},{"name":"Hard Rock","id":"570715c0-10b8-433b-a688-3e3b57667610","category":"Genre","family":"Rock","aliases":["Hard Rock","Hard-Rock"]},{"name":"Indie / Alternative Rock","id":"98f0ed94-7ca2-422a-b5b2-011b995f3f1a","category":"Genre","family":"Rock","aliases":["Indie / Alternative Rock","Rock"]},{"name":"Krautrock","id":"0ee80c5e-bfdf-41c7-8001-c5361e79b886","category":"Genre","family":"Rock","aliases":["Krautrock","Kosmische","Teutonic"]},{"name":"Metal / Alt. Metal","id":"f41681d3-7ee5-4f51-9e4e-275097284508","category":"Genre","family":"Rock","aliases":["Metal / Alt. Metal","Métal / Alt. Métal","Alternative Metal"]},{"name":"New Wave","id":"3495961a-3801-4d4e-adf0-c90e43a6ede6","category":"Genre","family":"Rock","aliases":["New Wave"]},{"name":"Pop Rock","id":"b9d7b301-bdb8-4c28-9cf0-ae5f1c614392","category":"Genre","family":"Rock","aliases":["Pop Rock","Pop-Rock"]},{"name":"Psychedelic","id":"38271586-8909-4bbd-a1ab-4e17a486bc10","category":"Genre","family":"Rock","aliases":["Psychedelic","Psychédélique"]},{"name":"Punk / Pop-Punk","id":"4b62d3ac-b72d-497c-b1aa-800d71128966","category":"Genre","family":"Rock","aliases":["Punk / Pop-Punk"]},{"name":"Rock","id":"91e5b372-dda6-4fa4-93eb-e6379051f401","category":"Genre","family":"Rock","aliases":["Rock"]},{"name":"Rock FM","id":"6e64b430-5c41-415e-ab90-5f3693fea4b7","category":"Genre","family":"Rock","aliases":["Rock FM","Rockabilly / Rock'n'Roll","Classic rock","Radio rock"]},{"name":"Rockabilly / Rock 'n' Roll","id":"d681e399-ace8-463d-91e5-4b1571f55323","category":"Genre","family":"Rock","aliases":["Rockabilly / Rock 'n' Roll","Rock FM"]},{"name":"Roots Rock / Garage Rock","id":"4a347e07-1014-4f36-a2ac-ebb4918804c5","category":"Genre","family":"Rock","aliases":["Roots Rock / Garage Rock","Roots rock / Garage rock"]},{"name":"Shoegaze","id":"2a3efda4-f6ea-44e3-b3b1-68033040d3f8","category":"Genre","family":"Rock","aliases":["Shoegaze"]},{"name":"Stoner","id":"f75f6f2c-9bd9-4851-86c4-a0d35f811993","category":"Genre","family":"Rock","aliases":["Stoner"]},{"name":"Surf","id":"0a335d19-1c98-451a-82e5-86a2643c3e2f","category":"Genre","family":"Rock","aliases":["Surf"]},{"name":"Nu-Soul","id":"d460bd26-0b3a-4236-ba0c-6e5a9a5f2d1c","category":"Genre","family":"Soul / Rhythm 'n' Blues","aliases":["Nu-Soul","Neo soul","New soul"]},{"name":"Soul","id":"32b1e110-5765-43ab-948d-0bee723a2a72","category":"Genre","family":"Soul / Rhythm 'n' Blues","aliases":["Soul"]},{"name":"Alt R'n'B","id":"13656c06-c8e8-4cbf-a790-6852d9bfb2f4","category":"Genre","family":"Soul / Rhythm’n’Blues","aliases":["Alt R'n'B"]},{"name":"Rhythm 'n' Blues","id":"e999030f-c35b-4c30-aa80-b4d3f074a70c","category":"Genre","family":"Soul / Rhythm 'n' Blues","aliases":["Rhythm 'n' Blues","Rhythm and Blues","Rhythm & Blues","R’n’B","R&B"]},{"name":"New Jack","id":"d43f0598-6fdb-42e3-8f1c-30fced930e36","category":"Genre","family":"Soul / Rhythm’n’Blues","aliases":["New Jack","Swingbeat"]},{"name":"R'n'B","id":"d3ebf5d0-e310-4731-a284-d92b25197199","category":"Genre","family":"Soul / Rhythm’n’Blues","aliases":["R'n'B"]},{"name":"Boom Bap","id":"2745a19b-bc40-43c7-b4af-7c287c5d3e03","category":"Genre","family":"Hip-Hop / Rap","aliases":["Boom Bap","East Coast"]},{"name":"Cloud","id":"98fba264-3f71-48a7-bafc-dbd40d3a1c2c","category":"Genre","family":"Hip-Hop / Rap","aliases":["Cloud"]},{"name":"Drill","id":"d3258b31-b204-4d17-aee9-73e0622082d2","category":"Genre","family":"Hip-Hop / Rap","aliases":["Drill"]},{"name":"Emo Rap","id":"fa062681-5bd5-47f9-b747-561da6eb37fb","category":"Genre","family":"Hip-Hop / Rap","aliases":["Emo Rap"]},{"name":"Exp / Alt / Abstrakt","id":"bf6586e4-bb87-4072-ac69-06871806f948","category":"Genre","family":"Hip-Hop / Rap","aliases":["Exp / Alt / Abstrakt","Abstrakt Hip Hop"]},{"name":"Hardcore","id":"df38f173-b61b-43de-8a42-e062c84a7e8b","category":"Genre","family":"Hip-Hop / Rap","aliases":["Hardcore"]},{"name":"Old School","id":"66aa588a-8410-4b90-a1ff-748b3ee66658","category":"Genre","family":"Hip-Hop / Rap","aliases":["Old School","Hardcore","Boom Bap"]},{"name":"Phonk","id":"c1cfb682-2b30-4d30-82ae-251f765bcac2","category":"Genre","family":"Hip-Hop / Rap","aliases":["Phonk"]},{"name":"Smurf / Breakdancing","id":"5dd60603-d28b-494f-be80-9d3b313848c6","category":"Genre","family":"Hip-Hop / Rap","aliases":["Smurf / Breakdancing","Smurf / Breakdance"]},{"name":"Spoken Words / Slam","id":"0ba8a325-07c6-41e3-9fbb-ddc239c1ca35","category":"Genre","family":"Hip-Hop / Rap","aliases":["Spoken Words / Slam"]},{"name":"Trap","id":"be47f3ee-19c5-4399-b030-a0272528ca9c","category":"Genre","family":"Hip-Hop / Rap","aliases":["Trap"]},{"name":"Hip-Hop / Rap","id":"0396a705-af2b-4624-ac5e-710c73c7e4fe","category":"Genre","family":"Hip-Hop / Rap","aliases":["Hip-Hop / Rap","Urban / Hip-hop"]},{"name":"Australia Traditional","id":"64c505a8-56c8-4ee9-ad03-f71ec4e334b7","category":"Genre","family":"Other","aliases":["Australia Traditional","Australien traditionnel","Aboriginal","World"]},{"name":"Cajun","id":"6f82bda7-65bb-4489-9f7a-3664a6153537","category":"Genre","family":"Other","aliases":["Cajun","Louisiana"]},{"name":"Ethnic","id":"a396b274-2ab0-4d35-afbb-0766226aa85d","category":"Genre","family":"Other","aliases":["Ethnic","Ethnique","World"]},{"name":"Hawaiian / Polynesian","id":"a702a0ff-19bb-4dd9-9629-45aa17e4b865","category":"Genre","family":"Other","aliases":["Hawaiian / Polynesian","Hawaïen / Polynésien"]},{"name":"Native American","id":"66a432ff-6c94-477b-b5e5-a8f7c0718c13","category":"Genre","family":"Other","aliases":["Native American","Amérindien","World"]},{"name":"Tribal","id":"d82afe85-2318-42e5-a0c3-c4a5610991b0","category":"Genre","family":"Other","aliases":["Tribal","World"]},{"name":"Tropical","id":"b9db23d8-115b-42cc-a1a5-7b64a1b8670f","category":"Genre","family":"Other","aliases":["Tropical"]},{"name":"Other","id":"a163b527-9b53-445e-aaa1-df8c358285dd","category":"Genre","family":"Other","aliases":["Other","Autre"]},{"name":"Child Choir","id":"211ab190-2669-4aad-953b-bac36466942a","category":"Vocal","family":"Choirs","aliases":["Child Choir","Chœur d'enfants","Children","Kids","ensemble","carolers","chorale","choristers","vocalists","singing group"]},{"name":"Female Choir","id":"4109ab05-87b0-4ca5-9956-b5e17a88eaf6","category":"Vocal","family":"Choirs","aliases":["Female Choir","Chœur de femmes","Women","ensemble","carolers","chorale","choristers","vocalists","singing group"]},{"name":"Male Choir","id":"7b851079-db43-4c89-9533-335f158c9e35","category":"Vocal","family":"Choirs","aliases":["Male Choir","Chœur d'hommes","Men","ensemble","carolers","chorale","choristers","vocalists","singing group"]},{"name":"Mixt Choir","id":"698633f2-1317-4791-942f-8f76cde8eb21","category":"Vocal","family":"Choirs","aliases":["Mixt Choir","Chœur mixte","Ensemble","carolers","chorale","choristers","vocalists","singing group"]},{"name":"Female Duet","id":"05ff7b67-c078-4589-8eee-0384703e734d","category":"Vocal","family":"Duet","aliases":["Female Duet","Duo féminin","Female duo","Women","pair"]},{"name":"Male Duet","id":"f6bbfc57-46e7-4762-9280-d632328cb267","category":"Vocal","family":"Duet","aliases":["Male Duet","Duo masculin","Male duo","Men","pair"]},{"name":"Male / Female Duet","id":"a403f310-300c-4f89-ab9a-ea1906b11932","category":"Vocal","family":"Duet","aliases":["Male / Female Duet","Duo homme / femme","Male / Female duo","mixt duo","mixt pair"]},{"name":"A Cappella","id":"de6f37aa-40f8-49ff-949e-14bf987e4557","category":"Vocal","family":"A Cappella","aliases":["A Cappella"]},{"name":"Instrumental","id":"adb0dc18-e64d-4ff3-8cac-869216cd06cf","category":"Instruments","family":"Instrumental","aliases":["Instrumental"]},{"name":"Albanian","id":"03176e03-f82a-43ec-9401-402a681d4ced","category":"Vocal","family":"Language","aliases":["Albanian","Albanais"]},{"name":"Amharic","id":"3481ae65-0a7c-4a61-b51b-199d5fcdb9c2","category":"Vocal","family":"Language","aliases":["Amharic","Amharique"]},{"name":"Arabic","id":"b0a89def-b5a4-4dae-9210-e037805cd918","category":"Vocal","family":"Language","aliases":["Arabic","Arabe"]},{"name":"Bambara","id":"6204eb99-339d-41c7-b9c8-02005649cf39","category":"Vocal","family":"Language","aliases":["Bambara"]},{"name":"Bulgarian","id":"b5e17a70-f74b-4d6f-991f-410833a46082","category":"Vocal","family":"Language","aliases":["Bulgarian","Bulgare"]},{"name":"Catalan","id":"1148a1ab-d2c4-4a06-a215-9fb3f2aae9a6","category":"Vocal","family":"Language","aliases":["Catalan"]},{"name":"Chinese","id":"43873c6b-3901-4000-86c7-a04fc4322e3e","category":"Vocal","family":"Language","aliases":["Chinese","Chinois","Mandarin","Cantonese"]},{"name":"Creole","id":"fd713838-aa6a-4811-a34d-acaa01e49c49","category":"Vocal","family":"Language","aliases":["Creole","Créole"]},{"name":"Czech","id":"ffa9edf5-e306-4f86-9f8e-44331826a343","category":"Vocal","family":"Language","aliases":["Czech","Tchèque"]},{"name":"Danish","id":"35c3d121-c20f-4458-9bfa-e0b36a1dfbff","category":"Vocal","family":"Language","aliases":["Danish","Danois"]},{"name":"Dutch","id":"d10e3f8b-7277-4cac-858c-8f7de2cce3cd","category":"Vocal","family":"Language","aliases":["Dutch","Néerlandais"]},{"name":"English","id":"42fe3610-6780-4b08-a581-4a2ca9563394","category":"Vocal","family":"Language","aliases":["English","Anglais"]},{"name":"Estonian","id":"dbe05394-2e99-46a8-83e2-bdb4cbb33909","category":"Vocal","family":"Language","aliases":["Estonian","Estonien"]},{"name":"Finnish","id":"3744260d-2e09-43b1-8fd2-f21a1cb9437c","category":"Vocal","family":"Language","aliases":["Finnish","Finlandais"]},{"name":"French","id":"2b8364c6-79e4-42e6-81d9-f3d2a2f9a251","category":"Vocal","family":"Language","aliases":["French","Français"]},{"name":"Fulfuldé","id":"e290cf5b-4e78-402e-84c3-f1f8a74e4dad","category":"Vocal","family":"Language","aliases":["Fulfuldé","Fulfulde"]},{"name":"Gallego","id":"6ca1d4c4-4a49-4c8b-9a84-14c29db22b6d","category":"Vocal","family":"Language","aliases":["Gallego"]},{"name":"German","id":"a938e674-d80b-4960-87a1-73c95c390bc4","category":"Vocal","family":"Language","aliases":["German","Allemand"]},{"name":"Greek","id":"63fa0ce2-2726-47da-8382-1546318a6c7e","category":"Vocal","family":"Language","aliases":["Greek","Grec"]},{"name":"Haoussa","id":"eaa51d0e-93f0-4491-86e0-4a82fc709e18","category":"Vocal","family":"Language","aliases":["Haoussa"]},{"name":"Hebrew","id":"44f4625a-be86-4905-94f0-75ff944e2f10","category":"Vocal","family":"Language","aliases":["Hebrew","Hébreu"]},{"name":"Hindi","id":"40f10de3-b7cc-418c-934a-ca8e6ac07643","category":"Vocal","family":"Language","aliases":["Hindi"]},{"name":"Hungarian","id":"a1696835-75a0-44db-afe8-53ccd43f1247","category":"Vocal","family":"Language","aliases":["Hungarian","Hongrois"]},{"name":"Ibo","id":"b85d6b34-e413-4bbd-9af7-b8e9d8e36de5","category":"Vocal","family":"Language","aliases":["Ibo"]},{"name":"Indonesian","id":"0ae81c52-ab4d-4864-b792-e1508bae817f","category":"Vocal","family":"Language","aliases":["Indonesian","Indonésien"]},{"name":"Italian","id":"957819b2-5deb-45e1-a646-1c1dffa51652","category":"Vocal","family":"Language","aliases":["Italian","Italien"]},{"name":"Japanese","id":"7839e952-20d5-41a2-b5e4-5ba6b8544dd6","category":"Vocal","family":"Language","aliases":["Japanese","Japonais"]},{"name":"Korean","id":"0457caa0-f78d-403a-8604-b42a2f8a07ef","category":"Vocal","family":"Language","aliases":["Korean","Coréen"]},{"name":"Latin","id":"0ec39a3e-12f1-4104-b0c0-258e050c7871","category":"Vocal","family":"Language","aliases":["Latin"]},{"name":"Latvian","id":"1753fac6-f32c-48a2-af02-d9b9a8f2a468","category":"Vocal","family":"Language","aliases":["Latvian","Letton"]},{"name":"Lingala","id":"5ce0e207-6f6e-44a8-b3db-242a30da9b87","category":"Vocal","family":"Language","aliases":["Lingala"]},{"name":"Lithuanian","id":"59094581-bcd6-4b2d-938f-caec5b535ba9","category":"Vocal","family":"Language","aliases":["Lithuanian","Lituanien"]},{"name":"Luganda","id":"f09c7338-6279-4030-84fc-f719e0104438","category":"Vocal","family":"Language","aliases":["Luganda"]},{"name":"Malagasy","id":"8d1293c2-add7-4018-ab2d-3a26678035a9","category":"Vocal","family":"Language","aliases":["Malagasy","Malgache"]},{"name":"Maltese","id":"adf5f41e-15da-412c-a022-c0a7946279c5","category":"Vocal","family":"Language","aliases":["Maltese","Maltais"]},{"name":"Norwegian","id":"301442b3-86c6-407f-87d1-0d949ba77fd4","category":"Vocal","family":"Language","aliases":["Norwegian","Norvégien"]},{"name":"Oromo","id":"bed7e5d0-650c-40b0-a164-798b39bb38db","category":"Vocal","family":"Language","aliases":["Oromo"]},{"name":"Persian","id":"f7a7254d-5c76-41f4-955d-f85f9328cdbe","category":"Vocal","family":"Language","aliases":["Persian","Persan"]},{"name":"Polish","id":"1cb681ca-be56-46da-8ada-a295e991bee9","category":"Vocal","family":"Language","aliases":["Polish","Polonais"]},{"name":"Portuguese","id":"4b55898b-51c1-4e4a-b542-9cd7baf5f860","category":"Vocal","family":"Language","aliases":["Portuguese","Portugais"]},{"name":"Romanian","id":"b754b5d9-35b6-4ab1-97ad-4547c97afd75","category":"Vocal","family":"Language","aliases":["Romanian","Roumain"]},{"name":"Russian","id":"e6ff5dba-f1bd-48b0-9f7e-e2f9cab0362c","category":"Vocal","family":"Language","aliases":["Russian","Russe"]},{"name":"Serbian","id":"c9c18ead-554e-4b0d-a888-5a1ae8aa9475","category":"Vocal","family":"Language","aliases":["Serbian","Serbe"]},{"name":"Shona","id":"77c0fac8-3efb-4f79-84b1-9a9dac63e74f","category":"Vocal","family":"Language","aliases":["Shona"]},{"name":"Slovak","id":"7abff87e-bb9f-4803-8f34-61b26d2c80aa","category":"Vocal","family":"Language","aliases":["Slovak","Slovaque"]},{"name":"Slovenian","id":"620cedcd-5a82-4e40-bea4-7a9ba8765388","category":"Vocal","family":"Language","aliases":["Slovenian","Slovène"]},{"name":"Spanish","id":"def7d373-23e6-4e20-918a-3807afb82261","category":"Vocal","family":"Language","aliases":["Spanish","Espagnol"]},{"name":"Swahili","id":"de1a3f25-197a-4e87-9168-87f1636d92e9","category":"Vocal","family":"Language","aliases":["Swahili"]},{"name":"Swedish","id":"ff7a1254-9799-490e-b521-6a07354bb629","category":"Vocal","family":"Language","aliases":["Swedish","Suédois"]},{"name":"Thai","id":"e94d83bd-704f-44e0-af23-972b1e0c0dfc","category":"Vocal","family":"Language","aliases":["Thai","Thaïlandais"]},{"name":"Turkish","id":"45aca91a-1ddc-43c5-83cc-dadff11d2a96","category":"Vocal","family":"Language","aliases":["Turkish","Turc"]},{"name":"Ukrainian","id":"25a0996f-a95f-4f25-88c6-444d3ab87ff8","category":"Vocal","family":"Language","aliases":["Ukrainian","Ukrainien"]},{"name":"Vietnamese","id":"15c3f4da-38f9-431f-8d96-2be9df1a4eb2","category":"Vocal","family":"Language","aliases":["Vietnamese","Vietnamien"]},{"name":"Yoruba","id":"28427d6c-2557-406f-bd59-b1829617675a","category":"Vocal","family":"Language","aliases":["Yoruba","Yorouba"]},{"name":"Zoulou","id":"8a1dcaab-06b4-4ec6-9bd1-8e6b9d8bd366","category":"Vocal","family":"Language","aliases":["Zoulou"]},{"name":"Androgynous","id":"ebb515df-3c31-4bf6-9f34-bbec1e96b088","category":"Vocal","family":"Lead","aliases":["Androgynous","Androgyne"]},{"name":"Child Lead","id":"e3042cca-5a2b-4beb-a9f5-531c9a772e30","category":"Vocal","family":"Lead","aliases":["Child Lead","Lead enfant","Child singer","kid singer","kid voice"]},{"name":"Female Lead","id":"bb9c58ab-7dfa-49c0-a1ad-f6da4f1ce362","category":"Vocal","family":"Lead","aliases":["Female Lead","Lead féminin","Female singer","Woman singer","Woman voice","female","female lead","female vocal","female vocals","woman vocal","woman voice","femme","voix femme","voix feminine","femelle lead"]},{"name":"Male Lead","id":"b9d3f02e-3d64-40b3-96c0-6cf50972535c","category":"Vocal","family":"Lead","aliases":["Male Lead","Lead masculin","Male singer","Man singer","Man voice","male","male lead","male vocal","male vocals","man vocal","man voice","homme","voix homme","voix masculine"]},{"name":"Crooner","id":"9d347ebe-a263-44fc-8f61-3c4d455f8ed1","category":"Vocal","family":"Vocal Dynamic","aliases":["Crooner"]},{"name":"Dynamic","id":"7e25102f-f5c8-4fc9-9349-812f0182f9e3","category":"Vocal","family":"Vocal Dynamic","aliases":["Dynamic","Dynamique"]},{"name":"Laid Back","id":"8e9236e5-0a9f-434a-ad45-5f93fc829751","category":"Vocal","family":"Vocal Dynamic","aliases":["Laid Back"]},{"name":"Lyrical","id":"a03b55fb-0b37-4e86-8108-0da5aa9ddec6","category":"Vocal","family":"Vocal Dynamic","aliases":["Lyrical","Lyrique"]},{"name":"Rapped","id":"0110688b-391e-4587-a46f-95b5f63f1c2c","category":"Vocal","family":"Vocal Dynamic","aliases":["Rapped","Rappé"]},{"name":"Shouted","id":"4ca66a4d-b4ed-4c4d-b9d4-a52e1605ee8f","category":"Vocal","family":"Vocal Dynamic","aliases":["Shouted","Crié"]},{"name":"Spoken","id":"01bd5260-2885-4560-bf50-d2cdc2a0e70d","category":"Vocal","family":"Vocal Dynamic","aliases":["Spoken","Parlé"]},{"name":"Sweet","id":"c0bcd149-8c6e-4927-a822-6ad1085745bb","category":"Vocal","family":"Vocal Dynamic","aliases":["Sweet","Doux","sweet voice","soft voice","gentle voice","smooth voice","voix douce"]},{"name":"Whispered","id":"c37569c8-751b-442a-9557-237af823a943","category":"Vocal","family":"Vocal Dynamic","aliases":["Whispered","Chuchoté","Whisper"]},{"name":"Onomatopoeia","id":"e2738ab3-ed7a-414d-a1b3-91503fe769b0","category":"Vocal","family":"Other","aliases":["Onomatopoeia","Onomatopée"]},{"name":"Sampled Voice","id":"1bea48eb-3e69-457d-8bf2-3b2befd01f84","category":"Vocal","family":"Other","aliases":["Sampled Voice","Voix samplée"]},{"name":"Whistle","id":"c19a1e5e-06e2-465c-8896-e7fc6fe2fb18","category":"Vocal","family":"Other","aliases":["Whistle","Sifflement"]},{"name":"Beat Programming","id":"6b5f4f1f-ab45-4eb4-ba68-b71dceea04ae","category":"Instruments","family":"Beats & Percussions","aliases":["Beat Programming","Beat programming"]},{"name":"Bells","id":"79550487-b7b2-4176-8449-08fb6a7c4d0b","category":"Instruments","family":"Beats & Percussions","aliases":["Bells","Cloches"]},{"name":"Body Percussion","id":"1e8738eb-7ece-49c1-b7d2-240087037ea1","category":"Instruments","family":"Beats & Percussions","aliases":["Body Percussion","Percussions corporelles"]},{"name":"Cymbalum","id":"86276495-cfd9-4dcd-b181-0e9811158c8b","category":"Instruments","family":"Beats & Percussions","aliases":["Cymbalum"]},{"name":"Drum Machine","id":"03a5a735-3cc8-4559-9d10-71e8acb9b9d6","category":"Instruments","family":"Beats & Percussions","aliases":["Drum Machine","Boîte à rythme"]},{"name":"Drums","id":"1f63beb4-6a44-401c-8ae1-3d44fbc5917a","category":"Instruments","family":"Beats & Percussions","aliases":["Drums","Batterie"]},{"name":"Finger Snap","id":"a12c20ef-4475-4289-96d6-16ecd3492f6f","category":"Instruments","family":"Beats & Percussions","aliases":["Finger Snap","Claquement de doigt"]},{"name":"Glockenspiel","id":"a2428df4-842a-4d1b-98de-f74bca7dd59c","category":"Instruments","family":"Beats & Percussions","aliases":["Glockenspiel"]},{"name":"Handclap","id":"24a25419-4e53-46f2-8fc5-2860fa32c7b5","category":"Instruments","family":"Beats & Percussions","aliases":["Handclap","Claquement de main","Clap"]},{"name":"Human Beatbox","id":"89931484-f1e2-4cbe-8a6d-86c82cf6a723","category":"Instruments","family":"Beats & Percussions","aliases":["Human Beatbox","Beatbox"]},{"name":"Percussions","id":"20ff94ae-3322-4aa8-b827-a93e37e5a682","category":"Instruments","family":"Beats & Percussions","aliases":["Percussions"]},{"name":"Steeldrum","id":"58e84ef3-6992-4604-9b48-4717e67c90bb","category":"Instruments","family":"Beats & Percussions","aliases":["Steeldrum","Pan"]},{"name":"Tabla","id":"f1b4f7c5-5787-46b6-b830-2db295d8634c","category":"Instruments","family":"Beats & Percussions","aliases":["Tabla"]},{"name":"Vibraphone","id":"d9a5aa78-e4c7-473a-9a04-b4a90b734db4","category":"Instruments","family":"Beats & Percussions","aliases":["Vibraphone"]},{"name":"Xylophone, Marimba","id":"b836331c-435c-46ae-be03-a80adb6e2f7b","category":"Instruments","family":"Beats & Percussions","aliases":["Xylophone, Marimba"]},{"name":"Autotune","id":"a0a209e0-c947-46b6-9da4-2f499e3d4ce2","category":"Instruments","family":"FX","aliases":["Autotune"]},{"name":"Compressed","id":"1eabbeae-960b-43bb-89e5-55dd1c4429ba","category":"Instruments","family":"FX","aliases":["Compressed","Compressé"]},{"name":"Flanger","id":"8e47abc1-9751-4c81-b65d-d45f0c8867b9","category":"Instruments","family":"FX","aliases":["Flanger"]},{"name":"Lo-Fi / Garage / DIY","id":"df6a8fa0-dc14-4a56-844f-d824d06a7b85","category":"Instruments","family":"FX","aliases":["Lo-Fi / Garage / DIY"]},{"name":"Reverberated","id":"7985f1a4-be92-408f-b439-c3d97fd36cdd","category":"Instruments","family":"FX","aliases":["Reverberated","Réverbéré"]},{"name":"Saturated","id":"5ef66bb9-4d7d-4113-868a-3f42d5d10df7","category":"Instruments","family":"FX","aliases":["Saturated","Saturé"]},{"name":"Vocoder","id":"4d796673-ad10-44cb-833c-c15831a447d3","category":"Instruments","family":"FX","aliases":["Vocoder","Vocodeur"]},{"name":"Acoustic Guitar","id":"4cc88124-4f5e-4214-b56a-a6a5bb43ccfd","category":"Instruments","family":"Guitar(s)","aliases":["Acoustic Guitar","Guitare acoustique"]},{"name":"Banjo","id":"c67cb674-b2e5-468f-9efc-15c316c09619","category":"Instruments","family":"Guitar(s)","aliases":["Banjo"]},{"name":"Bass Guitar","id":"2d005c8f-6ce6-44e2-86c8-877e7ed08a2f","category":"Instruments","family":"Guitar(s)","aliases":["Bass Guitar","Guitare basse"]},{"name":"Dobro","id":"bf8b7e19-b029-4252-a26e-4709481f2443","category":"Instruments","family":"Guitar(s)","aliases":["Dobro"]},{"name":"Electric Guitar","id":"c87dbb86-f5d0-444c-9cd7-c62d18da1a08","category":"Instruments","family":"Guitar(s)","aliases":["Electric Guitar","Guitare électrique"]},{"name":"Mandolin","id":"2b03ab7f-98b6-4dec-a890-ce743be4ec7a","category":"Instruments","family":"Guitar(s)","aliases":["Mandolin","Mandoline"]},{"name":"Oud","id":"962a9aa3-9c2c-484b-af5a-a3cbc6fa15b6","category":"Instruments","family":"Guitar(s)","aliases":["Oud"]},{"name":"Pedal Steel","id":"97b51b3a-0c7d-4b4b-adbd-f75f27882771","category":"Instruments","family":"Guitar(s)","aliases":["Pedal Steel"]},{"name":"Sitar","id":"63d61c12-351a-4ea9-b676-d52d5c1227e9","category":"Instruments","family":"Guitar(s)","aliases":["Sitar"]},{"name":"Ukulele","id":"5a6b0eb8-ae51-470e-bcf5-b5a6b41e8913","category":"Instruments","family":"Guitar(s)","aliases":["Ukulele","Ukulélé"]},{"name":"2-3 instr.","id":"d13ee4d6-27f3-4f1a-9918-b2b2b17236e3","category":"Instruments","family":"Instrument Density","aliases":["2-3 instr.","Duo","Trio"]},{"name":"4-9 instr.","id":"92c9e153-8419-4187-b177-7766b532eb36","category":"Instruments","family":"Instrument Density","aliases":["4-9 instr.","Quatuor","quintet","sextet","band"]},{"name":"10+ instr.","id":"50483149-4473-4dab-a295-1469c0c46b0c","category":"Instruments","family":"Instrument Density","aliases":["10+ instr."]},{"name":"Solo instr.","id":"4bbced20-f4e6-42fd-bea5-22cff87f37c6","category":"Instruments","family":"Instrument Density","aliases":["Solo instr."]},{"name":"Arpeggiator","id":"f154fafc-2b5f-4988-8839-50875ac36658","category":"Instruments","family":"Keyboards & Pianos","aliases":["Arpeggiator","Arpégiateur"]},{"name":"Celesta","id":"6d4cd0f5-d14f-41de-8779-6b3abb711b0b","category":"Instruments","family":"Keyboards & Pianos","aliases":["Celesta","Célesta"]},{"name":"Electric Piano","id":"190b4bd3-8aad-4792-a9e6-fd436d22379f","category":"Instruments","family":"Keyboards & Pianos","aliases":["Electric Piano","Piano électrique"]},{"name":"Harmonium","id":"871d840f-86bd-458d-8252-21242387fa42","category":"Instruments","family":"Keyboards & Pianos","aliases":["Harmonium"]},{"name":"Harpsichord","id":"98a804a7-9016-4ace-93a2-a3d967e2cba3","category":"Instruments","family":"Keyboards & Pianos","aliases":["Harpsichord","Clavecin"]},{"name":"Mellotron","id":"301c6ee8-84d0-4600-a6ac-606b2766847a","category":"Instruments","family":"Keyboards & Pianos","aliases":["Mellotron"]},{"name":"Omnichord","id":"5e64f258-5007-4b29-9be7-8fe7b83f93f5","category":"Instruments","family":"Keyboards & Pianos","aliases":["Omnichord"]},{"name":"Organ","id":"fdcd6714-d1a6-4596-be27-72e1faf538fe","category":"Instruments","family":"Keyboards & Pianos","aliases":["Organ","Orgue"]},{"name":"Piano","id":"dc71d47b-b2f7-47ff-8ee4-db8eacddd6b5","category":"Instruments","family":"Keyboards & Pianos","aliases":["Piano"]},{"name":"Prepared Piano","id":"0f7f4b26-b7e9-4ce6-9411-a0816e9e4ba9","category":"Instruments","family":"Keyboards & Pianos","aliases":["Prepared Piano","Piano préparé"]},{"name":"Synth","id":"c9c1e580-5707-4199-880b-55e9025bfcd9","category":"Instruments","family":"Keyboards & Pianos","aliases":["Synth","Synthé","Synthetizer"]},{"name":"Cello","id":"d5f9e113-80d4-41b8-8722-edcb7c988383","category":"Instruments","family":"Strings","aliases":["Cello","Violoncelle"]},{"name":"Double Bass","id":"7e9398b3-2332-4fa2-ae68-7b64ebcffefb","category":"Instruments","family":"Strings","aliases":["Double Bass","Contrebasse"]},{"name":"Harp","id":"937686fa-114d-4841-acce-686371831a4f","category":"Instruments","family":"Strings","aliases":["Harp","Harpe"]},{"name":"Strings Ensemble","id":"d0b9b9f7-5da2-4114-add3-96965e9c7a5e","category":"Instruments","family":"Strings","aliases":["Strings Ensemble","Ensemble à cordes"]},{"name":"Viola","id":"1749c744-8c37-4b1b-aa4f-793ff2f41ebe","category":"Instruments","family":"Strings","aliases":["Viola","Alto"]},{"name":"Viola da Gamba","id":"b045334f-27c3-4957-a15e-9f076e72b881","category":"Instruments","family":"Strings","aliases":["Viola da Gamba","Viole de gambe"]},{"name":"Violin Solo","id":"0af8e0f2-d720-489f-8d7a-5d49f1685ecf","category":"Instruments","family":"Strings","aliases":["Violin Solo","Violon Solo"]},{"name":"Acoustic Textures","id":"9045187f-a585-493f-a9ea-6c06be7f61ff","category":"Instruments","family":"Textures","aliases":["Acoustic Textures","Textures acoustiques","acoustic texture","acoustic textures","organic acoustic"]},{"name":"Electric Textures","id":"4fe11ff2-59a1-4863-90e6-167d43b3f4b1","category":"Instruments","family":"Textures","aliases":["Electric Textures","Textures électriques"]},{"name":"Electronic Textures","id":"724e4442-a2bf-439c-b141-86cb215b255f","category":"Instruments","family":"Textures","aliases":["Electronic Textures","Textures électroniques"]},{"name":"Brass Instruments","id":"6768aabf-42ab-483f-8de4-ec8ba55fc9ce","category":"Instruments","family":"Winds","aliases":["Brass Instruments","Cuivres"]},{"name":"Clarinet","id":"819ea9c4-828e-4cad-9a30-3e90702b3791","category":"Instruments","family":"Winds","aliases":["Clarinet","Clarinette"]},{"name":"Duduk","id":"7307cb69-9f81-438a-8416-ea9a55301524","category":"Instruments","family":"Instruments","aliases":["Duduk","Douduk"]},{"name":"Fanfare","id":"2732fd37-2383-4d9e-92e3-633c7cc961bc","category":"Instruments","family":"Instruments","aliases":["Fanfare","Fanfarade","flourish"]},{"name":"Flute","id":"35cc7029-0ead-48ba-9d46-dfc6ee9df3c8","category":"Instruments","family":"Winds","aliases":["Flute","Flûte"]},{"name":"Saxophone","id":"4e32301c-3877-464f-b7f4-d1a10acfe32f","category":"Instruments","family":"Winds","aliases":["Saxophone","Sax"]},{"name":"Trumpet","id":"6ee33853-7d60-42b5-97cc-d3d3231af035","category":"Instruments","family":"Winds","aliases":["Trumpet","Trompette"]},{"name":"Accordion","id":"0a664e9d-d5f5-465a-8797-41b764867647","category":"Instruments","family":"Other","aliases":["Accordion","Accordéon"]},{"name":"Glass Harmonica","id":"aa768c97-ca10-4ae6-a2c5-c58e898e9fac","category":"Instruments","family":"Other","aliases":["Glass Harmonica"]},{"name":"Guimbarde","id":"dfdfa5a9-5dc9-4a49-8680-24758b745033","category":"Instruments","family":"Other","aliases":["Guimbarde"]},{"name":"Harmonica","id":"e34be385-74db-4cbe-a961-bbd60b454530","category":"Instruments","family":"Other","aliases":["Harmonica"]},{"name":"Kazou","id":"ad41d6d6-3502-4826-88cd-56ef2336fba5","category":"Instruments","family":"Other","aliases":["Kazou"]},{"name":"Kora","id":"09a7ff32-e388-40e5-b956-1a5b4e88f4b8","category":"Instruments","family":"Other","aliases":["Kora"]},{"name":"Melodica","id":"61fe5f3e-7b46-4536-9d11-1dec41ab301c","category":"Instruments","family":"Other","aliases":["Melodica","Mélodica"]},{"name":"Musical Saw","id":"00d7f3cf-0cf7-4212-a6c4-583ec081063e","category":"Instruments","family":"Other","aliases":["Musical Saw","Scie musicale"]},{"name":"Orchestra","id":"6d41cc57-8463-4f13-8342-399235824f07","category":"Instruments","family":"Other","aliases":["Orchestra","Orchestre"]},{"name":"Pipe","id":"2cc25c88-16ae-40d5-bf2c-a7cbbb264346","category":"Instruments","family":"Other","aliases":["Pipe","Cornemuse"]},{"name":"Scratches","id":"e48edd6f-17ea-4b53-af95-8f15f2fc789d","category":"Instruments","family":"Other","aliases":["Scratches"]},{"name":"Fashion / Attitude","id":"a7365443-22fc-480d-9544-f987f4548639","category":"Mood","family":"Attitude","aliases":["Fashion / Attitude","Mode / Attitude","stylish","trendy","chic","fashionable","classy","sophisticated","posh"]},{"name":"Feminine","id":"85f2e588-8b2f-475e-874f-40c412cb03d8","category":"Mood","family":"Attitude","aliases":["Feminine","Féminin","womanly","ladylike","graceful","girlish"]},{"name":"Girl Power","id":"116921b5-a68f-4644-a25a-2e221138b9e3","category":"Mood","family":"Attitude","aliases":["Girl Power","female empowerment","sisterhood","feminist","feminism","Sorority"]},{"name":"Male","id":"d637e533-1a92-4af9-995b-d12f89d5ffdf","category":"Mood","family":"Attitude","aliases":["Male","Mâle","masculine","manly","virile","macho"]},{"name":"Calm","id":"70a003ee-65cc-4b96-9286-7662306945b6","category":"Mood","family":"Calm / Elegant","aliases":["Calm","Calme","relax","zen","chill","meditation","sleep","peaceful","ambient","nature","focus","slow"]},{"name":"Elegant","id":"f297e04b-2168-4a00-a00a-5fa096205c26","category":"Mood","family":"Calm / Elegant","aliases":["Elegant","Élégant","classy","sophisticated","refine"]},{"name":"Ethereal","id":"f65d9401-2ab4-4f89-ac72-9c5b281df73f","category":"Mood","family":"Calm / Elegant","aliases":["Ethereal","Éthéré","delicate","light","floating","mystical","surreal","magical"]},{"name":"Intimist","id":"a097fec2-8237-4332-a59d-7153d7b974cd","category":"Mood","family":"Calm / Elegant","aliases":["Intimist","Intimiste","cozy","personal","gentle","poetic","Lounge","intimate"]},{"name":"Aggressive","id":"d91b404d-1b08-4261-8434-40c1af003df2","category":"Mood","family":"Dark / Weird","aliases":["Aggressive","Agressif","Gritty","Intense","violent","hard","angry","fierce","vigorous"]},{"name":"Anxious","id":"5444dda7-0bb3-4520-9579-c50677f668f8","category":"Mood","family":"Dark / Weird","aliases":["Anxious","Anxieux","nervous","restless","tension","spooky","stress","stressful"]},{"name":"Hypnotic","id":"bf1d88cd-0f76-4117-92a6-e05da1838903","category":"Mood","family":"Dark / Weird","aliases":["Hypnotic","Hypnotique","trance","mesmerising","addictive"]},{"name":"Suspense","id":"926a8a57-59a8-4782-a5ec-faf018d72478","category":"Mood","family":"Dark / Weird","aliases":["Suspense","tension","exciting","pressure"]},{"name":"Emotional","id":"a4ebfa7d-67b5-4786-9431-99a66a8096e4","category":"Mood","family":"Emotive","aliases":["Emotional","Émotionnel","touching","passionate","dramatic","tearing"]},{"name":"Hopeful","id":"7e870c08-b6cf-4903-8bcb-e36b8352ee12","category":"Mood","family":"Emotive","aliases":["Hopeful","Optimiste","motivating","uplifting","optimistic","elevating"]},{"name":"Nostalgic","id":"751df5c7-2c58-49b2-96f7-0b3866f2e6c2","category":"Mood","family":"Emotive","aliases":["Nostalgic","Nostalgique","melancholic","sentimental","retro"]},{"name":"Sad","id":"a498b3e1-9901-4634-a9cc-9faa69ecf88d","category":"Mood","family":"Emotive","aliases":["Sad","Triste","tragic","blue","sorrowful","sorrow","depressing","crying","tearful","tears"]},{"name":"Dancing","id":"6643d7f9-1a56-4e92-bc3a-7cce28e4152d","category":"Mood","family":"Energetic","aliases":["Dancing","Dansant","groovy","swinging","twisting","vibing","bouncy","dancefloor","clubbing"]},{"name":"Energetic","id":"a5ad2243-c73c-4248-a842-b19b3d3ec693","category":"Mood","family":"Energetic","aliases":["Energetic","Énergique","Powerful","vibrant","dynamic","Energy"]},{"name":"Heroic / Epic","id":"e5cc640a-1da4-4cab-983d-59d4f37dc64c","category":"Mood","family":"Energetic","aliases":["Heroic / Epic","Héroïque / Épique","Anthemic","spectacular"]},{"name":"Massive / Heavy","id":"b5f9409a-c6d2-4453-97ad-02d926639499","category":"Mood","family":"Energetic","aliases":["Massive / Heavy","Massif / Lourd","Lounge","casual","mellow","smooth","chill"]},{"name":"Performance","id":"5383c26a-c32d-4f29-ad77-2e70154c1546","category":"Mood","family":"Energetic","aliases":["Performance","iconic","cinematic","immersive"]},{"name":"Romantic","id":"c8bdca9d-4684-4b91-9cdb-22d41f5d554d","category":"Mood","family":"Love","aliases":["Romantic","Romantique","warm","sweet","passionate"]},{"name":"Sensual","id":"6ef4b5d3-a542-43f1-b6ef-ac493c4e77a5","category":"Mood","family":"Love","aliases":["Sensual","Sensuel","delicate","lush","smooth"]},{"name":"Sexual","id":"c4e0b5c5-3328-422d-bdea-b9178a97b6e1","category":"Mood","family":"Love","aliases":["Sexual","Sexuel","erotic","sexy","tempting","steamy"]},{"name":"Christmas","id":"23c6f0be-eac1-44c8-a56f-1a04b3a81956","category":"Mood","family":"Magic","aliases":["Christmas","Noël","festive","merry","joyful","santa"]},{"name":"Dreamy","id":"7063fc4b-4b30-44bc-9078-db463f6f9080","category":"Mood","family":"Magic","aliases":["Dreamy","Rêveur","otherwordly","whimsical","visionary"]},{"name":"Magical","id":"e49ab010-1f19-4d90-80e4-95c6988958db","category":"Mood","family":"Magic","aliases":["Magical","Magique","witchy","charming","mystical","surreal","mysterious"]},{"name":"Fun","id":"ebfa8df5-b776-426d-a0a4-264f018bec06","category":"Mood","family":"Positive","aliases":["Fun","Amusant","playful","bouncy","lively","exciting","party"]},{"name":"Happy","id":"57b8c141-267e-47c8-8b4d-2876a3976e5a","category":"Mood","family":"Positive","aliases":["Happy","Heureux","cheerful","uplifting","positive","euphoric"]},{"name":"Quirky","id":"91af23df-0063-45c0-8bd1-70378977e42b","category":"Mood","family":"Positive","aliases":["Quirky","Excentrique","weird","eccentric","bizarre","freaky","unique"]},{"name":"Unifying","id":"3022c301-c63d-4e1b-badb-b1edfae54024","category":"Mood","family":"Positive","aliases":["Unifying","Unifiant","inclusive","empowering"]},{"name":"Childish","id":"30975344-04a6-444d-b410-374c37a615f0","category":"Mood","family":"Various","aliases":["Childish","Enfantin","innocent","cute","carefree","playful","kids"]},{"name":"Drunk","id":"c772c8ab-202d-4e60-aeae-304cc594ed1d","category":"Mood","family":"Various","aliases":["Drunk","Ivre","chaotic","tipsy"]},{"name":"Laidback / Cool","id":"b9f007dc-8976-421e-b2dc-8830dad550df","category":"Mood","family":"Various","aliases":["Laidback / Cool","Décontracté / Cool","Lounge","casual","mellow","smooth","chill","laidback","laid back","cool mood"]},{"name":"Naive / Simple","id":"dd128958-53c0-4829-9e74-00f14ae90cd4","category":"Mood","family":"Various","aliases":["Naive / Simple","Naïf / Simple","pure","authentic","natural"]},{"name":"Patriotic","id":"49018e2c-a2ff-40c8-98bf-f9a935bb3a2d","category":"Mood","family":"Various","aliases":["Patriotic","Patriotique","proud","orchestral","pompous","anthem","hymn"]},{"name":"Build Up (layers)","id":"e5dc6dfb-8214-4299-8a3a-fa33d1e83521","category":"Movement","family":"Structure","aliases":["Build Up (layers)","Build Up (couches)","crescendo","accumulation","layering","rising","escalation","increase"]},{"name":"Build Up (volume)","id":"2d28c8c3-9c32-43c5-ad7f-8c244aad4dbb","category":"Movement","family":"Structure","aliases":["Build Up (volume)","crescendo","accumulation","layering","rising","escalation","increase"]},{"name":"Explosion / Contrast","id":"c957b022-d5bd-401d-b1ed-737f4ee5bb3d","category":"Movement","family":"Structure","aliases":["Explosion / Contrast","Explosion / Contraste","boom","eruption","burst","flare","bang"]},{"name":"Linear","id":"32e11fa2-5c11-4a40-a71e-dc894b601e5e","category":"Movement","family":"Structure","aliases":["Linear","Linéaire","straightforward","direct","simple","basic"]},{"name":"Repetitive","id":"43fae6db-e392-4286-b972-b86ae2928b67","category":"Movement","family":"Structure","aliases":["Repetitive","Répétitif","cyclical","monotonous","cycle"]},{"name":"Chorus / Verse","id":"a760169a-77cb-445a-bac1-5c0be58ddd90","category":"Movement","family":"Structure","aliases":["Chorus / Verse","Couplet / Refrain"]},{"name":"Hook / Gimmick","id":"478889ea-298a-46fa-8136-f6c03ab96288","category":"Movement","family":"Structure","aliases":["Hook / Gimmick","Catchy"]},{"name":"Clock / Tick-Tock","id":"8ad2afb1-c6a8-48fb-bc45-97751c3a4d82","category":"Movement","family":"Image","aliases":["Clock / Tick-Tock","Horloge / Tic-Tac","ticking","metronome","chronometer","stopwatch","timer"]},{"name":"Clumsy","id":"e9a495b7-86ca-4423-9728-1145c9118066","category":"Movement","family":"Image","aliases":["Clumsy","Maladroit","awkward","cute","unhinged"]},{"name":"Chase","id":"05f908b2-3b6c-481c-ae60-f9a3815ff03c","category":"Movement","family":"Image","aliases":["Chase","Course-poursuite","pursuit","hunt","race","dash","rush"]},{"name":"Frantic","id":"90e4007b-6824-4c7b-9dba-ea804304d811","category":"Movement","family":"Image","aliases":["Frantic","Frénétique","hectic","stressed","agitated","wild"]},{"name":"Gracious","id":"fa93e575-f328-4adc-a51b-e1594ae150fa","category":"Movement","family":"Image","aliases":["Gracious","Gracieux","elegant","refined","sophisticated","finesse"]},{"name":"Mechanical","id":"66b204f2-300f-4cd2-a00a-ed52e54b7609","category":"Movement","family":"Image","aliases":["Mechanical","Mécanique","robotic","automatic","metal","industrial","machine"]},{"name":"Riding","id":"f79bbc33-da1b-4ec5-a231-d4f51000ef6e","category":"Movement","family":"Image","aliases":["Riding","Chevauchant","cruising","rolling","driving","moving"]},{"name":"Running","id":"b9692ee4-4e35-4f53-91ef-ba652b1ae9aa","category":"Movement","family":"Image","aliases":["Running","Vif","racing","speeding","chasing"]},{"name":"Slow Motion Pictures","id":"8125aebe-f7ff-4a47-8b8b-3b21443b9ec6","category":"Movement","family":"Image","aliases":["Slow Motion Pictures","Images au ralenti","Slow-mo","Slo-mo","idle"]},{"name":"Whirling","id":"2ff16e34-9138-44ba-8b30-d7eaeceb8552","category":"Movement","family":"Image","aliases":["Whirling","Tourbillonnant","spinning","twirling","swirling","rotating"]},{"name":"Very Low","id":"609a8e4c-e40e-4699-9766-4284a7d46be3","category":"Movement","family":"Presence of Beat","aliases":["Very Low","Très faible"]},{"name":"Low","id":"80d4854e-c46f-4bcd-b03b-b04b93aafa58","category":"Movement","family":"Presence of Beat","aliases":["Low","Faible"]},{"name":"Normal","id":"bce955c1-dcc9-4b86-9278-ca1d81bf6463","category":"Movement","family":"Presence of Beat","aliases":["Normal","Normale"]},{"name":"High","id":"19fcaf0b-32e9-4f8d-ae71-75692fd34c0c","category":"Movement","family":"Presence of Beat","aliases":["High","Haut"]},{"name":"Very High","id":"583645dd-3034-46d7-8c8b-57e2bf57ab1f","category":"Movement","family":"Presence of Beat","aliases":["Very High","Très élevé"]},{"name":"Very Low","id":"418c756a-8736-4988-8337-088f022fc876","category":"Movement","family":"Tempo","aliases":["Very Low","Très bas","Larghissimo","Adagissimo","Very Slow"]},{"name":"Low","id":"22f487b1-e387-425e-81aa-53a68cb6d64f","category":"Movement","family":"Tempo","aliases":["Low","Bas","Slow","Largo","Larguetto","Adagio","Adagietto","Lento"]},{"name":"Mid Tempo","id":"e1f0d80f-dd89-44a6-9ad9-f81073035cca","category":"Movement","family":"Tempo","aliases":["Mid Tempo","Mid-tempo","Andante","Andantino","Moderato","Medium"]},{"name":"Up Tempo","id":"5cc7dc13-fdb2-479a-879f-850afa26caf3","category":"Movement","family":"Tempo","aliases":["Up Tempo","Up tempo","Allegretto","Allegro","Vivace","Fast"]},{"name":"Ultra","id":"5b1d7e96-333d-45e5-bed0-b1986c2d7f29","category":"Movement","family":"Tempo","aliases":["Ultra","Vivacissimo","Very fast","Allegrissimo","Presto","Prestissimo"]},{"name":"Acceleration","id":"2d67809e-c5e5-4c73-9651-45ae84bc52ef","category":"Movement","family":"Tempo","aliases":["Acceleration","Accélération","Accelerando","Increase","Accelerating","Affrettando","Mosso","Precipitando"]},{"name":"Progressive Deceleration","id":"8309444a-0945-4a55-a522-f2aa3c69e2d8","category":"Movement","family":"Tempo","aliases":["Progressive Deceleration","Décélération progressive","Allargando","Calando","Lentando","Decreasing","Rallentando","Ritardando"]},{"name":"A Tempo","id":"eebed3b7-be22-4265-a49d-b17efe3601d5","category":"Movement","family":"Tempo","aliases":["A Tempo","À tempo","A capriccio"]},{"name":"Varied","id":"7cfa2675-0333-4c55-81fa-91b0ad99299b","category":"Movement","family":"Tempo","aliases":["Varied","Varié"]},{"name":"Explicit","id":"641814db-18b0-4de3-a1b8-533ff27da906","category":"Lyrics","family":"Explicit","aliases":["Explicit","Explicite","Parental Advisory","crude","coarse","rude","vulgar","curse","swearing","obscene"]},{"name":"Addiction / Recovery","id":"ca4c00d7-0d92-48c1-b6d3-f2af605beb9e","category":"Lyrics","family":"Theme","aliases":["Addiction / Recovery","Addiction / Rétablissement","Drugs","Abuse","Rehab","Substance","Dependance","Healing","Sobriety","High","Stoned","Habit"]},{"name":"Adventure","id":"aa4eb549-f993-448e-adf9-548b429198bd","category":"Lyrics","family":"Theme","aliases":["Adventure","Aventure","quest","journey","expedition"]},{"name":"Animals","id":"e51ea33d-43ba-42e6-8985-cefb52c76128","category":"Lyrics","family":"Theme","aliases":["Animals","Animaux","creatures","wildlife","pets","birds","jungle","beast","fauna"]},{"name":"Art / Creativity","id":"98e17a57-077a-4ff7-9b34-23488230c22f","category":"Lyrics","family":"Theme","aliases":["Art / Creativity","Art / Créativité","imagination","innovation","expression","emancipation","artistic"]},{"name":"Beauty","id":"9c7e60f5-72d3-46ff-a88e-bbb6107e5654","category":"Lyrics","family":"Theme","aliases":["Beauty","Beauté","charm","aesthetics","elegance"]},{"name":"Betrayal / Disillusionment","id":"ae912c5a-ba9f-4f0f-ade8-8a75c3f2f9f4","category":"Lyrics","family":"Theme","aliases":["Betrayal / Disillusionment","Trahison / Désillusion","deception","letdown","disapointment","treason"]},{"name":"Change","id":"289884be-f4ac-490c-a362-8e10e5fa98be","category":"Lyrics","family":"Theme","aliases":["Change","Changement","transformation","revolution","transition","metamorphosis","shift"]},{"name":"Childhood","id":"43f9d982-4a74-4880-b514-4edab59d4f89","category":"Lyrics","family":"Theme","aliases":["Childhood","Enfance","adolescence","early years","teenage"]},{"name":"Christmas","id":"dbce0b47-c0c2-4612-974e-de993ffc1229","category":"Lyrics","family":"Theme","aliases":["Christmas","Noël","Noel","Carol","Santa"]},{"name":"Courage / Resilience","id":"24e21eb3-ac18-47b3-8004-ac7d157cb08b","category":"Lyrics","family":"Theme","aliases":["Courage / Resilience","Courage / Résilience","Bravery","Grit","Endurance","Strength"]},{"name":"Dance","id":"97cb2286-3c81-43fa-9e22-e502347cf2c8","category":"Lyrics","family":"Theme","aliases":["Dance","Danse","performance"]},{"name":"Death / Mourning","id":"68eb20e3-fa88-406f-914b-9b8a3e5c4d99","category":"Lyrics","family":"Theme","aliases":["Death / Mourning","Mort / Deuil","Loss","Grief","Demise","Funeral"]},{"name":"Desire / Temptation","id":"51eae33a-c066-4067-99bd-61714c80f1ed","category":"Lyrics","family":"Theme","aliases":["Desire / Temptation","Désir / Tentation","Lust","Urge","Craving","Teasing"]},{"name":"Discovery / Exploration","id":"816a0b05-0004-4a88-a95b-8b711d30aea6","category":"Lyrics","family":"Theme","aliases":["Discovery / Exploration","Découverte / Exploration","Finding","Expedition","Searching"]},{"name":"Dreams / Aspirations","id":"c3af609b-fa3f-436d-aed4-a28192e3af9b","category":"Lyrics","family":"Theme","aliases":["Dreams / Aspirations","Rêves / Aspirations","Ambitions","Goals","Visions","Hopes"]},{"name":"Eating / Food","id":"80d5f395-acde-40c3-b491-fbbc801f9102","category":"Lyrics","family":"Theme","aliases":["Eating / Food","Manger / Nourriture","Restaurant","Dishes","Cook","Cooking","Cuisine","Gastronomy"]},{"name":"Empowerment","id":"bab55b74-9ef4-400c-b9c4-480a070fbc40","category":"Lyrics","family":"Theme","aliases":["Empowerment","Confidence","Power"]},{"name":"Fame","id":"943c12a2-b251-4ace-97b3-59617f96df6c","category":"Lyrics","family":"Theme","aliases":["Fame","Célébrité","Celebrity","Stardom","Idol","Icon","Queen"]},{"name":"Family","id":"43f2339b-1226-43dc-99b6-c9b956e3d6c4","category":"Lyrics","family":"Theme","aliases":["Family","Famille","Household","Kin","Parents","Siblings"]},{"name":"Fashion","id":"31f04959-c00a-4877-a7b8-3bbfc46c71aa","category":"Lyrics","family":"Theme","aliases":["Fashion","Mode","Style","Trend","Couture","Streetwear","Vogue"]},{"name":"Father","id":"fd742900-3cde-4425-b4d3-4c9f820271d2","category":"Lyrics","family":"Theme","aliases":["Father","Père","Dad","Papa","Daddy"]},{"name":"Fear / Anxiety","id":"957d2ed5-fae5-4650-8c6b-30ffae36c787","category":"Lyrics","family":"Theme","aliases":["Fear / Anxiety","Peur / Anxiété","Worry","Terror","Unease","Disturbing","Trauma","Stress"]},{"name":"Freedom / Liberation","id":"88ddd176-b30a-4d1e-b880-d0f8a2ee2c1e","category":"Lyrics","family":"Theme","aliases":["Freedom / Liberation","Liberté / Libération","Independence","Release","Liberty","Autonomy"]},{"name":"Friendship","id":"bf5aa0c4-e4ce-447e-a6dc-2d607ca516c4","category":"Lyrics","family":"Theme","aliases":["Friendship","Amitié","Companionship","Amity","Alliance","Buddy"]},{"name":"Good Times","id":"9046bc5d-90f8-46d6-8a34-64975ef35a32","category":"Lyrics","family":"Theme","aliases":["Good Times","Coziness","Fun","Memories"]},{"name":"Heartbreak","id":"bafc995b-23b8-4b06-bcdf-644e25a684d5","category":"Lyrics","family":"Theme","aliases":["Heartbreak","Chagrin","Sorrow","Breakup","Despair"]},{"name":"Holiday","id":"18985ba0-0c6c-46ae-b9a3-ceb7148e29dd","category":"Lyrics","family":"Theme","aliases":["Holiday","Vacances","Vacation","Break","Pause","Travel"]},{"name":"Home / Belonging","id":"ff0ff694-9d25-4cba-8c1f-afeed1bb8f91","category":"Lyrics","family":"Theme","aliases":["Home / Belonging","Foyer / Appartenance","Residence","Apartment","Room","Estate","House"]},{"name":"Hope / Optimism","id":"7f07ad9e-b4bf-4b83-bca8-b3dcb83215c4","category":"Lyrics","family":"Theme","aliases":["Hope / Optimism","Espoir / Optimisme","Positivity","Goodness","Help","Rescue"]},{"name":"Hymn / Patriotic","id":"db68a0b5-0c54-4660-8804-10c3dabb76cd","category":"Lyrics","family":"Theme","aliases":["Hymn / Patriotic","Hymne / Patriotisme","Chant","Anthem","Psalm","Ode","March"]},{"name":"Identity / Self-Expression","id":"5589e983-6dac-4e23-945d-57dac7d8e850","category":"Lyrics","family":"Theme","aliases":["Identity / Self-Expression","Identité / Expression de soi","Individuality","Uniqueness","Selfhood","Diversity"]},{"name":"Joy / Happiness","id":"93288cc6-6246-47d7-8202-840d15ea4416","category":"Lyrics","family":"Theme","aliases":["Joy / Happiness","Joie / Bonheur","Pleasure","Bliss","Luck","Laugh"]},{"name":"Loneliness / Solitude","id":"ef90c38f-9eed-43c0-b74e-4b395a147163","category":"Lyrics","family":"Theme","aliases":["Loneliness / Solitude","Solitude","Isolation","Aloneness","Remoteness"]},{"name":"Love / Romance","id":"4b0fb917-df1e-4eff-a9c7-f592f8d03998","category":"Lyrics","family":"Theme","aliases":["Love / Romance","Amour / Romance","Affection","Passion","Adoration","Amour","Devotion","Affair","Infatuation"]},{"name":"Magic / Supernatural","id":"f25c5368-321a-48ca-a4ea-7e82922de01f","category":"Lyrics","family":"Theme","aliases":["Magic / Supernatural","Magie / Surnaturel","Sorcery","Wizardry","Occult","Mysticism","Paganism"]},{"name":"Men","id":"63218db3-5f11-4ec1-9ab5-3d5e221a20b2","category":"Lyrics","family":"Theme","aliases":["Men","Hommes","Guys","Fellows","Lads","Boys","Bros","Homies"]},{"name":"Money / Wealth","id":"0ded80af-8992-4bb8-93ac-5b335ae414c4","category":"Lyrics","family":"Theme","aliases":["Money / Wealth","Argent / Richesse","Fortune","Finance","Riches","Dollars","Clout"]},{"name":"Mother","id":"2eda4dde-43b7-4013-b49c-2180c3a03a42","category":"Lyrics","family":"Theme","aliases":["Mother","Mère","Mom","Mama","Caregiver","Mommy"]},{"name":"Music","id":"03088297-23d2-4a2a-9c4e-2adac0fd7e21","category":"Lyrics","family":"Theme","aliases":["Music","Musique","Tune","Banger","Harmony","Sound","Composition","Beat"]},{"name":"Nature / Environment","id":"2ea5e799-c7e9-4a8e-9605-d030cab43944","category":"Lyrics","family":"Theme","aliases":["Nature / Environment","Nature / Environnement","Ecosystem","Earth","Landscape","Wilderness","flora","plants","trees"]},{"name":"New Beginning","id":"05482313-ecfc-44b3-b6d3-70823122d73d","category":"Lyrics","family":"Theme","aliases":["New Beginning","Fresh Start","Rebirth","Renewal","Restart","Awakening"]},{"name":"Nostalgia","id":"343e6085-3e26-4a22-8b2e-dc6e9e5fe1d8","category":"Lyrics","family":"Theme","aliases":["Nostalgia","Nuit","Reminiscence","Melancholy","Longing","Memories"]},{"name":"Night","id":"2fdc81a1-9731-4300-9d6b-986fa2d5e538","category":"Lyrics","family":"Theme","aliases":["Night","Nostalgie","Darkness","Midnight","Twilight","Moonlight","Mystery","Stars"]},{"name":"Parenthood","id":"9221539d-3c9a-44ac-aec5-fe1472555f95","category":"Lyrics","family":"Theme","aliases":["Parenthood","Parentalité","Motherhood","Fatherhood"]},{"name":"Party / Celebration","id":"0a50ac94-aa26-4a1d-9868-4f888b9ae288","category":"Lyrics","family":"Theme","aliases":["Party / Celebration","Fête / Célébration","Fiesta","Rave","Gathering","Festivity","Birthday"]},{"name":"Places / Towns","id":"ab56587a-1be2-436e-95a5-c453a1d8c35d","category":"Lyrics","family":"Theme","aliases":["Places / Towns","Lieux / Villes","Cities","Villages","Destinations","Vibes","Location"]},{"name":"Politics","id":"8b5dd8ce-b766-41b7-859e-781691fa50ba","category":"Lyrics","family":"Theme","aliases":["Politics","Politique","Policy","Ideology","Strategy","Management","Elections"]},{"name":"Power","id":"e8bef7ea-2db8-4624-8cb1-d2f6de66fc32","category":"Lyrics","family":"Theme","aliases":["Power","Pouvoir","Influence","Authority","Control","Dominance"]},{"name":"Rebellion","id":"039bb342-ef4e-4de2-bae2-1dab67abe959","category":"Lyrics","family":"Theme","aliases":["Rebellion","Rébellion","Revolt","Revolution","Insurgence","Fight"]},{"name":"Redemption","id":"0199c51e-c562-4dd0-9dd5-9cbfbe8ca94e","category":"Lyrics","family":"Theme","aliases":["Redemption","Rédemption","Salvation","Forgiveness","Restoration"]},{"name":"Regret / Disappointment","id":"ed33ad32-8f50-4ce5-ab85-ce5d8b6d22d7","category":"Lyrics","family":"Theme","aliases":["Regret / Disappointment","Regret / Déception","Remorse","Sorrow","Guilt"]},{"name":"Religion / Spirituality","id":"92a37198-607e-4430-b25c-0a07a472da77","category":"Lyrics","family":"Theme","aliases":["Religion / Spirituality","Religion / Spiritualité","Faith","Worship","Belief","Divinity","Theology","God","Prayers"]},{"name":"School / Education","id":"cfd9054e-d063-4f78-ad80-75285a88d437","category":"Lyrics","family":"Theme","aliases":["School / Education","École / Éducation","Learning","Academia","Studies","Teaching","Teacher","Classroom","University","Diploma"]},{"name":"Science / Space","id":"2d402dda-6025-4680-8fc4-d90b1abc471e","category":"Lyrics","family":"Theme","aliases":["Science / Space","Sciences / Espace","Astronomy","Physics","Cosmos","Universe","Stars","Chemistry","Planets"]},{"name":"Sea","id":"c78f2a0d-b679-4bf9-977f-2257962e1ed6","category":"Lyrics","family":"Theme","aliases":["Sea","Mer","Ocean","Waves","Deep","Marine","Water"]},{"name":"Seasons / Weather","id":"f1c0d967-43b5-493f-989f-850d738e4b25","category":"Lyrics","family":"Theme","aliases":["Seasons / Weather","Saisons / Météo","Climate","Atmosphere","Forecast"]},{"name":"Sexuality","id":"85a69a81-471f-48a7-94d3-34da0c01780d","category":"Lyrics","family":"Theme","aliases":["Sexuality","Sexualité","Sex","Desire","Passion","Sensuality","Attraction","Drive","Intimacy"]},{"name":"Society / Social Issues","id":"4bd895a7-bbb9-4c53-9345-15899ccbb2d3","category":"Lyrics","family":"Theme","aliases":["Society / Social Issues","Société / Questions sociales","Community","Culture","Justice","Humanity","Inequality","Equality","Rights"]},{"name":"Sports","id":"2b5b1e41-dac2-4ec4-a9fa-b98a464746b3","category":"Lyrics","family":"Theme","aliases":["Sports","Sport","Games","Football","Exercise","Competition","Olympics","Athletes","Race"]},{"name":"Success","id":"a12ee91b-9115-4098-80ac-030bed92c5ca","category":"Lyrics","family":"Theme","aliases":["Success","Succès","Win","Winner"]},{"name":"Summer","id":"33bcd655-e9c6-468b-a40e-447d0d983c5a","category":"Lyrics","family":"Theme","aliases":["Summer","Été","Heat","Sunshine","Beach"]},{"name":"Sun","id":"379a8a8e-3ce9-4267-bfb2-78acd554f300","category":"Lyrics","family":"Theme","aliases":["Sun","Soleil","Solar","Radiance","Daylight","Glow"]},{"name":"Technology","id":"ea78220e-6ae6-4200-90b2-a10dbf6538d7","category":"Lyrics","family":"Theme","aliases":["Technology","Technologie","innovation","AI","Digital","Computer","Artificial intelligence"]},{"name":"Togetherness / Team","id":"11c35870-2b2d-4c51-8670-12fbc9596eb2","category":"Lyrics","family":"Theme","aliases":["Togetherness / Team","Ensemble / Équipe","Unity","Bonding","Cooperation","Solidarity","Group"]},{"name":"Travel","id":"018ce3ff-ce57-4ff0-9c0c-3caf775d8e11","category":"Lyrics","family":"Theme","aliases":["Travel","Voyage","Journey","Trip","Cruise"]},{"name":"Violence","id":"2717409a-7618-4d70-8620-e756207280d1","category":"Lyrics","family":"Theme","aliases":["Violence","Aggression","Conflict","Brutality","Assault","Fight"]},{"name":"War / Peace","id":"e0831717-9de8-42eb-b568-b48cb8efd903","category":"Lyrics","family":"Theme","aliases":["War / Peace","Guerre / Paix","Battle","Combat","Ceasefire","Conflict","Warfare"]},{"name":"Winter","id":"b650ca36-7cfe-4415-b7e2-6107791f91d6","category":"Lyrics","family":"Theme","aliases":["Winter","Hiver","Cold","Frost","Snow","Ice"]},{"name":"Wisdom / Knowledge","id":"1a0a5e1e-da92-4b2a-bdf6-721e66d7dc95","category":"Lyrics","family":"Theme","aliases":["Wisdom / Knowledge","Sagesse / Connaissance","Poise","Astuteness","intelligence"]},{"name":"Women","id":"51deeb38-4cf3-4e95-86c0-b5d8aba006f3","category":"Lyrics","family":"Theme","aliases":["Women","Femmes","Females","Ladies","Girls","Sisters"]},{"name":"Work","id":"eb02adb4-6320-41f6-a8e9-6ddfc06fb7ff","category":"Lyrics","family":"Theme","aliases":["Work","Travail","Labor","Job","Career","Profession","Curiculum"]},{"name":"Youth","id":"fe77ea93-b505-4ba3-a7fb-8304bd8fdd87","category":"Lyrics","family":"Theme","aliases":["Youth","Jeunesse","Vitality","Freshness"]},{"name":"Old Recording","id":"bac33929-2f9b-4b79-a6a0-dfbdbdf9beae","category":"Other","family":"Soundslike","aliases":["Old Recording","Ancien enregistrement"]},{"name":"Soundslike 00s","id":"7660befd-ffdc-47ec-94d8-d6eea3943e10","category":"Other","family":"Soundslike","aliases":["Soundslike 00s","Sonne années 2000","2000's"]},{"name":"Soundslike 20s / 40s","id":"803626eb-f220-4a4a-8f2f-d314c317bb54","category":"Other","family":"Soundslike","aliases":["Soundslike 20s / 40s","Sonne années 20/40","1920's","1930's","1940's"]},{"name":"Soundslike 50s","id":"c7507bf5-0800-4f73-86d6-ae5229d0985c","category":"Other","family":"Soundslike","aliases":["Soundslike 50s","Sonne années 50","1950's"]},{"name":"Soundslike 60s","id":"bc1e26f5-5c7f-49a8-a64a-046b3309b655","category":"Other","family":"Soundslike","aliases":["Soundslike 60s","Sonne années 60","1960's","sounds like 60s","sounds like the 60s","60s sound","sixties"]},{"name":"Soundslike 70s","id":"3dc579e2-9d4a-4483-8a8e-8c0f107bf68c","category":"Other","family":"Soundslike","aliases":["Soundslike 70s","Sonne années 70","1970's"]},{"name":"Soundslike 80s","id":"0f6ad0ba-d3db-4460-a433-4e955bb3d8e1","category":"Other","family":"Soundslike","aliases":["Soundslike 80s","Sonne années 80","1980's"]},{"name":"Soundslike 90s","id":"73829724-9c50-468e-b888-715c3d96e415","category":"Other","family":"Soundslike","aliases":["Soundslike 90s","Sonne années 90","1990's"]},{"name":"Easy Clear","id":"53d8c7a3-fc56-4647-abaf-d872c600259f","category":"Other","family":"Business / Sync","aliases":["Easy Clear"]},{"name":"Focus","id":"31a0a7dd-170e-4a87-b363-e452aff74b0e","category":"Other","family":"Business / Sync","aliases":["Focus"]},{"name":"One Stop","id":"43592574-bfc1-4573-a0f5-243f5ee4e49d","category":"Other","family":"Business / Sync","aliases":["One Stop"]},{"name":"Released","id":"7fdabdad-9b79-4476-8158-800af68c9a58","category":"Other","family":"Business / Sync","aliases":["Released"]},{"name":"Unreleased","id":"ea94bbb1-741a-4de0-b49b-a6dc05c96c1e","category":"Other","family":"Business / Sync","aliases":["Unreleased"]},{"name":"Library","id":"85529097-c7bd-4d66-b7f7-3b11638e7c9d","category":"Other","family":"Business / Sync","aliases":["Library","Librairie"]},{"name":"Score","id":"eba4df50-6a8c-4895-b621-2b4eba10eec8","category":"Other","family":"Business / Sync","aliases":["Score"]},{"name":"Sync","id":"4a2e220d-63a2-4ec9-af2b-d709bac12334","category":"Other","family":"Business / Sync","aliases":["Sync","Synchro"]},{"name":"Cover","id":"a80a8401-ebca-462a-9886-90795bdbcf38","category":"Other","family":"Version","aliases":["Cover","Remake"]},{"name":"Demo","id":"fd0d9a22-05e0-4db5-9ecf-b2cfe870404e","category":"Other","family":"Version","aliases":["Demo","Démo"]},{"name":"Live","id":"d00e5519-8eab-4de2-9a20-11980ad44e50","category":"Other","family":"Version","aliases":["Live"]},{"name":"Remix","id":"1d3d4156-eb57-4afc-89c2-e79b30fa8d9e","category":"Other","family":"Version","aliases":["Remix"]},{"name":"Rerecord","id":"e86cb01a-ea2f-4215-b410-9e0c2095c885","category":"Other","family":"Version","aliases":["Rerecord","Réenregistré"]},{"name":"Samples","id":"93ec5b2d-4278-4c37-9ba4-543570773ca0","category":"Other","family":"Version","aliases":["Samples"]},{"name":"Edit","id":"c0711962-49b3-4119-8a67-327435cce832","category":"Other","family":"Version","aliases":["Edit"]},{"name":"Stem","id":"83f50f4a-cfe2-462e-95be-7d893921a185","category":"Other","family":"Version","aliases":["Stem"]},{"name":"Voice Over","id":"bef1b69d-5776-4e57-acae-7f77ba53a01e","category":"Other","family":"Nature","aliases":["Voice Over","Voix off"]},{"name":"Sound Design","id":"43959dc9-a94d-4c10-88ac-a0ed2ec6ec5a","category":"Other","family":"Nature","aliases":["Sound Design"]},{"name":"Music","id":"a4ff3bb2-4226-49e3-a4fe-aa1aaffa33a6","category":"Other","family":"Nature","aliases":["Music","Musique"]},{"name":"Guitar","id":"__bridge_family_guitar__","category":"Instruments","family":"Guitar(s)","aliases":["guitar","guitare"],"synthetic":true}];
 
   const SMART_FALLBACK_GRAPH = {
     'female lead':['Feminine','Girl Power','Sweet','Energetic','Confident'],
@@ -4779,12 +5205,16 @@ react/cjs/react-jsx-runtime.production.js:
     {title:'Contrast Theory',artist:'Frame Unit',album:'Motion',label:'Frame Music',isrc:'GBFRA2600016',catalog:'FRM-016',composer:'Frame Unit',publisher:'Frame Publishing',duration:'2:29',tags:['instrumental','contrasts','trailer','build up']}
   ];
 
+  const DEMO_YEARS = [1976,1974,1978,1982,1991,2016,1968,2008,2012,2015,1988,1975,1977,2001,1979,1997];
+  DEMO.forEach((track,index)=>{ if(!track.year) track.year=DEMO_YEARS[index%DEMO_YEARS.length]; });
+
   const state = {
     scope: null,             // explicit selection: metadata scope or frozen Global query
     keyboardIndex: -1,
     voice: null,
     liveMetaActive: false,
     menu: null,
+    globalLiveTimer: null,
   };
 
   const q = (sel, root=document) => root?.querySelector ? root.querySelector(sel) : null;
@@ -4800,6 +5230,96 @@ react/cjs/react-jsx-runtime.production.js:
   const normalize = s => String(s || '').trim().toLowerCase();
   const normalizeISRC = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g,'');
 
+  const normalizeWords = s => String(s || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().replace(/[’']/g,' ')
+    .replace(/[^a-z0-9♭♯#]+/g,' ')
+    .trim().replace(/\s+/g,' ');
+
+  const NEGATION_RE = /(?:^|\s)(?:without|no|avoid|exclude|excluding|except|sans|pas de|pas d|eviter|éviter)\s+(?:[a-z0-9]+\s+){0,2}$/i;
+  const NICE_RE = /(?:^|\s)(?:nice to have|ideally|preferably|if possible|bonus|si possible|de preference|de préférence)\s+(?:[a-z0-9]+\s+){0,2}$/i;
+
+  const TAG_ALIASES = (() => {
+    const rows=[];
+    for(const tag of BRIDGE_TAG_DICTIONARY){
+      for(const aliasRaw of (tag.aliases||[])){
+        const alias=normalizeWords(aliasRaw);
+        if(!alias || alias.length<2) continue;
+        rows.push({tag,alias,tokens:alias.split(' ').length,length:alias.length,canonicalExact:normalizeWords(tag.name)===alias});
+      }
+    }
+    rows.sort((a,b)=>b.tokens-a.tokens || Number(b.canonicalExact)-Number(a.canonicalExact) || b.length-a.length);
+    return rows;
+  })();
+
+  function detectKnownTags(raw){
+    const source=normalizeWords(raw);
+    if(!source) return [];
+
+    const occupied=[];
+    const found=[];
+    const seen=new Set();
+
+    const overlaps=(start,end)=>occupied.some(span=>start<span.end && end>span.start);
+
+    for(const row of TAG_ALIASES){
+      const escaped=row.alias.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s+');
+      const re=new RegExp(`(^|\\s)(${escaped})(?=\\s|$)`,'g');
+      let match;
+      while((match=re.exec(source))){
+        const start=match.index + match[1].length;
+        const end=start + match[2].length;
+        if(overlaps(start,end)) continue;
+
+        const key=row.tag.name;
+        if(seen.has(key)) continue;
+
+        const before=source.slice(Math.max(0,start-48),start);
+        const weight=NEGATION_RE.test(before) ? 'exclude' : NICE_RE.test(before) ? 'should' : 'must';
+
+        occupied.push({start,end});
+        seen.add(key);
+        found.push({
+          name:row.tag.name,
+          id:row.tag.id,
+          family:row.tag.family,
+          category:row.tag.category,
+          synthetic:!!row.tag.synthetic,
+          alias:match[2],
+          weight,
+          start,
+          end
+        });
+      }
+    }
+
+    return found.sort((a,b)=>a.start-b.start);
+  }
+
+  function tagBundleCandidate(raw){
+    const matches=detectKnownTags(raw);
+    if(!matches.length) return null;
+
+    const must=matches.filter(x=>x.weight==='must').length;
+    const should=matches.filter(x=>x.weight==='should').length;
+    const exclude=matches.filter(x=>x.weight==='exclude').length;
+    const pieces=matches.map(x=>`${x.weight==='exclude'?'− ':x.weight==='should'?'+ ':''}${x.name}`);
+
+    return {
+      kind:'tagbundle',
+      label:pieces.join(' · '),
+      detail:[
+        `${matches.length} known Bridge ${matches.length===1?'tag':'tags'}`,
+        must?`${must} Must`:null,
+        should?`${should} Nice`:null,
+        exclude?`${exclude} Exclude`:null
+      ].filter(Boolean).join(' · '),
+      typeLabel:matches.length===1?'Tag':'Tags',
+      score:1200 + matches.length*70,
+      matches
+    };
+  }
+
   function metadataFields(track) {
     return {
       track: track.title || '',
@@ -4810,6 +5330,7 @@ react/cjs/react-jsx-runtime.production.js:
       catalog: track.catalog || '',
       composer: track.composer || '',
       publisher: track.publisher || '',
+      year: String(track.year || ''),
     };
   }
 
@@ -4901,33 +5422,35 @@ react/cjs/react-jsx-runtime.production.js:
       clearScopeChip();
       return;
     }
-    const input = mainInput();
-    const flow = input?.closest('.input-flow');
-    if (!input || !flow) return;
 
-    const signature = `${state.scope.type}|${state.scope.value}`;
-    const existing = q('.bridge-scope-chip',flow);
-    if (existing?.dataset.bridgeScopeSignature === signature) return;
+    const input=mainInput();
+    const flow=input?.closest('.input-flow');
+    if(!input||!flow) return;
+
+    const signature=`${state.scope.type}|${state.scope.value}`;
+    const existing=q('.bridge-scope-chip',flow);
+    if(existing?.dataset.bridgeScopeSignature===signature) return;
     existing?.remove();
 
-    const chip = document.createElement('span');
-    chip.className = 'bridge-scope-chip';
-    chip.dataset.bridgeScopeSignature = signature;
-    chip.innerHTML = `
-      <span class="bridge-scope-pill">${state.scope.type === 'global' ? 'Global' : state.scope.type}</span>
+    const chip=document.createElement('span');
+    chip.className='bridge-scope-chip';
+    chip.dataset.bridgeScopeSignature=signature;
+    chip.innerHTML=`
+      <span class="bridge-scope-pill">${state.scope.type==='global'?'Global':state.scope.type}</span>
       <span class="bridge-scope-value">${state.scope.value}</span>
-      <button type="button" aria-label="Remove metadata scope">×</button>`;
-    flow.insertBefore(chip, input);
+      <button type="button" aria-label="Remove ${state.scope.type==='global'?'global search':'metadata scope'}">×</button>`;
+    flow.insertBefore(chip,input);
 
-    chip.querySelector('button').addEventListener('click', (event) => {
+    chip.querySelector('button').addEventListener('click',event=>{
       event.preventDefault();
       event.stopPropagation();
-      const previous = state.scope;
-      state.scope = null;
+      const previous=state.scope;
+      state.scope=null;
       clearScopeChip();
       clearLiveMetadataResults();
-      setReactInputValue(input, previous.value || '');
+      setReactInputValue(input,previous.value||'');
       input.focus();
+      requestAnimationFrame(()=>syncComposerLayout({keepVisible:true,smooth:true}));
     });
   }
 
@@ -4950,9 +5473,129 @@ react/cjs/react-jsx-runtime.production.js:
     mainInput()?.focus();
   }
 
+  function chooseDateScope(candidate){
+    if(!candidate) return;
+    state.scope={
+      type:candidate.mode==='year'?'year':'period',
+      value:candidate.label,
+      from:candidate.from,
+      to:candidate.to
+    };
+    renderScopeChip();
+    setReactInputValue(mainInput(),'');
+    removeUnifiedSection();
+    renderDateSearch(state.scope,true);
+    mainInput()?.focus();
+  }
+
+
   /* ---------------------------------------------------------
-     ONE suggestion list — ranked across all candidate types
+     Native criteria + max-two-line composer
      --------------------------------------------------------- */
+  function nativeTagCriteriaNodes(){
+    return qa('.search-box .tag-criterion');
+  }
+
+  function nativeSourceCriteriaNodes(){
+    return qa('.search-box .source-criterion');
+  }
+
+  function nativeSmartCriteriaNodes(){
+    return qa('.search-box .smart-criterion');
+  }
+
+  function criterionLabel(node){
+    return q('.criterion-main > span:nth-child(2)',node)?.textContent?.trim()
+      || q('strong',node)?.textContent?.trim()
+      || '';
+  }
+
+  function criterionWeight(node){
+    return node.classList.contains('weight-exclude') ? 'exclude'
+      : node.classList.contains('weight-should') ? 'should'
+      : 'must';
+  }
+
+  function setNativeCriterionWeight(node,weight){
+    if(!node) return;
+    const main=q('.criterion-main',node);
+    main?.click();
+    requestAnimationFrame(()=>{
+      const menu=q('.weight-menu',node);
+      const wanted=qa('button',menu).find(button=>{
+        const text=normalizeWords(button.textContent);
+        return weight==='exclude' ? text.includes('exclude')
+          : weight==='should' ? text.includes('nice')
+          : text.includes('must');
+      });
+      wanted?.click();
+      requestAnimationFrame(syncComposerLayout);
+    });
+  }
+
+  function composerElementIsVisible(el,flow){
+    if(!el||!flow) return true;
+    const er=el.getBoundingClientRect();
+    const fr=flow.getBoundingClientRect();
+    return er.top>=fr.top+1 && er.bottom<=fr.bottom-1;
+  }
+
+  function scrollComposerTargetIntoView(target,{smooth=false}={}){
+    const flow=q('.search-box .input-flow');
+    if(!flow||!target||!q('.search-box')?.classList.contains('bridge-composer-overflow')) return;
+    if(composerElementIsVisible(target,flow)) return;
+
+    const flowRect=flow.getBoundingClientRect();
+    const targetRect=target.getBoundingClientRect();
+    const deltaTop=targetRect.top-flowRect.top;
+    const deltaBottom=targetRect.bottom-flowRect.bottom;
+
+    let next=flow.scrollTop;
+    if(deltaTop<0) next+=deltaTop-2;
+    else if(deltaBottom>0) next+=deltaBottom+2;
+
+    flow.scrollTo({
+      top:Math.max(0,next),
+      behavior:smooth?'smooth':'auto'
+    });
+  }
+
+  function syncComposerLayout({keepVisible=false,smooth=false}={}){
+    qa('.bridge-criteria-strip,.bridge-criteria-popover').forEach(el=>el.remove());
+
+    const box=searchBox();
+    const flow=q('.search-box .input-flow');
+    if(!box||!flow) return;
+
+    requestAnimationFrame(()=>{
+      const overflowing=flow.scrollHeight>flow.clientHeight+2;
+      box.classList.toggle('bridge-composer-overflow',overflowing);
+
+      if(!overflowing){
+        // Reset only when there is no longer anything to scroll.
+        if(flow.scrollTop!==0) flow.scrollTop=0;
+        return;
+      }
+
+      if(keepVisible){
+        const target=document.activeElement===mainInput()
+          ? mainInput()
+          : qa('.search-box .criterion').at(-1);
+        scrollComposerTargetIntoView(target,{smooth});
+      }
+    });
+  }
+
+  // Kept as a compatibility alias for existing controller calls.
+  function renderCriteriaStrip(){
+    syncComposerLayout();
+  }
+
+  /* ---------------------------------------------------------
+     SINGLE-OWNER suggestion pipeline
+     One visible row per user intention.
+     --------------------------------------------------------- */
+
   function removeUnifiedSection(root=document) {
     qa('.bridge-ranked-section, .bridge-unified-section',root).forEach(el=>el.remove());
   }
@@ -5068,6 +5711,87 @@ react/cjs/react-jsx-runtime.production.js:
     requestAnimationFrame(tryNative);
   }
 
+  function findNativeCriterionByLabel(label){
+    const wanted=normalizeWords(label);
+    return nativeTagCriteriaNodes().find(node=>normalizeWords(criterionLabel(node))===wanted)
+      || nativeTagCriteriaNodes().find(node=>normalizeWords(criterionLabel(node)).includes(wanted) || wanted.includes(normalizeWords(criterionLabel(node))));
+  }
+
+  function addOneKnownTag(match,done){
+    const input=mainInput();
+    if(!input){done();return}
+
+    const beforeCount=nativeTagCriteriaNodes().length;
+    setReactInputValue(input,match.name);
+    input.focus();
+
+    let attempts=0;
+    const trySelect=()=>{
+      attempts+=1;
+      const dd=nativeSuggestions();
+      const buttons=dd?[...dd.children].filter(el=>el.tagName==='BUTTON'):[];
+      const wanted=normalizeWords(match.name);
+      let button=buttons.find(btn=>normalizeWords(q('.suggestion-title-line strong',btn)?.textContent||q('strong',btn)?.textContent||'')===wanted);
+
+      // Synthetic "Guitar" maps to the most direct Guitar candidate available.
+      if(!button && match.synthetic){
+        button=buttons.find(btn=>/\bguitar\b/i.test(q('.suggestion-title-line strong',btn)?.textContent||q('strong',btn)?.textContent||btn.textContent||''));
+      }
+      if(!button){
+        button=buttons.find(btn=>normalizeWords(btn.textContent).includes(wanted));
+      }
+
+      if(button){
+        button.click();
+        waitCriterion();
+        return;
+      }
+      if(attempts<10){requestAnimationFrame(trySelect);return}
+      setReactInputValue(input,'');
+      done();
+    };
+
+    let waitAttempts=0;
+    const waitCriterion=()=>{
+      waitAttempts+=1;
+      const node=findNativeCriterionByLabel(match.name)
+        || (nativeTagCriteriaNodes().length>beforeCount ? nativeTagCriteriaNodes()[nativeTagCriteriaNodes().length-1] : null);
+      if(node){
+        if(match.weight!=='must') setNativeCriterionWeight(node,match.weight);
+        setReactInputValue(input,'');
+        done();
+        return;
+      }
+      if(waitAttempts<10){requestAnimationFrame(waitCriterion);return}
+      setReactInputValue(input,'');
+      done();
+    };
+
+    requestAnimationFrame(trySelect);
+  }
+
+  function validateTagBundle(matches){
+    const queue=[...matches];
+    clearLiveMetadataResults();
+    closeSuggestions();
+
+    const next=()=>{
+      const match=queue.shift();
+      if(!match){
+        setReactInputValue(mainInput(),'');
+        renderCriteriaStrip();
+        requestAnimationFrame(()=>{
+          syncComposerLayout({keepVisible:true,smooth:true});
+          const submit=q('.search-button');
+          submit?.click();
+        });
+        return;
+      }
+      addOneKnownTag(match,next);
+    };
+    next();
+  }
+
   function lexicalSuggestionScore(label, raw) {
     const l = normalize(label);
     const r = normalize(raw);
@@ -5092,8 +5816,12 @@ react/cjs/react-jsx-runtime.production.js:
     return 'Suggestion';
   }
 
-  function nativeCandidates(host, raw) {
+  function nativeSupplementalCandidates(host, raw, explicitTagMatches) {
     if (!host || host.dataset.bridgeOwned === 'true') return [];
+
+    const explicitTagsOwnThisQuery =
+      Array.isArray(explicitTagMatches) && explicitTagMatches.length > 0;
+
     return [...host.children]
       .filter(el => el.tagName === 'BUTTON' && !el.disabled)
       .map((button,index) => {
@@ -5101,18 +5829,44 @@ react/cjs/react-jsx-runtime.production.js:
           || q('strong',button)?.textContent?.trim()
           || button.textContent?.trim()
           || 'Suggestion';
-        const detail = q('small',button)?.textContent?.trim() || '';
+
+        let detail = q('small',button)?.textContent?.trim() || '';
         const typeLabel = nativeTypeLabel(button);
         const recommended = !!q('.recommended-badge',button);
-        const base = 118 - index*4;
+        let displayLabel = label;
+
+        /*
+          SINGLE-OWNER RULE
+          If the deterministic Bridge dictionary has recognised one or more
+          explicit tags in this typed query, it is the only producer of
+          Tag / Tags rows in the visible ranked dropdown.
+
+          React remains the action engine used to actually add the tag, but
+          parallel native rows such as "1 new tag detected" are not collected.
+        */
+        if (explicitTagsOwnThisQuery && (typeLabel === 'Tag' || typeLabel === 'Tags')) {
+          return null;
+        }
+
+        if (typeLabel === 'Prompt') {
+          displayLabel = String(raw || '').trim() || label;
+          detail = 'Use the full sentence as a Prompt';
+        }
+
+        if (typeLabel === 'Similarity') {
+          detail = detail || 'Find musically similar tracks';
+        }
+
+        const base = 118 - index * 4;
         const score = base
-          + lexicalSuggestionScore(label,raw)
+          + lexicalSuggestionScore(displayLabel,raw)
           + (recommended ? 48 : 0)
-          + (typeLabel === 'Tag' ? 22 : typeLabel === 'Tags' ? 16 : typeLabel === 'Similarity' ? 10 : 0);
+          + (typeLabel === 'Similarity' ? 760 : typeLabel === 'Tag' ? 90 : typeLabel === 'Tags' ? 110 : 0)
+          + (typeLabel === 'Prompt' ? -260 : 0);
 
         return {
           kind:'native',
-          label,
+          label:displayLabel,
           detail,
           typeLabel,
           score,
@@ -5120,1034 +5874,280 @@ react/cjs/react-jsx-runtime.production.js:
           preview:q('.suggestion-tag-preview',button)?.cloneNode(true) || null,
           thumb:q('.youtube-suggestion-thumb',button)?.cloneNode(true) || null
         };
-      });
+      })
+      .filter(Boolean);
+  }
+
+  function dateCandidates(raw){
+    const value=String(raw||'').trim();
+    if(!/^\d{4}$/.test(value)) return [];
+    const year=Number(value);
+    if(year<1900 || year>2099) return [];
+    return [
+      {
+        kind:'date',
+        mode:'year',
+        label:String(year),
+        detail:`Exact year · ${year}`,
+        typeLabel:'Year',
+        score:1080,
+        from:year,
+        to:year
+      },
+      {
+        kind:'date',
+        mode:'period',
+        label:`${year-2}–${year+2}`,
+        detail:`Period · ±2 years around ${year}`,
+        typeLabel:'Period',
+        score:1040,
+        from:year-2,
+        to:year+2
+      }
+    ];
+  }
+
+  function queryTokenSpans(raw){
+    const normalized=normalizeWords(raw);
+    if(!normalized) return [];
+    const tokens=normalized.split(' ');
+    const spans=[];
+    for(let start=0; start<tokens.length; start++){
+      for(let end=start+1; end<=Math.min(tokens.length,start+5); end++){
+        const phrase=tokens.slice(start,end).join(' ');
+        if(phrase.length>=2){
+          spans.push({phrase,start,end,length:end-start});
+        }
+      }
+    }
+    // Longer phrases first, then earlier occurrence.
+    return spans.sort((a,b)=>b.length-a.length || a.start-b.start);
+  }
+
+  function inlineEntityContextBoost(raw,type,value){
+    const q=normalizeWords(raw);
+    const v=normalizeWords(value);
+    if(!q||!v) return 0;
+
+    const escaped=v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const patterns={
+      artist:[
+        new RegExp(`(?:artist|artiste|by|de|par)\\s+${escaped}\\b`,'i'),
+        new RegExp(`(?:titre|track|song|morceau)\\s+(?:de|by|par)\\s+${escaped}\\b`,'i')
+      ],
+      album:[
+        new RegExp(`(?:album)\\s+(?:de|by|par)?\\s*${escaped}\\b`,'i')
+      ],
+      track:[
+        new RegExp(`(?:titre|track|song|morceau)\\s+${escaped}\\b`,'i')
+      ],
+      composer:[
+        new RegExp(`(?:composer|compositeur|composed by|compose par|composé par)\\s+${escaped}\\b`,'i')
+      ],
+      label:[
+        new RegExp(`(?:label|label de|chez)\\s+${escaped}\\b`,'i')
+      ]
+    };
+
+    const list=patterns[type]||[];
+    if(list.some(re=>re.test(q))) return 220;
+    return 0;
+  }
+
+  function inlineEntityCandidates(raw){
+    const rawValue=String(raw||'').trim();
+    if(rawValue.length<3) return [];
+
+    const spans=queryTokenSpans(rawValue);
+    const out=[];
+    const seen=new Set();
+
+    for(const track of DEMO){
+      const fields=metadataFields(track);
+
+      for(const [type,valueRaw] of Object.entries(fields)){
+        if(!valueRaw) continue;
+        if(!['artist','track','album','label','composer','publisher','catalog','isrc'].includes(type)) continue;
+
+        const value=String(valueRaw);
+        const normalizedValue=type==='isrc' ? normalizeISRC(value) : normalizeWords(value);
+        if(!normalizedValue) continue;
+
+        let best=null;
+
+        for(const span of spans){
+          const phrase=type==='isrc' ? normalizeISRC(span.phrase) : normalizeWords(span.phrase);
+          if(!phrase) continue;
+
+          let quality=0;
+          let matchClass=null;
+
+          if(phrase===normalizedValue){
+            quality=1000;
+            matchClass='exact';
+          } else if(normalizedValue.startsWith(phrase) && phrase.length>=3){
+            quality=650;
+            matchClass='strong';
+          } else if(normalizedValue.includes(phrase) && phrase.length>=4){
+            quality=420;
+            matchClass='partial';
+          } else {
+            continue;
+          }
+
+          // Prefer longer spans and context indicating the entity type.
+          const contextBoost=inlineEntityContextBoost(rawValue,type,value);
+          const score=quality + span.length*25 + contextBoost;
+
+          if(!best || score>best.score){
+            best={score,matchClass,span};
+          }
+        }
+
+        if(!best) continue;
+
+        const key=`${type}|${normalizedValue}`;
+        if(seen.has(key)) continue;
+        seen.add(key);
+
+        out.push({
+          kind:'metadata',
+          label:value,
+          detail:type==='artist'
+            ? 'Artist'
+            : `${track.title} · ${track.artist}`,
+          typeLabel:type,
+          score:best.score,
+          entityMatch:best.matchClass,
+          inlineMatch:true,
+          item:{
+            type,
+            value,
+            score:best.score,
+            track
+          }
+        });
+      }
+    }
+
+    return out;
   }
 
   function metadataCandidates(raw) {
-    if (String(raw||'').trim().length < 2) return [];
+    const rawValue=String(raw||'').trim();
+    if (rawValue.length < 2) return [];
+
+    const inline=inlineEntityCandidates(rawValue);
+    const dateOwnsExactYear=/^\d{4}$/.test(rawValue);
+
     const fieldBoost = {
-      isrc:34, track:28, artist:26, album:18, catalog:16,
-      label:12, composer:12, publisher:10
+      isrc:60, track:54, artist:58, album:50, catalog:34,
+      label:28, composer:32, publisher:24, year:56
     };
-    return metadataSuggestions(raw).map(item => ({
-      kind:'metadata',
-      label:item.value,
-      detail:item.type === 'artist' ? 'Artist' : `${item.track.title} · ${item.track.artist}`,
-      typeLabel:item.type,
-      score:item.score + (fieldBoost[item.type] || 0),
-      item
-    }));
+
+    const direct=metadataSuggestions(rawValue)
+      .filter(item=>!(dateOwnsExactYear && item.type==='year'))
+      .map(item => {
+        const candidate=normalizeWords(item.value);
+        const query=normalizeWords(rawValue);
+        const exact=candidate===query;
+        const strong=!exact && candidate.startsWith(query);
+
+        return {
+          kind:'metadata',
+          label:item.value,
+          detail:item.type === 'artist' ? 'Artist' : `${item.track.title} · ${item.track.artist}`,
+          typeLabel:item.type,
+          score:item.score + (fieldBoost[item.type] || 0),
+          entityMatch:exact ? 'exact' : strong ? 'strong' : 'partial',
+          inlineMatch:false,
+          item
+        };
+      });
+
+    const inlineOwned = dateOwnsExactYear
+      ? inline.filter(candidate=>candidate.typeLabel!=='year')
+      : inline;
+
+    const seen=new Set();
+    return [...inlineOwned,...direct]
+      .sort((a,b)=>b.score-a.score)
+      .filter(candidate=>{
+        const key=`${candidate.typeLabel}|${normalizeWords(candidate.label)}`;
+        if(seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
   }
 
-  function fallbackCandidates(raw, host) {
+  function fallbackCandidates(raw, host, explicitTagMatches) {
+    if (activeTagCriteria().length >= 5) return [];
+
+    const rawValue = String(raw || '').trim();
+
+    // An explicit dictionary match already owns the Tag interpretation.
+    if (rawValue && explicitTagMatches?.length) return [];
+
     const hasNative = host && host.dataset.bridgeOwned !== 'true'
       && [...host.children].some(el=>el.tagName==='BUTTON' && !el.disabled);
+
     if (hasNative) return [];
+
     return fallbackSmartLabels().map((label,index)=>({
       kind:'fallback',
       label,
-      detail:'Suggested from your current criteria',
+      detail:'Suggested next',
       typeLabel:'Tag',
       score:116 - index*5 + lexicalSuggestionScore(label,raw)
     }));
   }
 
-  function rankedCandidates(host, raw) {
-    const rawValue = String(raw || '').trim();
-    const candidates = [
-      ...nativeCandidates(host,rawValue),
-      ...metadataCandidates(rawValue),
-      ...fallbackCandidates(rawValue,host)
-    ];
+  function explicitCombinedCandidate(raw){
+    const rawValue=String(raw||'').trim();
+    if(!rawValue) return null;
 
-    const seen = new Set();
-    const ranked = candidates
-      .sort((a,b)=>b.score-a.score)
-      .filter(candidate => {
-        const key = `${normalize(candidate.typeLabel)}|${normalize(candidate.label)}`;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
+    const entities=inlineEntityCandidates(rawValue)
+      .filter(c=>['artist','track','album'].includes(c.typeLabel))
+      .sort((a,b)=>{
+        const rank={exact:3,strong:2,partial:1};
+        return (rank[b.entityMatch]||0)-(rank[a.entityMatch]||0) || b.score-a.score;
       });
 
-    // Reserve the last slot for the literal Global interpretation.
-    // It never competes in the relevance ranking.
-    const interpreted = ranked.slice(0, rawValue ? 9 : 10);
+    const tagBundle=tagBundleCandidate(rawValue);
+    const tags=tagBundle?.matches || [];
 
-    if (rawValue) {
-      interpreted.push({
-        kind:'global',
-        label:rawValue,
-        detail:'Search everywhere exactly as typed',
-        typeLabel:'Global',
-        score:-1
+    // "Combined" is reserved for genuinely different explicit dimensions:
+    // one structured entity + at least one Bridge tag.
+    // Multiple tags alone already belong to the single Tags interpretation.
+    if(!entities.length || !tags.length) return null;
+
+    const parts=[];
+    const seen=new Set();
+
+    const entity=entities[0];
+    const entityKey=`entity:${entity.typeLabel}:${normalizeWords(entity.label)}`;
+    seen.add(entityKey);
+    parts.push({
+      kind:'entity',
+      type:entity.typeLabel,
+      label:entity.label,
+      entity
+    });
+
+    for(const tag of tags){
+      const key=`tag:${normalizeWords(tag.name)}`;
+      if(seen.has(key)) continue;
+      seen.add(key);
+      parts.push({
+        kind:'tag',
+        type:'Tag',
+        label:tag.name,
+        weight:tag.weight,
+        tag
       });
+      if(parts.length>=3) break;
     }
 
-    return interpreted;
-  }
+    if(parts.length<2) return null;
 
-  function candidateRow(candidate) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'bridge-ranked-row';
-    button.setAttribute('role','option');
-
-    if (candidate.thumb) {
-      button.appendChild(candidate.thumb);
-      button.classList.add('bridge-ranked-youtube');
-    } else {
-      const type = document.createElement('span');
-      type.className = 'bridge-meta-type';
-      type.textContent = candidate.typeLabel;
-      button.appendChild(type);
-    }
-
-    const copy = document.createElement('span');
-    copy.className = 'bridge-meta-copy';
-    const strong = document.createElement('strong');
-    strong.textContent = candidate.label;
-    const small = document.createElement('small');
-    small.textContent = candidate.detail || candidate.typeLabel;
-    copy.append(strong,small);
-    if (candidate.preview) copy.appendChild(candidate.preview);
-    button.appendChild(copy);
-
-    button.addEventListener('pointerdown',event=>event.preventDefault());
-    button.addEventListener('click',event=>{
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (candidate.kind === 'native') {
-        clearLiveMetadataResults();
-        candidate.source.click();
-        state.keyboardIndex=-1;
-        requestAnimationFrame(()=>{
-          mainInput()?.focus();
-          openSuggestions();
-          syncRankedDropdown();
-        });
-        return;
-      }
-      if (candidate.kind === 'metadata') {
-        chooseMetadataScope(candidate.item.type,candidate.item.value);
-        return;
-      }
-      if (candidate.kind === 'fallback') {
-        addTagThroughNativeSearch(candidate.label);
-        return;
-      }
-      if (candidate.kind === 'global') {
-        freezeGlobalSearch(candidate.label);
-      }
-    });
-
-    return button;
-  }
-
-  function syncRankedDropdown() {
-    const raw = mainInput()?.value.trim() || '';
-    const host = syncSuggestionHost();
-    if (!host) return;
-
-    if (state.scope && !raw) {
-      removeUnifiedSection(host);
-      host.classList.remove('bridge-ranked-mode');
-      if (host.dataset.bridgeOwned === 'true') host.remove();
-      return;
-    }
-
-    const heading = q(':scope > .suggestion-heading',host);
-    const headingLabel = q('span:first-child',heading);
-    if (headingLabel) headingLabel.textContent = 'Suggestions';
-
-    const candidates = rankedCandidates(host,raw);
-    const signature = JSON.stringify({
-      raw,
-      scope:state.scope ? [state.scope.type,state.scope.value] : null,
-      candidates:candidates.map(c=>[c.kind,c.typeLabel,c.label,Math.round(c.score)])
-    });
-
-    const existing = q(':scope > .bridge-ranked-section',host);
-    if (existing?.dataset.bridgeSignature === signature) {
-      host.classList.toggle('bridge-ranked-mode',candidates.length>0);
-      tuneMobileSuggestionCount();
-      return;
-    }
-
-    existing?.remove();
-
-    if (!candidates.length) {
-      host.classList.remove('bridge-ranked-mode');
-      if (host.dataset.bridgeOwned === 'true') host.remove();
-      return;
-    }
-
-    host.classList.add('bridge-ranked-mode');
-    const section = document.createElement('div');
-    section.className = 'bridge-ranked-section';
-    section.dataset.bridgeSignature = signature;
-    candidates.forEach((candidate,index)=>{
-      const row = candidateRow(candidate);
-      if (index === 0) row.classList.add('bridge-default-choice');
-      section.appendChild(row);
-    });
-    host.appendChild(section);
-    tuneMobileSuggestionCount();
-  }
-
-  function visibleChoices() {
-    const dd = suggestions();
-    if (!dd || getComputedStyle(dd).display === 'none') return [];
-    const ranked = qa(':scope > .bridge-ranked-section > .bridge-ranked-row',dd)
-      .filter(el=>getComputedStyle(el).display!=='none');
-    if (ranked.length) return ranked;
-    return qa(':scope > button',dd)
-      .filter(el => !el.disabled && getComputedStyle(el).display !== 'none');
-  }
-
-  function clearKeyboardActive() {
-    visibleChoices().forEach(el => el.classList.remove('bridge-active'));
-    state.keyboardIndex = -1;
-  }
-
-  function setKeyboardActive(index) {
-    const choices = visibleChoices();
-    if (!choices.length) return;
-    state.keyboardIndex = (index + choices.length) % choices.length;
-    choices.forEach(el => {
-      el.classList.remove('bridge-active');
-      el.classList.remove('bridge-default-choice');
-    });
-    const active = choices[state.keyboardIndex];
-    active.classList.add('bridge-active');
-    active.scrollIntoView({block:'nearest'});
-  }
-
-  function openSuggestions() {
-    const area = searchArea();
-    if (!area) return;
-    area.classList.remove('bridge-dismissed');
-    requestAnimationFrame(syncRankedDropdown);
-  }
-
-  function closeSuggestions() {
-    searchArea()?.classList.add('bridge-dismissed');
-    clearKeyboardActive();
-  }
-
-  function tuneMobileSuggestionCount() {
-    if (!matchMedia('(max-width:760px)').matches) return;
-    const dd = suggestions();
-    if (!dd) return;
-    qa(':scope > .bridge-ranked-section > .bridge-ranked-row',dd)
-      .forEach((el,index)=>el.style.display=index<7?'':'none');
-  }
-
-  /* ---------------------------------------------------------
-     Results — deterministic 10, metadata live + native search
-     --------------------------------------------------------- */
-  const MORE = '<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M3 10a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM8.5 10a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM15.5 8.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" fill="currentColor"/></svg>';
-
-  function iconButton(label, svg, cls='') {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = `bridge-icon-btn ${cls}`.trim();
-    button.setAttribute('aria-label',label);
-    button.setAttribute('title',label);
-    button.innerHTML = svg;
-    return button;
-  }
-
-  function hashHue(value) {
-    let n = 0;
-    for (const c of value) n = (n * 31 + c.charCodeAt(0)) >>> 0;
-    return n % 360;
-  }
-
-  function demoArtwork(title) {
-    const hue = hashHue(title);
-    return `<div class="art" style="background:hsl(${hue} 24% 28%);display:grid;place-items:center;color:#fff">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 7.5v9l7-4.5-7-4.5Z"/></svg>
-    </div>`;
-  }
-
-  function demoRow(track) {
-    const row = document.createElement('div');
-    row.className = 'track-result bridge-demo-row';
-    row.innerHTML = `<div class="track">
-      <input type="checkbox" class="bridge-select" aria-label="Select ${track.title}">
-      ${demoArtwork(track.title)}
-      <div class="track-main"><strong>${track.title}</strong><span>${track.artist}</span></div>
-      <div class="track-album"><strong>${track.album || ''}</strong></div>
-      <div class="bridge-duration">${track.duration || '3:00'}</div>
-      <div class="bridge-added"><span>${track.label || 'Demo catalog'}</span><small>${track.isrc || ''}</small></div>
-      <div class="bridge-hubs"></div>
-      <div class="bridge-actions"></div>
-    </div>`;
-    const hubs = q('.bridge-hubs',row);
-    hubs.appendChild(iconButton('Publish on hubs',SVG.publish));
-    const actions = q('.bridge-actions',row);
-    actions.appendChild(iconButton('Share',SVG.share));
-    actions.appendChild(iconButton('Track information',SVG.info));
-    actions.appendChild(iconButton('More options',MORE,'bridge-more'));
-    return row;
-  }
-
-  function fallbackRank(raw) {
-    const terms = normalize(raw).split(/[^a-z0-9]+/).filter(x => x.length > 2);
-    return DEMO.map((track,index) => {
-      const hay = normalize([
-        track.title,track.artist,track.album,track.label,track.isrc,
-        track.catalog,track.composer,track.publisher,...track.tags
-      ].join(' '));
-      let score = 0;
-      for (const term of terms) {
-        if (hay.includes(term)) score += 6;
-        for (const tag of track.tags) {
-          const nt = normalize(tag);
-          if (nt.includes(term) || term.includes(nt)) score += 2;
-        }
-      }
-      return {...track, score, index};
-    }).sort((a,b) => b.score - a.score || a.index - b.index);
-  }
-
-  function criterionMatchesTrack(track,label) {
-    const wanted = normalize(label);
-    if (!wanted) return false;
-    const pieces = wanted.split(/\s*\/\s*|\s*·\s*/).filter(Boolean);
-    return track.tags.some(tag => {
-      const t = normalize(tag);
-      return pieces.some(piece =>
-        t === piece ||
-        t.includes(piece) ||
-        piece.includes(t) ||
-        (piece.includes('60') && t.includes('60')) ||
-        (piece === 'laidback' && t === 'cool')
-      );
-    });
-  }
-
-  function criterionIsKnown(label) {
-    return DEMO.some(track=>criterionMatchesTrack(track,label));
-  }
-
-  function activeCriteriaScore(track) {
-    let score = 0;
-    for (const criterion of activeTagCriteria()) {
-      const known = criterionIsKnown(criterion.label);
-      if (!known) continue;
-      const match = criterionMatchesTrack(track,criterion.label);
-      if (criterion.weight === 'must' && !match) return {valid:false,score:-999};
-      if (criterion.weight === 'exclude' && match) return {valid:false,score:-999};
-      if (criterion.weight === 'must' && match) score += 46;
-      if (criterion.weight === 'should' && match) score += 24;
-    }
-    return {valid:true,score};
-  }
-
-  function scopeAllowsTrack(track) {
-    if (!state.scope) return true;
-
-    if (state.scope.type === 'global') {
-      return globalTrackScore(track,state.scope.value) > 0;
-    }
-
-    const candidate = metadataFields(track)[state.scope.type];
-    return fieldMatchScore(state.scope.type,candidate,state.scope.value) > 0;
-  }
-
-  function globalTrackScore(track,raw) {
-    const query = String(raw||'').trim();
-    if (!query) return 0;
-
-    let best = 0;
-    for (const [field,value] of Object.entries(metadataFields(track))) {
-      const fieldScore = fieldMatchScore(field,value,query);
-      const boost = field === 'track' ? 28
-        : field === 'artist' ? 26
-        : field === 'isrc' ? 34
-        : field === 'album' ? 16
-        : field === 'catalog' ? 15
-        : 10;
-      if (fieldScore) best = Math.max(best,fieldScore+boost);
-    }
-
-    for (const tag of track.tags) {
-      const tagScore = fieldMatchScore('tag',tag,query);
-      if (tagScore) best = Math.max(best,tagScore+24);
-    }
-
-    const terms = normalize(query).split(/[^a-z0-9]+/).filter(term=>term.length>=2);
-    if (terms.length > 1) {
-      const hay = normalize([
-        track.title,track.artist,track.album,track.label,track.isrc,
-        track.catalog,track.composer,track.publisher,...track.tags
-      ].join(' '));
-      const matched = terms.filter(term=>hay.includes(term)).length;
-      if (matched) best += matched*16;
-      if (matched === terms.length) best += 28;
-    }
-
-    return best;
-  }
-
-  function rankGlobal(raw) {
-    return DEMO.map((track,index)=>{
-      if (!scopeAllowsTrack(track)) return null;
-      const queryScore = globalTrackScore(track,raw);
-      if (!queryScore) return null;
-      const criteria = activeCriteriaScore(track);
-      if (!criteria.valid) return null;
-      return {...track,score:queryScore+criteria.score,index};
-    }).filter(Boolean)
-      .sort((a,b)=>b.score-a.score || a.index-b.index);
-  }
-
-  function clearLiveMetadataResults() {
-    q('.bridge-live-results-shell')?.remove();
-    q('.page')?.classList.remove('bridge-live-filtering');
-    state.liveMetaActive = false;
-  }
-
-  function createLiveResultsShell() {
-    clearLiveMetadataResults();
-    const area = searchArea();
-    const page = q('.page');
-    if (!area || !page) return null;
-
-    const shell = document.createElement('section');
-    shell.className = 'results bridge-live-results-shell';
-    area.insertAdjacentElement('afterend',shell);
-    page.classList.add('bridge-live-filtering');
-    state.liveMetaActive = true;
-    return shell;
-  }
-
-  function appendGroup(host, title, detail, pill, rows, alt=false) {
-    if (!rows.length) return;
-    const head = document.createElement('div');
-    head.className = `bridge-group-head ${alt ? 'alt' : ''}`;
-    head.innerHTML = `<strong>${title}</strong><span class="bridge-group-detail">${detail}</span><span class="bridge-result-pill">${pill}</span>`;
-    host.appendChild(head);
-    rows.forEach(track => host.appendChild(demoRow(track)));
-  }
-
-  function renderMetadataSearch(type, value, frozen=false) {
-    if (!value) {
-      clearLiveMetadataResults();
-      return;
-    }
-
-    const root = createLiveResultsShell();
-    if (!root) return;
-
-    const container = document.createElement('div');
-    container.className = 'bridge-results-live';
-
-    const header = document.createElement('div');
-    header.className = 'bridge-list-head';
-    header.innerHTML = '<span></span><span>Track</span><span>Album</span><span>Duration</span><span>Added</span><span>Hubs</span><span></span>';
-    container.appendChild(header);
-
-    const exact = rankMetadata(value,type)
-      .filter(track=>activeCriteriaScore(track).valid)
-      .slice(0,10);
-
-    if (exact.length) {
-      appendGroup(
-        container,
-        frozen ? (type ? `${type} matches` : 'Metadata matches') : 'Live metadata results',
-        `${exact.length} ${exact.length===1?'title':'titles'} matching ${type ? `${type}: ${value}` : `“${value}”`}`,
-        frozen ? (type || 'Metadata') : 'Live · Metadata',
-        exact,
-        false
-      );
-    } else {
-      const empty = document.createElement('div');
-      empty.className = 'bridge-live-empty';
-      empty.innerHTML = `<strong>No metadata match yet</strong><span>Keep typing or choose a Smart Suggestion above.</span>`;
-      container.appendChild(empty);
-    }
-
-    // Alternatives belong to a validated/frozen search, not to the live keystroke preview.
-    if (frozen) {
-      const used = new Set(exact.map(x => x.title));
-      const alternatives = fallbackRank(value).filter(x => !used.has(x.title)).slice(0,Math.max(0,10-exact.length));
-      if (alternatives.length) {
-        appendGroup(container,'Suggested alternatives',`${alternatives.length} closest available ${alternatives.length===1?'title':'titles'}`,'Not a 100% match',alternatives,true);
-      }
-    }
-
-    root.appendChild(container);
-  }
-
-  function renderGlobalSearch(value, frozen=false) {
-    if (!value) {
-      clearLiveMetadataResults();
-      return;
-    }
-
-    const root = createLiveResultsShell();
-    if (!root) return;
-
-    const container = document.createElement('div');
-    container.className = 'bridge-results-live bridge-global-results';
-
-    const header = document.createElement('div');
-    header.className = 'bridge-list-head';
-    header.innerHTML = '<span></span><span>Track</span><span>Album</span><span>Duration</span><span>Added</span><span>Hubs</span><span></span>';
-    container.appendChild(header);
-
-    const matches = rankGlobal(value).slice(0,10);
-
-    if (matches.length) {
-      appendGroup(
-        container,
-        frozen ? 'Global search' : 'Live results',
-        `${matches.length} ${matches.length===1?'title':'titles'} matching “${value}” across your current search`,
-        frozen ? 'Global' : 'Live',
-        matches,
-        false
-      );
-    } else {
-      const empty = document.createElement('div');
-      empty.className = 'bridge-live-empty';
-      empty.innerHTML = `<strong>No live match yet</strong><span>Keep typing or choose one of the suggestions above.</span>`;
-      container.appendChild(empty);
-    }
-
-    // Only a validated Global search gets alternatives.
-    if (frozen) {
-      const used = new Set(matches.map(x=>x.title));
-      const alternatives = fallbackRank(value)
-        .filter(x=>!used.has(x.title))
-        .slice(0,Math.max(0,10-matches.length));
-      if (alternatives.length) {
-        appendGroup(
-          container,
-          'Suggested alternatives',
-          `${alternatives.length} closest available ${alternatives.length===1?'title':'titles'}`,
-          'Not a 100% match',
-          alternatives,
-          true
-        );
-      }
-    }
-
-    root.appendChild(container);
-  }
-
-  function decorateNativeRow(row) {
-    if (row.dataset.bridgeDecorated === '1') return;
-    const track = q(':scope > .track',row);
-    if (!track) return;
-
-    const title = q(':scope > .track-main strong',track)?.textContent?.trim() || 'Track';
-    const album = q(':scope > .track-album',track);
-    const year = album?.querySelector('span')?.textContent?.trim() || '2026';
-
-    const select = document.createElement('input');
-    select.type = 'checkbox';
-    select.className = 'bridge-select';
-    select.setAttribute('aria-label',`Select ${title}`);
-    track.prepend(select);
-
-    const duration = document.createElement('div');
-    duration.className = 'bridge-duration';
-    let n=0; for (const c of title) n=(n*31+c.charCodeAt(0))>>>0;
-    const sec=118+(n%155);
-    duration.textContent=`${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
-
-    const added = document.createElement('div');
-    added.className = 'bridge-added';
-    added.innerHTML = `<span>${year}</span><small>Bridge Search</small>`;
-
-    const hubs = document.createElement('div');
-    hubs.className = 'bridge-hubs';
-    hubs.appendChild(iconButton('Publish on hubs',SVG.publish));
-
-    const actions = document.createElement('div');
-    actions.className = 'bridge-actions';
-    actions.appendChild(iconButton('Share',SVG.share));
-    actions.appendChild(iconButton('Track information',SVG.info));
-    actions.appendChild(iconButton('More options',MORE,'bridge-more'));
-
-    track.append(duration,added,hubs,actions);
-    row.dataset.bridgeDecorated='1';
-  }
-
-  function ensureNativeHeader(firstGroup) {
-    if (!firstGroup) {
-      qa('.bridge-list-head.native').forEach(x=>x.remove());
-      return;
-    }
-
-    const list = q(':scope > .track-list',firstGroup);
-    if (!list) return;
-
-    const current = q(':scope > .bridge-list-head.native',firstGroup);
-    qa('.bridge-list-head.native').forEach(x => {
-      if (x !== current) x.remove();
-    });
-
-    if (current) return;
-
-    const header = document.createElement('div');
-    header.className='bridge-list-head native';
-    header.innerHTML='<span></span><span>Track</span><span>Album</span><span>Duration</span><span>Added</span><span>Hubs</span><span></span>';
-    list.before(header);
-  }
-
-  function normalizeGroupHeading(group, isAlt, count) {
-    const head = q(':scope > .result-group-head',group);
-    if (!head) return;
-    const signature = `${isAlt?'alt':'exact'}:${count}`;
-    if (head.dataset.bridgeHeadingSignature === signature) return;
-
-    head.className = `bridge-group-head ${isAlt?'alt':''}`;
-    head.innerHTML = `<strong>${isAlt?'Suggested alternatives':'Perfect matches'}</strong>
-      <span class="bridge-group-detail">${isAlt ? `${count} closest available ${count===1?'title':'titles'}` : `${count} ${count===1?'title':'titles'} matching all required criteria`}</span>
-      <span class="bridge-result-pill">${isAlt?'Not a 100% match':'Perfect'}</span>`;
-    head.dataset.bridgeHeadingSignature = signature;
-  }
-
-  function enhanceNativeResults() {
-    if (state.liveMetaActive) return;
-    const root = results();
-    if (!root) return;
-
-    const exactGroup = q('.result-group.exact-group',root);
-    const altGroup = q('.result-group.alternative-group',root);
-    const exactRows = exactGroup ? qa(':scope .track-list > .track-result',exactGroup) : [];
-    const altRows = altGroup ? qa(':scope .track-list > .track-result',altGroup) : [];
-
-    const exactShown = exactRows.slice(0,10);
-    const remaining = Math.max(0,10-exactShown.length);
-    const altShown = altRows.slice(0,remaining);
-
-    exactRows.forEach(row => row.style.display = exactShown.includes(row) ? '' : 'none');
-    altRows.forEach(row => row.style.display = altShown.includes(row) ? '' : 'none');
-
-    exactShown.forEach(decorateNativeRow);
-    altShown.forEach(decorateNativeRow);
-
-    if (exactGroup) {
-      exactGroup.style.display = exactShown.length ? '' : 'none';
-      if (exactShown.length) normalizeGroupHeading(exactGroup,false,exactShown.length);
-    }
-    if (altGroup) {
-      altGroup.style.display = altShown.length ? '' : 'none';
-      if (altShown.length) normalizeGroupHeading(altGroup,true,altShown.length);
-    }
-
-    const total = exactShown.length + altShown.length;
-    if (total < 10) {
-      let demoGroup = q('.bridge-native-fallback',root);
-      const used = new Set([...exactShown,...altShown].map(row => q('.track-main strong',row)?.textContent?.trim()).filter(Boolean));
-      const query = mainInput()?.value || '';
-      const demos = fallbackRank(query).filter(track => !used.has(track.title)).slice(0,10-total);
-      const signature = JSON.stringify({
-        query,
-        used:[...used].sort(),
-        demos:demos.map(track=>track.title)
-      });
-
-      if (demos.length) {
-        if (demoGroup?.dataset.bridgeFallbackSignature !== signature) {
-          demoGroup?.remove();
-          demoGroup = document.createElement('div');
-          demoGroup.className='bridge-native-fallback';
-          demoGroup.dataset.bridgeFallbackSignature = signature;
-          appendGroup(demoGroup,'Suggested alternatives',`${demos.length} closest available ${demos.length===1?'title':'titles'}`,'Not a 100% match',demos,true);
-          root.appendChild(demoGroup);
-        }
-      } else {
-        demoGroup?.remove();
-      }
-    } else {
-      q('.bridge-native-fallback',root)?.remove();
-    }
-
-    ensureNativeHeader(exactShown.length ? exactGroup : (altShown.length ? altGroup : q('.bridge-native-fallback',root)));
-  }
-
-  /* ---------------------------------------------------------
-     Options menu
-     --------------------------------------------------------- */
-  function closeMenu() {
-    state.menu?.remove();
-    state.menu=null;
-  }
-
-  function openMenu(button) {
-    closeMenu();
-    const menu=document.createElement('div');
-    menu.className='bridge-options-menu';
-    const items=[
-      ['download','Download'],['replace','Replace audio'],['publish','Publish on hubs'],
-      ['message','Message'],['email','Send by email'],['move','Move to folder'],
-      ['info','Track information'],['share','Share'],['divider',''],['trash','Delete','danger']
-    ];
-    menu.innerHTML=items.map(item => item[0]==='divider'
-      ? '<div class="bridge-option-divider"></div>'
-      : `<button type="button" class="bridge-option ${item[2]||''}">${SVG[item[0]]}<span>${item[1]}</span></button>`).join('');
-    document.body.appendChild(menu);
-    const r=button.getBoundingClientRect(), w=210;
-    menu.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+'px';
-    const h=menu.offsetHeight||370;
-    menu.style.top=(r.bottom+6+h>innerHeight ? Math.max(8,r.top-h-6) : r.bottom+6)+'px';
-    state.menu=menu;
-  }
-
-  /* ---------------------------------------------------------
-     Voice — ONE implementation
-     --------------------------------------------------------- */
-  function stopVoice(commit) {
-    const voice=state.voice;
-    if (!voice) return;
-    voice.finishing=true;
-    try { commit ? voice.recognition.stop() : voice.recognition.abort(); } catch {}
-    if (commit) setReactInputValue(voice.input, voice.value());
-    voice.box.classList.remove('bridge-recording');
-    q('.bridge-live-transcript',voice.box)?.remove();
-    q('.bridge-record-controls',voice.box)?.remove();
-    state.voice=null;
-    requestAnimationFrame(()=>voice.input.focus());
-  }
-
-  function startVoice(button) {
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if (!SR) return;
-
-    const box=button.closest('.search-box');
-    const input=q('.input-flow input',box);
-    if (!box||!input) return;
-    if (state.voice) stopVoice(false);
-
-    const base=input.value||'';
-    let finalText='', interimText='';
-    const value=()=>[base.trim(),(finalText+' '+interimText).replace(/\s+/g,' ').trim()].filter(Boolean).join(' ');
-
-    box.classList.add('bridge-recording');
-
-    const mirror=document.createElement('div');
-    mirror.className='bridge-live-transcript placeholder';
-    mirror.textContent=base||'Listening…';
-    q('.input-flow',box).appendChild(mirror);
-
-    const controls=document.createElement('div');
-    controls.className='bridge-record-controls';
-    controls.innerHTML=`
-      <button type="button" class="bridge-record-cancel" aria-label="Cancel recording">
-        <svg viewBox="0 0 20 20" width="16" height="16"><path d="M5.4 5.4l9.2 9.2m0-9.2-9.2 9.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-      </button>
-      <button type="button" class="bridge-record-confirm" aria-label="Validate recording">
-        <svg viewBox="0 0 20 20" width="16" height="16"><path d="M4.4 10.4l3.3 3.3 7.9-8.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>`;
-    box.appendChild(controls);
-
-    const recognition=new SR();
-    recognition.lang=navigator.language?.startsWith('fr')?'fr-FR':'en-US';
-    recognition.interimResults=true;
-    recognition.continuous=true;
-
-    state.voice={box,input,recognition,finishing:false,value};
-
-    recognition.onresult=event=>{
-      interimText='';
-      for(let i=event.resultIndex;i<event.results.length;i++){
-        const part=event.results[i][0]?.transcript||'';
-        if(event.results[i].isFinal) finalText+=part+' ';
-        else interimText+=part;
-      }
-      const live=value();
-      mirror.textContent=live||'Listening…';
-      mirror.classList.toggle('placeholder',!live);
-    };
-    recognition.onerror=event=>{
-      if(event.error!=='aborted') stopVoice(false);
-    };
-    recognition.onend=()=>{
-      if(!state.voice||state.voice.finishing) return;
-      try { recognition.start(); } catch { stopVoice(true); }
-    };
-
-    q('.bridge-record-cancel',controls).onclick=event=>{event.preventDefault();event.stopPropagation();stopVoice(false)};
-    q('.bridge-record-confirm',controls).onclick=event=>{event.preventDefault();event.stopPropagation();stopVoice(true)};
-
-    try { recognition.start(); } catch { stopVoice(false); }
-  }
-
-  /* ---------------------------------------------------------
-     Precise Filter helpers
-     --------------------------------------------------------- */
-  function closeFilters() {
-    const panel=q('.filter-panel');
-    const close=q('.filter-panel-head > button',panel);
-    close?.click();
-  }
-  function visibleFilterTags() {
-    return qa('.filter-panel .tag-family-items > button').filter(button =>
-      !button.disabled && button.getClientRects().length && getComputedStyle(button).visibility!=='hidden'
-    );
-  }
-  function updateFilterMatches() {
-    const input=q('.filter-panel .tag-browser-search input');
-    const query=normalize(input?.value);
-    qa('.filter-panel .tag-family-items > button').forEach(button=>{
-      const text=normalize(button.textContent);
-      button.classList.toggle('bridge-query-match',!!query&&text.includes(query));
-    });
-  }
-
-  /* ---------------------------------------------------------
-     Unified events — NO duplicate listeners elsewhere
-     --------------------------------------------------------- */
-
-  // Click-out: only outside entire search area. Internal metadata clicks stay usable.
-  document.addEventListener('pointerdown', event => {
-    const area=searchArea();
-    if (area && !area.contains(event.target)) {
-      closeSuggestions();
-      const panel=q('.filter-panel');
-      if (panel) closeFilters();
-    }
-    if (state.menu && !event.target.closest('.bridge-options-menu') && !event.target.closest('.bridge-more')) closeMenu();
-  }, true);
-
-  // Main input: one ranked suggestion list + Global Live filter.
-  document.addEventListener('input', event => {
-    const target=event.target;
-    if (target.matches?.('.search-box .input-flow input')) {
-      const raw=target.value.trim();
-
-      if (raw) {
-        openSuggestions();
-        state.keyboardIndex=-1;
-      } else if (!state.scope) {
-        closeSuggestions();
-      }
-
-      if (raw.length >= 3) {
-        // Until the user explicitly chooses a suggestion, raw text is a
-        // temporary Global Live filter across metadata + tags, layered on
-        // top of all already-selected explicit criteria.
-        renderGlobalSearch(raw,false);
-      } else if (state.scope) {
-        // Keep the previously validated explicit selection visible until
-        // the new raw query reaches the live threshold.
-        if (state.scope.type === 'global') {
-          renderGlobalSearch(state.scope.value,true);
-        } else {
-          renderMetadataSearch(state.scope.type,state.scope.value,true);
-        }
-      } else {
-        clearLiveMetadataResults();
-      }
-
-      closeFilters();
-      return;
-    }
-    if (target.matches?.('.filter-panel .tag-browser-search input')) {
-      requestAnimationFrame(updateFilterMatches);
-    }
-  }, true);
-
-  document.addEventListener('focusin', event => {
-    if (!event.target.matches?.('.search-box .input-flow input')) return;
-    const raw=event.target.value.trim();
-    if (raw || !state.scope) openSuggestions();
-  }, true);
-
-  // Keyboard owns the ranked suggestions; Enter accepts the first choice by default.
-  document.addEventListener('keydown', event => {
-    const target=event.target;
-    if (!(target instanceof Element)) return;
-
-    const panel=target.closest('.filter-panel');
-    if (panel) {
-      const search=target.matches('.tag-browser-search input');
-      const tag=target.closest('.tag-family-items > button');
-      if (event.key==='Escape') {
-        event.preventDefault(); event.stopPropagation();
-        closeFilters(); q('.filter-button')?.focus?.(); return;
-      }
-      const items=visibleFilterTags();
-      if (search && (event.key==='ArrowDown'||event.key==='ArrowUp')) {
-        event.preventDefault(); event.stopPropagation();
-        const item=event.key==='ArrowDown'?items[0]:items[items.length-1];
-        item?.focus({preventScroll:true}); item?.scrollIntoView({block:'nearest'}); return;
-      }
-      if (tag && (event.key==='ArrowDown'||event.key==='ArrowUp')) {
-        event.preventDefault(); event.stopPropagation();
-        let index=items.indexOf(tag);
-        index=(index+(event.key==='ArrowDown'?1:-1)+items.length)%items.length;
-        items[index]?.focus({preventScroll:true}); items[index]?.scrollIntoView({block:'nearest'}); return;
-      }
-      return;
-    }
-
-    if (!target.matches('.search-box .input-flow input')) return;
-
-    if (event.key==='Backspace' && !target.value) {
-      const criteria = qa('.search-box .criterion');
-      const last = criteria[criteria.length-1];
-      const remove = last ? q('.criterion-remove',last) : null;
-
-      if (remove) {
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-        remove.click();
-        state.keyboardIndex=-1;
-        requestAnimationFrame(() => {
-          target.focus();
-          openSuggestions();
-          syncRankedDropdown();
-        });
-        return;
-      }
-
-      if (state.scope) {
-        event.preventDefault();
-        event.stopPropagation();
-        const previous=state.scope;
-        state.scope=null;
-        clearScopeChip();
-        clearLiveMetadataResults();
-        setReactInputValue(target,previous.value||'');
-        target.focus();
-        return;
-      }
-    }
-
-    const choices=visibleChoices();
-    if (event.key==='ArrowDown' && choices.length) {
-      event.preventDefault(); event.stopPropagation();
-      openSuggestions(); setKeyboardActive(state.keyboardIndex+1); return;
-    }
-    if (event.key==='ArrowUp' && choices.length) {
-      event.preventDefault(); event.stopPropagation();
-      openSuggestions(); setKeyboardActive(state.keyboardIndex<=0?choices.length-1:state.keyboardIndex-1); return;
-    }
-    if (event.key==='Enter' && !event.isComposing) {
-      const raw=target.value.trim();
-
-      if (choices.length) {
-        event.preventDefault();
-        event.stopPropagation();
-        const index = state.keyboardIndex >= 0 ? state.keyboardIndex : 0;
-        choices[index]?.click();
-        clearKeyboardActive();
-        return;
-      }
-
-      // Defensive fallback: if React has not rendered the dropdown yet,
-      // Global is the only safe interpretation.
-      if (raw) {
-        event.preventDefault();
-        event.stopPropagation();
-        freezeGlobalSearch(raw);
-        return;
-      }
-    }
-    if (event.key==='Escape') closeSuggestions();
-  }, true);
-
-  // Main search arrow mirrors Enter: validate the best interpretation.
-  document.addEventListener('click', event => {
-    const button=event.target.closest?.('.search-button');
-    if (button) {
-      const raw=mainInput()?.value.trim();
-      if (raw) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-
-        const choices=visibleChoices();
-        if (choices.length) {
-          const index = state.keyboardIndex >= 0 ? state.keyboardIndex : 0;
-          choices[index]?.click();
-          clearKeyboardActive();
-        } else {
-          freezeGlobalSearch(raw);
-        }
-        return;
-      }
-    }
-
-    const nativeSuggestion=event.target.closest?.('.suggestions:not([data-bridge-owned="true"]) > button');
-    if (nativeSuggestion) {
-      clearLiveMetadataResults();
-      state.keyboardIndex=-1;
-      requestAnimationFrame(() => {
-        mainInput()?.focus();
-        openSuggestions();
-        syncRankedDropdown();
-      });
-    }
-
-    const filterTag=event.target.closest?.('.filter-panel .tag-family-items > button');
-    if (filterTag) {
-      filterTag.classList.remove('bridge-feedback');
-      void filterTag.offsetWidth;
-      filterTag.classList.add('bridge-feedback');
-      setTimeout(()=>filterTag.classList.remove('bridge-feedback'),220);
-    }
-
-    const voice=event.target.closest?.('.voice-button');
-    if (voice) {
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      startVoice(voice);
-      return;
-    }
-
-    const more=event.target.closest?.('.bridge-more');
-    if (more) {
-      event.preventDefault();
-      event.stopPropagation();
-      openMenu(more);
-    }
-  }, true);
-
-  // MutationObserver is presentation-only: inject metadata after React redraw,
-  // enhance result rows, never dispatches input/keyboard events.
-  let scheduled=false;
-  const observer=new MutationObserver(()=>{
-    if (scheduled) return;
-    scheduled=true;
-    requestAnimationFrame(()=>{
-      scheduled=false;
-      if (state.scope) renderScopeChip();
-
-      const raw=mainInput()?.value.trim() || '';
-      if (raw || !state.scope) {
-        syncRankedDropdown();
-      } else {
-        ownedSuggestions()?.remove();
-      }
-
-      tuneMobileSuggestionCount();
-      enhanceNativeResults();
-      updateFilterMatches();
-    });
-  });
-  observer.observe(q('#root')||document.body,{subtree:true,childList:true});
-
-  window.addEventListener('resize',()=> {
-    tuneMobileSuggestionCount();
-    const raw=mainInput()?.value.trim() || '';
-    if (raw || !state.scope) syncRankedDropdown();
-  });
-  window.addEventListener('load',()=>{
-    enhanceNativeResults();
-    updateFilterMatches();
-  });
-})();
-</script>
-
-</body>
-</html>
+    const readable=parts.map(part=>{
