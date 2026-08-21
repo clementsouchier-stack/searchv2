@@ -6151,3 +6151,1433 @@ react/cjs/react-jsx-runtime.production.js:
     if(parts.length<2) return null;
 
     const readable=parts.map(part=>{
+      if(part.kind==='entity'){
+        const type=part.type.charAt(0).toUpperCase()+part.type.slice(1);
+        return `${type} · ${part.label}`;
+      }
+      if(part.weight==='exclude') return `Exclude · ${part.label}`;
+      if(part.weight==='should') return `Nice · ${part.label}`;
+      return `Tag · ${part.label}`;
+    });
+
+    return {
+      kind:'combined',
+      label:readable.join(' + '),
+      detail:'Use these explicit criteria together',
+      typeLabel:'Combined',
+      score:5000,
+      parts
+    };
+  }
+
+  function applyCombinedCandidate(candidate){
+    if(!candidate?.parts?.length) return;
+
+    const entityPart=candidate.parts.find(part=>part.kind==='entity') || null;
+    const tagParts=candidate.parts.filter(part=>part.kind==='tag');
+
+    clearLiveMetadataResults();
+    closeSuggestions();
+
+    // Apply the entity first so the selected Artist / Track / Album scope
+    // remains visible in the composer, then add the explicit tags.
+    if(entityPart?.entity?.item){
+      chooseMetadataScope(entityPart.entity.item.type,entityPart.entity.item.value);
+    }
+
+    const queue=[...tagParts];
+    const next=()=>{
+      const part=queue.shift();
+
+      if(!part){
+        setReactInputValue(mainInput(),'');
+        renderScopeChip();
+        syncComposerLayout({keepVisible:true,smooth:true});
+        requestAnimationFrame(()=>q('.search-button')?.click());
+        return;
+      }
+
+      addOneKnownTag(part.tag,next);
+    };
+
+    requestAnimationFrame(next);
+  }
+
+  function rankedCandidates(host, raw) {
+    const rawValue = String(raw || '').trim();
+
+    if (!rawValue && activeTagCriteria().length >= 5) return [];
+
+    const explicitTagMatches = rawValue ? detectKnownTags(rawValue) : [];
+    const bundle = explicitTagMatches.length ? tagBundleCandidate(rawValue) : null;
+    const combined = rawValue ? explicitCombinedCandidate(rawValue) : null;
+
+    /*
+      One owner per interpretation:
+      - combined explicit intent: controller
+      - literal Bridge tags: deterministic dictionary
+      - dates / periods: controller
+      - entities / metadata: metadata extractor + unique native entities
+      - Prompt / Similarity / ISWC / BPM / recognition / harmony: native supplement
+      - Suggested next: native, or fallback graph when native is absent
+      - Global: controller, always last
+    */
+    const candidates = [
+      ...(combined ? [combined] : []),
+      ...(bundle ? [bundle] : []),
+      ...dateCandidates(rawValue),
+      ...nativeSupplementalCandidates(host, rawValue, explicitTagMatches),
+      ...metadataCandidates(rawValue),
+      ...fallbackCandidates(rawValue, host, explicitTagMatches)
+    ];
+
+    function relevanceTier(candidate) {
+      if (candidate.kind === 'combined') return 140;
+
+      if (candidate.kind === 'metadata' && candidate.entityMatch === 'exact') {
+        if (candidate.inlineMatch && ['artist','track','album'].includes(candidate.typeLabel)) return 124;
+        if (['artist','track','album','isrc','year'].includes(candidate.typeLabel)) return 120;
+        return 116;
+      }
+
+      if (candidate.kind === 'metadata' && candidate.entityMatch === 'strong') {
+        if (candidate.inlineMatch && ['artist','track','album'].includes(candidate.typeLabel)) return 116;
+        if (['artist','track','album','isrc','year'].includes(candidate.typeLabel)) return 112;
+        return 108;
+      }
+
+      if (candidate.kind === 'tagbundle') return 106;
+      if (candidate.kind === 'date') return 104;
+      if (candidate.typeLabel === 'Similarity') return 102;
+      if (candidate.kind === 'metadata') return 92;
+      if (candidate.typeLabel === 'Tag' || candidate.typeLabel === 'Tags') return 90;
+      if (candidate.kind === 'fallback') return 78;
+      if (candidate.typeLabel === 'Prompt') return 20;
+      return 60;
+    }
+
+    function candidateIdentity(candidate) {
+      if (candidate.kind === 'combined') {
+        return `combined|${normalizeWords(candidate.label)}`;
+      }
+      if (candidate.kind === 'tagbundle') {
+        return `tagbundle|${(candidate.matches || []).map(x=>normalizeWords(x.name)).join('+')}`;
+      }
+      if (candidate.kind === 'date') {
+        return `date|${candidate.mode}|${candidate.from}|${candidate.to}`;
+      }
+      return `${normalize(candidate.typeLabel)}|${normalizeWords(candidate.label)}`;
+    }
+
+    const seen = new Set();
+    const ranked = candidates
+      .sort((a,b) => {
+        const tier = relevanceTier(b) - relevanceTier(a);
+        return tier || (b.score - a.score);
+      })
+      .filter(candidate => {
+        const key = candidateIdentity(candidate);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+    const interpreted = ranked.slice(0, rawValue ? 9 : 10);
+
+    if (rawValue) {
+      interpreted.push({
+        kind:'global',
+        label:rawValue,
+        detail:'Search everywhere exactly as typed',
+        typeLabel:'Global',
+        score:-1
+      });
+    }
+
+    return interpreted;
+  }
+
+  function candidateRow(candidate) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'bridge-ranked-row';
+    if(candidate.kind==='date') button.classList.add('bridge-date-row');
+    button.setAttribute('role','option');
+
+    if (candidate.thumb) {
+      button.appendChild(candidate.thumb);
+      button.classList.add('bridge-ranked-youtube');
+    } else {
+      const type = document.createElement('span');
+      type.className = candidate.kind==='combined'
+        ? 'bridge-meta-type bridge-meta-type-combined'
+        : 'bridge-meta-type';
+      type.textContent = candidate.typeLabel;
+      button.appendChild(type);
+    }
+
+    const copy = document.createElement('span');
+    copy.className = 'bridge-meta-copy';
+    const strong = document.createElement('strong');
+    strong.textContent = candidate.label;
+    const small = document.createElement('small');
+    small.textContent = candidate.detail || candidate.typeLabel;
+    copy.append(strong,small);
+    if (candidate.preview) copy.appendChild(candidate.preview);
+    button.appendChild(copy);
+
+    button.addEventListener('pointerdown',event=>event.preventDefault());
+    button.addEventListener('click',event=>{
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (candidate.kind === 'combined') {
+        applyCombinedCandidate(candidate);
+        return;
+      }
+      if (candidate.kind === 'tagbundle') {
+        validateTagBundle(candidate.matches);
+        return;
+      }
+      if (candidate.kind === 'native') {
+        clearLiveMetadataResults();
+        candidate.source.click();
+        state.keyboardIndex=-1;
+        requestAnimationFrame(()=>{
+          mainInput()?.focus();
+          syncComposerLayout({keepVisible:true,smooth:true});
+          openSuggestions();
+          syncRankedDropdown();
+        });
+        return;
+      }
+      if (candidate.kind === 'date') {
+        chooseDateScope(candidate);
+        return;
+      }
+      if (candidate.kind === 'metadata') {
+        chooseMetadataScope(candidate.item.type,candidate.item.value);
+        return;
+      }
+      if (candidate.kind === 'fallback') {
+        addTagThroughNativeSearch(candidate.label);
+        return;
+      }
+      if (candidate.kind === 'global') {
+        freezeGlobalSearch(candidate.label);
+      }
+    });
+
+    return button;
+  }
+
+  function syncRankedDropdown() {
+    const raw = mainInput()?.value.trim() || '';
+    const host = syncSuggestionHost();
+    if (!host) return;
+
+    if (state.scope && !raw) {
+      removeUnifiedSection(host);
+      host.classList.remove('bridge-ranked-mode');
+      if (host.dataset.bridgeOwned === 'true') host.remove();
+      return;
+    }
+
+    const heading = q(':scope > .suggestion-heading',host);
+    const headingLabel = q('span:first-child',heading);
+    if (headingLabel) headingLabel.textContent = 'Suggestions';
+
+    const candidates = rankedCandidates(host,raw);
+    const signature = JSON.stringify({
+      raw,
+      scope:state.scope ? [state.scope.type,state.scope.value] : null,
+      candidates:candidates.map(c=>[c.kind,c.typeLabel,c.label,Math.round(c.score)])
+    });
+
+    const existing = q(':scope > .bridge-ranked-section',host);
+    if (existing?.dataset.bridgeSignature === signature) {
+      host.classList.toggle('bridge-ranked-mode',candidates.length>0);
+      tuneMobileSuggestionCount();
+      return;
+    }
+
+    existing?.remove();
+
+    if (!candidates.length) {
+      host.classList.remove('bridge-ranked-mode');
+      host.classList.toggle('bridge-suppress-suggestions', !raw && activeTagCriteria().length >= 5);
+      if (host.dataset.bridgeOwned === 'true') host.remove();
+      return;
+    }
+
+    host.classList.remove('bridge-suppress-suggestions');
+    host.classList.add('bridge-ranked-mode');
+    const section = document.createElement('div');
+    section.className = 'bridge-ranked-section';
+    section.dataset.bridgeSignature = signature;
+    candidates.forEach((candidate,index)=>{
+      const row = candidateRow(candidate);
+      if (index === 0) row.classList.add('bridge-default-choice');
+      section.appendChild(row);
+    });
+    host.appendChild(section);
+    tuneMobileSuggestionCount();
+  }
+
+  function visibleChoices() {
+    const dd = suggestions();
+    if (!dd || getComputedStyle(dd).display === 'none') return [];
+    const ranked = qa(':scope > .bridge-ranked-section > .bridge-ranked-row',dd)
+      .filter(el=>getComputedStyle(el).display!=='none');
+    if (ranked.length) return ranked;
+    return qa(':scope > button',dd)
+      .filter(el => !el.disabled && getComputedStyle(el).display !== 'none');
+  }
+
+  function clearKeyboardActive() {
+    visibleChoices().forEach(el => el.classList.remove('bridge-active'));
+    state.keyboardIndex = -1;
+  }
+
+  function setKeyboardActive(index) {
+    const choices = visibleChoices();
+    if (!choices.length) return;
+    state.keyboardIndex = (index + choices.length) % choices.length;
+    choices.forEach(el => {
+      el.classList.remove('bridge-active');
+      el.classList.remove('bridge-default-choice');
+    });
+    const active = choices[state.keyboardIndex];
+    active.classList.add('bridge-active');
+    active.scrollIntoView({block:'nearest'});
+  }
+
+  function openSuggestions() {
+    const area = searchArea();
+    if (!area) return;
+    area.classList.remove('bridge-dismissed');
+    requestAnimationFrame(syncRankedDropdown);
+  }
+
+  function closeSuggestions() {
+    searchArea()?.classList.add('bridge-dismissed');
+    clearKeyboardActive();
+  }
+
+  function tuneMobileSuggestionCount() {
+    if (!matchMedia('(max-width:760px)').matches) return;
+    const dd = suggestions();
+    if (!dd) return;
+    qa(':scope > .bridge-ranked-section > .bridge-ranked-row',dd)
+      .forEach((el,index)=>el.style.display=index<7?'':'none');
+  }
+
+  /* ---------------------------------------------------------
+     Results — ONE renderer / ONE visible list
+     React result groups are data sources only and never visible.
+     --------------------------------------------------------- */
+  const MORE = '<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M3 10a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM8.5 10a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM15.5 8.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" fill="currentColor"/></svg>';
+
+  function iconButton(label, svg, cls='') {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `bridge-icon-btn ${cls}`.trim();
+    button.setAttribute('aria-label',label);
+    button.setAttribute('title',label);
+    button.innerHTML = svg;
+    return button;
+  }
+
+  function hashHue(value) {
+    let n = 0;
+    for (const c of value) n = (n * 31 + c.charCodeAt(0)) >>> 0;
+    return n % 360;
+  }
+
+  function demoArtwork(title) {
+    const hue = hashHue(title);
+    return `<div class="art" style="background:hsl(${hue} 24% 28%);display:grid;place-items:center;color:#fff">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 7.5v9l7-4.5-7-4.5Z"/></svg>
+    </div>`;
+  }
+
+  function resultTagSummary(track){
+    const active=activeTagCriteria().map(x=>x.label);
+    const pool=[...(track.tags||[])];
+    const ordered=[
+      ...pool.filter(tag=>active.some(a=>
+        normalizeWords(a)===normalizeWords(tag) ||
+        normalizeWords(a).includes(normalizeWords(tag)) ||
+        normalizeWords(tag).includes(normalizeWords(a))
+      )),
+      ...pool
+    ].filter((tag,index,arr)=>
+      arr.findIndex(x=>normalizeWords(x)===normalizeWords(tag))===index
+    );
+    const visible=ordered.slice(0,3);
+    const extra=Math.max(0,pool.length-visible.length);
+    return {visible,extra};
+  }
+
+  function matchTagsHTML(track){
+    const summary=resultTagSummary(track);
+    if(!summary.visible.length) return '';
+    return `<span class="bridge-match-tags">${
+      summary.visible.map(tag=>`<i>${tag}</i>`).join('')
+    }${summary.extra?`<b>+${summary.extra}</b>`:''}</span>`;
+  }
+
+  function demoRow(track) {
+    const row = document.createElement('div');
+    row.className = 'track-result bridge-demo-row';
+    row.innerHTML = `<div class="track">
+      <input type="checkbox" class="bridge-select" aria-label="Select ${track.title}">
+      ${demoArtwork(track.title)}
+      <div class="track-main"><strong>${track.title}</strong><span>${track.artist}</span>${matchTagsHTML(track)}</div>
+      <div class="track-album"><strong>${track.album || ''}</strong></div>
+      <div class="bridge-duration">${track.duration || '3:00'}</div>
+      <div class="bridge-added"><span>${track.label || 'Demo catalog'}</span><small>${track.isrc || ''}</small></div>
+      <div class="bridge-hubs"></div>
+      <div class="bridge-actions"></div>
+    </div>`;
+    q('.bridge-hubs',row)?.appendChild(iconButton('Publish on hubs',SVG.publish));
+    const actions = q('.bridge-actions',row);
+    actions?.appendChild(iconButton('Share',SVG.share));
+    actions?.appendChild(iconButton('Track information',SVG.info));
+    actions?.appendChild(iconButton('More options',MORE,'bridge-more'));
+    return row;
+  }
+
+  function fallbackRank(raw) {
+    const terms = normalize(raw).split(/[^a-z0-9]+/).filter(x => x.length > 2);
+    return DEMO.map((track,index) => {
+      const hay = normalize([
+        track.title,track.artist,track.album,track.label,track.isrc,
+        track.catalog,track.composer,track.publisher,...track.tags
+      ].join(' '));
+      let score = 0;
+      for (const term of terms) {
+        if (hay.includes(term)) score += 6;
+        for (const tag of track.tags) {
+          const nt = normalize(tag);
+          if (nt.includes(term) || term.includes(nt)) score += 2;
+        }
+      }
+      return {...track, score, index};
+    }).sort((a,b) => b.score - a.score || a.index - b.index);
+  }
+
+  function criterionMatchesTrack(track,label) {
+    const wanted = normalize(label);
+    if (!wanted) return false;
+    const pieces = wanted.split(/\s*\/\s*|\s*·\s*/).filter(Boolean);
+    return track.tags.some(tag => {
+      const t = normalize(tag);
+      return pieces.some(piece =>
+        t === piece ||
+        t.includes(piece) ||
+        piece.includes(t) ||
+        (piece.includes('60') && t.includes('60')) ||
+        (piece === 'laidback' && t === 'cool')
+      );
+    });
+  }
+
+  function criterionIsKnown(label) {
+    return DEMO.some(track=>criterionMatchesTrack(track,label));
+  }
+
+  function activeCriteriaScore(track) {
+    let score = 0;
+    for (const criterion of activeTagCriteria()) {
+      const known = criterionIsKnown(criterion.label);
+      if (!known) continue;
+      const match = criterionMatchesTrack(track,criterion.label);
+      if (criterion.weight === 'must' && !match) return {valid:false,score:-999};
+      if (criterion.weight === 'exclude' && match) return {valid:false,score:-999};
+      if (criterion.weight === 'must' && match) score += 46;
+      if (criterion.weight === 'should' && match) score += 24;
+    }
+    return {valid:true,score};
+  }
+
+  function scopeAllowsTrack(track) {
+    if (!state.scope) return true;
+
+    if (state.scope.type === 'global') {
+      return globalTrackScore(track,state.scope.value) > 0;
+    }
+    if (state.scope.type === 'year') {
+      return Number(track.year) === Number(state.scope.from ?? state.scope.value);
+    }
+    if (state.scope.type === 'period') {
+      const year=Number(track.year);
+      return year>=Number(state.scope.from) && year<=Number(state.scope.to);
+    }
+
+    const candidate = metadataFields(track)[state.scope.type];
+    return fieldMatchScore(state.scope.type,candidate,state.scope.value) > 0;
+  }
+
+  function globalTrackScore(track,raw) {
+    const query = String(raw||'').trim();
+    if (!query) return 0;
+
+    let best = 0;
+    for (const [field,value] of Object.entries(metadataFields(track))) {
+      const fieldScore = fieldMatchScore(field,value,query);
+      const boost = field === 'track' ? 28
+        : field === 'artist' ? 26
+        : field === 'isrc' ? 34
+        : field === 'album' ? 16
+        : field === 'catalog' ? 15
+        : 10;
+      if (fieldScore) best = Math.max(best,fieldScore+boost);
+    }
+
+    for (const tag of track.tags) {
+      const tagScore = fieldMatchScore('tag',tag,query);
+      if (tagScore) best = Math.max(best,tagScore+24);
+    }
+
+    const terms = normalize(query).split(/[^a-z0-9]+/).filter(term=>term.length>=2);
+    if (terms.length > 1) {
+      const hay = normalize([
+        track.title,track.artist,track.album,track.label,track.isrc,
+        track.catalog,track.composer,track.publisher,...track.tags
+      ].join(' '));
+      const matched = terms.filter(term=>hay.includes(term)).length;
+      if (matched) best += matched*16;
+      if (matched === terms.length) best += 28;
+    }
+
+    return best;
+  }
+
+  function rankGlobal(raw) {
+    return DEMO.map((track,index)=>{
+      if (!scopeAllowsTrack(track)) return null;
+      const queryScore = globalTrackScore(track,raw);
+      if (!queryScore) return null;
+      const criteria = activeCriteriaScore(track);
+      if (!criteria.valid) return null;
+      return {...track,score:queryScore+criteria.score,index};
+    }).filter(Boolean)
+      .sort((a,b)=>b.score-a.score || a.index-b.index);
+  }
+
+  function resultsPage() {
+    return q('.page');
+  }
+
+  function nativeResultsSource() {
+    const page=resultsPage();
+    if(!page) return null;
+    return q(':scope > .results:not(.bridge-live-results-shell)',page)
+      || q('.results:not(.bridge-live-results-shell)',page);
+  }
+
+  function controlledResultsSurface() {
+    return q('.bridge-controlled-results-shell');
+  }
+
+  function removeControlledResultsSurface() {
+    controlledResultsSurface()?.remove();
+  }
+
+  function enforceSingleResultsSurface() {
+    const page=resultsPage();
+    if(!page) return;
+    page.classList.add('bridge-results-controlled');
+  }
+
+  function createControlledResultsSurface({mode='native',preview=false,signature=''}={}) {
+    removeControlledResultsSurface();
+    enforceSingleResultsSurface();
+
+    const page=resultsPage();
+    const area=searchArea();
+    if(!page||!area) return null;
+
+    const shell=document.createElement('section');
+    shell.className='bridge-controlled-results-shell';
+    shell.dataset.bridgeResultsMode=mode;
+    shell.dataset.bridgeResultsSignature=signature;
+    if(preview) shell.classList.add('bridge-global-preview');
+
+    const source=nativeResultsSource();
+    const quick=q('.quick-start',page);
+    const anchor=source||quick;
+
+    if(anchor && anchor.parentElement===page) page.insertBefore(shell,anchor);
+    else area.insertAdjacentElement('afterend',shell);
+
+    page.classList.toggle('bridge-live-filtering',preview);
+    return shell;
+  }
+
+  function controlledResultsMatch(mode,signature){
+    const shell=controlledResultsSurface();
+    return !!shell &&
+      shell.dataset.bridgeResultsMode===mode &&
+      shell.dataset.bridgeResultsSignature===signature;
+  }
+
+  function appendListHeader(host) {
+    const header=document.createElement('div');
+    header.className='bridge-list-head';
+    header.innerHTML='<span></span><span>Track</span><span>Album</span><span>Duration</span><span>Added</span><span>Hubs</span><span></span>';
+    host.appendChild(header);
+  }
+
+  function appendAlternativeSeparator(host) {
+    const separator=document.createElement('div');
+    separator.className='bridge-alternative-separator';
+    separator.innerHTML='<strong>Suggested alternatives</strong><span>Not a 100% match</span>';
+    host.appendChild(separator);
+  }
+
+  function appendTrackObjects(host,tracks) {
+    tracks.forEach(track=>host.appendChild(demoRow(track)));
+  }
+
+  function nativeRowIdentity(row) {
+    const title=q('.track-main strong',row)?.textContent?.trim()||'';
+    const artist=q('.track-main > span',row)?.textContent?.trim()||'';
+    return `${normalizeWords(title)}|${normalizeWords(artist)}`;
+  }
+
+  function uniqueNativeRows(rows,blocked=new Set()) {
+    const seen=new Set(blocked);
+    return rows.filter(row=>{
+      const key=nativeRowIdentity(row);
+      if(!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  function decorateNativeRow(row) {
+    const track = q(':scope > .track',row);
+    if (!track) return;
+
+    // A clone can come from a source that React/controller already touched.
+    // Normalize it first so the controlled row is decorated exactly once.
+    qa(':scope > .bridge-select,:scope > .bridge-duration,:scope > .bridge-added,:scope > .bridge-hubs,:scope > .bridge-actions',track)
+      .forEach(el=>el.remove());
+    q('.bridge-match-tags',track)?.remove();
+
+    const title = q(':scope > .track-main strong',track)?.textContent?.trim() || 'Track';
+    const main=q(':scope > .track-main',track);
+    const activeLabels=activeTagCriteria().map(x=>x.label);
+    if(main && activeLabels.length){
+      const visible=activeLabels.slice(0,3);
+      const extra=Math.max(0,activeLabels.length-visible.length);
+      const wrap=document.createElement('span');
+      wrap.className='bridge-match-tags';
+      wrap.innerHTML=visible.map(tag=>`<i>${tag}</i>`).join('')+(extra?`<b>+${extra}</b>`:'');
+      main.appendChild(wrap);
+    }
+
+    const album = q(':scope > .track-album',track);
+    const year = album?.querySelector('span')?.textContent?.trim() || '2026';
+
+    const select = document.createElement('input');
+    select.type = 'checkbox';
+    select.className = 'bridge-select';
+    select.setAttribute('aria-label',`Select ${title}`);
+    track.prepend(select);
+
+    let n=0;
+    for (const c of title) n=(n*31+c.charCodeAt(0))>>>0;
+    const sec=118+(n%155);
+
+    const duration = document.createElement('div');
+    duration.className = 'bridge-duration';
+    duration.textContent=`${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
+
+    const added = document.createElement('div');
+    added.className = 'bridge-added';
+    added.innerHTML = `<span>${year}</span><small>Bridge Search</small>`;
+
+    const hubs = document.createElement('div');
+    hubs.className = 'bridge-hubs';
+    hubs.appendChild(iconButton('Publish on hubs',SVG.publish));
+
+    const actions = document.createElement('div');
+    actions.className = 'bridge-actions';
+    actions.appendChild(iconButton('Share',SVG.share));
+    actions.appendChild(iconButton('Track information',SVG.info));
+    actions.appendChild(iconButton('More options',MORE,'bridge-more'));
+
+    track.append(duration,added,hubs,actions);
+    row.classList.add('bridge-controlled-native-row');
+  }
+
+  function cloneNativeRow(row,{alternative=false}={}) {
+    const clone=row.cloneNode(true);
+    clone.removeAttribute('style');
+    clone.classList.remove('bridge-hidden-native-row');
+    if(alternative) clone.classList.add('alternative');
+    decorateNativeRow(clone);
+    return clone;
+  }
+
+  function clearLiveMetadataResults() {
+    clearTimeout(state.globalLiveTimer);
+    removeControlledResultsSurface();
+    q('.page')?.classList.remove('bridge-live-filtering');
+    state.liveMetaActive = false;
+
+    // Never reveal React's two-group result UI; rebuild the one-list surface
+    // on the next frame if a validated native result set exists.
+    enforceSingleResultsSurface();
+    requestAnimationFrame(enhanceNativeResults);
+  }
+
+  function renderObjectResults({
+    mode,
+    preview=false,
+    liveBanner=false,
+    perfect=[],
+    alternatives=[],
+    emptyTitle='No match yet',
+    emptyDetail=''
+  }) {
+    const perfectShown=perfect.slice(0,10);
+    const remaining=Math.max(0,10-perfectShown.length);
+    const altShown=alternatives.slice(0,remaining);
+    const signature=JSON.stringify({
+      mode,
+      preview,
+      perfect:perfectShown.map(track=>`${normalizeWords(track.title)}|${normalizeWords(track.artist)}`),
+      alternatives:altShown.map(track=>`${normalizeWords(track.title)}|${normalizeWords(track.artist)}`),
+      criteria:activeTagCriteria().map(x=>`${normalizeWords(x.label)}:${x.weight}`)
+    });
+
+    if(controlledResultsMatch(mode,signature)) return;
+
+    const shell=createControlledResultsSurface({mode,preview,signature});
+    if(!shell) return;
+
+    if(liveBanner){
+      const banner=document.createElement('div');
+      banner.className='bridge-global-live-banner';
+      banner.innerHTML='<span class="bridge-live-dot"></span><strong>Global · Live</strong><span>Preview while typing — choose a suggestion or press Enter to validate</span>';
+      shell.appendChild(banner);
+    }
+
+    appendListHeader(shell);
+
+    if(perfectShown.length){
+      appendTrackObjects(shell,perfectShown);
+    }
+
+    if(altShown.length){
+      appendAlternativeSeparator(shell);
+      appendTrackObjects(shell,altShown);
+    }
+
+    if(!perfectShown.length && !altShown.length){
+      const empty=document.createElement('div');
+      empty.className='bridge-live-empty';
+      empty.innerHTML=`<strong>${emptyTitle}</strong>${emptyDetail?`<span>${emptyDetail}</span>`:''}`;
+      shell.appendChild(empty);
+    }
+  }
+
+  function renderMetadataSearch(type, value, frozen=false) {
+    if (!value) {
+      clearLiveMetadataResults();
+      return;
+    }
+
+    state.liveMetaActive=true;
+
+    const perfect=rankMetadata(value,type)
+      .filter(track=>activeCriteriaScore(track).valid)
+      .slice(0,10);
+
+    const used=new Set(perfect.map(track=>`${normalizeWords(track.title)}|${normalizeWords(track.artist)}`));
+    const alternatives=frozen
+      ? fallbackRank(value).filter(track=>!used.has(`${normalizeWords(track.title)}|${normalizeWords(track.artist)}`))
+      : [];
+
+    renderObjectResults({
+      mode:frozen?'metadata':'metadata-live',
+      preview:!frozen,
+      perfect,
+      alternatives,
+      emptyTitle:'No metadata match yet',
+      emptyDetail:'Keep typing or choose a suggestion above.'
+    });
+  }
+
+  function renderDateSearch(scope,frozen=true){
+    if(!scope) return;
+    state.liveMetaActive=true;
+
+    const perfect=DEMO.filter(track=>{
+      const year=Number(track.year);
+      const criteria=activeCriteriaScore(track);
+      if(!criteria.valid) return false;
+      return scope.type==='year'
+        ? year===Number(scope.from)
+        : year>=Number(scope.from)&&year<=Number(scope.to);
+    }).slice(0,10);
+
+    const used=new Set(perfect.map(track=>`${normalizeWords(track.title)}|${normalizeWords(track.artist)}`));
+    const alternatives=frozen
+      ? fallbackRank(scope.value||`${scope.from}-${scope.to}`)
+          .filter(track=>!used.has(`${normalizeWords(track.title)}|${normalizeWords(track.artist)}`))
+      : [];
+
+    renderObjectResults({
+      mode:'date',
+      preview:false,
+      perfect,
+      alternatives,
+      emptyTitle:'No date match in the demo catalog',
+      emptyDetail:scope.type==='year'?scope.value:`${scope.from}–${scope.to}`
+    });
+  }
+
+  function scheduleGlobalLive(value){
+    clearTimeout(state.globalLiveTimer);
+    if(String(value||'').trim().length<3) return;
+    state.globalLiveTimer=setTimeout(()=>{
+      if((mainInput()?.value.trim()||'')===value){
+        renderGlobalSearch(value,false);
+      }
+    },70);
+  }
+
+  function renderGlobalSearch(value, frozen=false) {
+    if (!value) {
+      clearLiveMetadataResults();
+      return;
+    }
+
+    state.liveMetaActive=true;
+
+    const perfect=rankGlobal(value).slice(0,10);
+    const used=new Set(perfect.map(track=>`${normalizeWords(track.title)}|${normalizeWords(track.artist)}`));
+    const alternatives=frozen
+      ? fallbackRank(value).filter(track=>!used.has(`${normalizeWords(track.title)}|${normalizeWords(track.artist)}`))
+      : [];
+
+    renderObjectResults({
+      mode:frozen?'global':'global-live',
+      preview:!frozen,
+      liveBanner:!frozen,
+      perfect,
+      alternatives,
+      emptyTitle:'No live match yet',
+      emptyDetail:'Keep typing or choose one of the suggestions above.'
+    });
+  }
+
+  function nativeSourceRows() {
+    const source=nativeResultsSource();
+    if(!source) return {source:null,exact:[],alternatives:[]};
+
+    const exactGroup=q('.result-group.exact-group',source);
+    const altGroup=q('.result-group.alternative-group',source);
+
+    const rawExact=exactGroup ? qa(':scope .track-list > .track-result',exactGroup) : [];
+    const exact=uniqueNativeRows(rawExact);
+
+    const exactKeys=new Set(exact.map(nativeRowIdentity));
+    const rawAlt=altGroup ? qa(':scope .track-list > .track-result',altGroup) : [];
+    const alternatives=uniqueNativeRows(rawAlt,exactKeys);
+
+    return {source,exact,alternatives};
+  }
+
+  function enhanceNativeResults() {
+    enforceSingleResultsSurface();
+
+    // Controller-owned live/metadata/date/global result surfaces already are
+    // the unique visible surface. Native React remains hidden underneath.
+    if (state.liveMetaActive) return;
+
+    const {source,exact,alternatives}=nativeSourceRows();
+    if(!source) {
+      removeControlledResultsSurface();
+      return;
+    }
+
+    const perfectShown=exact.slice(0,10);
+    const remaining=Math.max(0,10-perfectShown.length);
+    const nativeAltShown=alternatives.slice(0,remaining);
+
+    const usedKeys=new Set([
+      ...perfectShown.map(nativeRowIdentity),
+      ...nativeAltShown.map(nativeRowIdentity)
+    ]);
+
+    const needed=Math.max(0,10-perfectShown.length-nativeAltShown.length);
+    const query=state.scope?.value || mainInput()?.value || '';
+    const fallback=needed
+      ? fallbackRank(query)
+          .filter(track=>!usedKeys.has(`${normalizeWords(track.title)}|${normalizeWords(track.artist)}`))
+          .slice(0,needed)
+      : [];
+
+    const signature=JSON.stringify({
+      mode:'native',
+      perfect:perfectShown.map(nativeRowIdentity),
+      alternatives:[
+        ...nativeAltShown.map(nativeRowIdentity),
+        ...fallback.map(track=>`${normalizeWords(track.title)}|${normalizeWords(track.artist)}`)
+      ],
+      criteria:activeTagCriteria().map(x=>`${normalizeWords(x.label)}:${x.weight}`)
+    });
+
+    if(controlledResultsMatch('native',signature)) return;
+
+    const shell=createControlledResultsSurface({mode:'native',preview:false,signature});
+    if(!shell) return;
+
+    appendListHeader(shell);
+
+    perfectShown.forEach(row=>{
+      shell.appendChild(cloneNativeRow(row,{alternative:false}));
+    });
+
+    const hasAlternatives=nativeAltShown.length>0 || fallback.length>0;
+    if(hasAlternatives){
+      appendAlternativeSeparator(shell);
+      nativeAltShown.forEach(row=>{
+        shell.appendChild(cloneNativeRow(row,{alternative:true}));
+      });
+      appendTrackObjects(shell,fallback);
+    }
+
+    if(!perfectShown.length && !hasAlternatives){
+      const empty=document.createElement('div');
+      empty.className='bridge-live-empty';
+      empty.innerHTML='<strong>No matching tracks</strong><span>Adjust one of the criteria to broaden the results.</span>';
+      shell.appendChild(empty);
+    }
+  }
+
+  /* ---------------------------------------------------------
+     Options menu
+     --------------------------------------------------------- */
+  function closeMenu() {
+    state.menu?.remove();
+    state.menu=null;
+  }
+
+  function openMenu(button) {
+    closeMenu();
+    const menu=document.createElement('div');
+    menu.className='bridge-options-menu';
+    const items=[
+      ['download','Download'],['replace','Replace audio'],['publish','Publish on hubs'],
+      ['message','Message'],['email','Send by email'],['move','Move to folder'],
+      ['info','Track information'],['share','Share'],['divider',''],['trash','Delete','danger']
+    ];
+    menu.innerHTML=items.map(item => item[0]==='divider'
+      ? '<div class="bridge-option-divider"></div>'
+      : `<button type="button" class="bridge-option ${item[2]||''}">${SVG[item[0]]}<span>${item[1]}</span></button>`).join('');
+    document.body.appendChild(menu);
+    const r=button.getBoundingClientRect(), w=210;
+    menu.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+'px';
+    const h=menu.offsetHeight||370;
+    menu.style.top=(r.bottom+6+h>innerHeight ? Math.max(8,r.top-h-6) : r.bottom+6)+'px';
+    state.menu=menu;
+  }
+
+  /* ---------------------------------------------------------
+     Voice — persistent session, independent from React DOM
+     --------------------------------------------------------- */
+  function voiceSessionValue(session=state.voice) {
+    if (!session) return '';
+    const speech=(session.finalText+' '+session.interimText).replace(/\s+/g,' ').trim();
+    return [session.base.trim(),speech].filter(Boolean).join(' ');
+  }
+
+  function cleanupVoiceDOM() {
+    qa('.search-box.bridge-recording').forEach(box=>{
+      box.classList.remove('bridge-recording');
+      box.removeAttribute('aria-busy');
+      qa('[data-bridge-voice-hidden="true"]',box).forEach(el=>{
+        el.removeAttribute('data-bridge-voice-hidden');
+        el.removeAttribute('aria-hidden');
+        el.removeAttribute('tabindex');
+        el.style.removeProperty('display');
+      });
+    });
+    qa('.bridge-live-transcript,.bridge-record-controls').forEach(el=>el.remove());
+  }
+
+  function renderVoiceSession() {
+    const session=state.voice;
+    if (!session) {
+      cleanupVoiceDOM();
+      return;
+    }
+
+    const box=searchBox();
+    const input=mainInput();
+    const flow=input?.closest('.input-flow');
+    if (!box||!input||!flow) return;
+
+    // React may have replaced the whole composer. Remove stale recording UI
+    // everywhere, then project the session onto the CURRENT composer only.
+    qa('.search-box').forEach(other=>{
+      if(other!==box) other.classList.remove('bridge-recording');
+    });
+    qa('.bridge-record-controls').forEach(el=>{
+      if(el.parentElement!==box) el.remove();
+    });
+    qa('.bridge-live-transcript').forEach(el=>{
+      if(el.parentElement!==flow) el.remove();
+    });
+
+    box.classList.add('bridge-recording');
+    box.setAttribute('aria-busy','true');
+
+    // Explicitly hide the three normal right-side actions as well as relying
+    // on CSS, so a transient React redraw cannot show them beside × / ✓.
+    ['.voice-button','.filter-button','.search-button'].forEach(selector=>{
+      const action=q(`:scope > ${selector}`,box) || q(selector,box);
+      if(action){
+        action.dataset.bridgeVoiceHidden='true';
+        action.setAttribute('aria-hidden','true');
+        action.setAttribute('tabindex','-1');
+        action.style.setProperty('display','none','important');
+      }
+    });
+
+    let mirror=q(':scope > .bridge-live-transcript',flow);
+    if(!mirror){
+      mirror=document.createElement('div');
+      mirror.className='bridge-live-transcript';
+      flow.appendChild(mirror);
+    }
+    const live=voiceSessionValue(session);
+    mirror.textContent=live||'Listening…';
+    mirror.classList.toggle('placeholder',!live);
+
+    let controls=q(':scope > .bridge-record-controls',box);
+    if(!controls){
+      controls=document.createElement('div');
+      controls.className='bridge-record-controls';
+      controls.setAttribute('role','group');
+      controls.setAttribute('aria-label','Voice recording controls');
+      controls.innerHTML=`
+        <button type="button" class="bridge-record-cancel" aria-label="Cancel recording">
+          <svg viewBox="0 0 20 20" width="16" height="16"><path d="M5.4 5.4l9.2 9.2m0-9.2-9.2 9.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+        <button type="button" class="bridge-record-confirm" aria-label="Validate recording">
+          <svg viewBox="0 0 20 20" width="16" height="16"><path d="M4.4 10.4l3.3 3.3 7.9-8.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>`;
+      box.appendChild(controls);
+      q('.bridge-record-cancel',controls).onclick=event=>{
+        event.preventDefault(); event.stopPropagation(); stopVoice(false);
+      };
+      q('.bridge-record-confirm',controls).onclick=event=>{
+        event.preventDefault(); event.stopPropagation(); stopVoice(true);
+      };
+    }
+
+    closeSuggestions();
+    closeFilters();
+  }
+
+  function stopVoice(commit) {
+    const session=state.voice;
+    if (!session) return;
+
+    session.finishing=true;
+    const committedValue=voiceSessionValue(session);
+
+    // Clear session before stopping recognition so onend cannot restart it.
+    state.voice=null;
+    try { commit ? session.recognition.stop() : session.recognition.abort(); } catch {}
+
+    cleanupVoiceDOM();
+
+    const input=mainInput();
+    if(commit && input){
+      setReactInputValue(input,committedValue);
+    }
+
+    requestAnimationFrame(()=>{
+      const current=mainInput();
+      current?.focus();
+      syncComposerLayout({keepVisible:true,smooth:false});
+      if(commit){
+        const raw=current?.value.trim()||'';
+        if(raw){
+          openSuggestions();
+          syncRankedDropdown();
+          if(raw.length>=3) scheduleGlobalLive(raw);
+        }
+      }
+    });
+  }
+
+  function startVoice(button) {
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if (!SR) return;
+
+    if (state.voice) stopVoice(false);
+
+    const input=mainInput();
+    if(!input) return;
+
+    const recognition=new SR();
+    recognition.lang=navigator.language?.startsWith('fr')?'fr-FR':'en-US';
+    recognition.interimResults=true;
+    recognition.continuous=true;
+
+    const session={
+      recognition,
+      base:input.value||'',
+      finalText:'',
+      interimText:'',
+      finishing:false
+    };
+
+    // Session exists BEFORE any DOM mutation so MutationObserver / React redraws
+    // can always reconstruct the correct recording UI.
+    state.voice=session;
+    renderVoiceSession();
+
+    recognition.onresult=event=>{
+      if(state.voice!==session) return;
+      session.interimText='';
+      for(let i=event.resultIndex;i<event.results.length;i++){
+        const part=event.results[i][0]?.transcript||'';
+        if(event.results[i].isFinal) session.finalText+=part+' ';
+        else session.interimText+=part;
+      }
+      renderVoiceSession();
+    };
+
+    recognition.onerror=event=>{
+      if(state.voice!==session) return;
+      if(event.error!=='aborted') stopVoice(false);
+    };
+
+    recognition.onend=()=>{
+      if(state.voice!==session || session.finishing) return;
+      try { recognition.start(); }
+      catch { stopVoice(true); }
+    };
+
+    try { recognition.start(); }
+    catch { stopVoice(false); }
+  }
+
+  /* ---------------------------------------------------------
+     Precise Filter helpers
+     --------------------------------------------------------- */
+  function closeFilters() {
+    const panel=q('.filter-panel');
+    const close=q('.filter-panel-head > button',panel);
+    close?.click();
+  }
+  function visibleFilterTags() {
+    return qa('.filter-panel .tag-family-items > button').filter(button =>
+      !button.disabled && button.getClientRects().length && getComputedStyle(button).visibility!=='hidden'
+    );
+  }
+  function updateFilterMatches() {
+    const input=q('.filter-panel .tag-browser-search input');
+    const query=normalize(input?.value);
+    qa('.filter-panel .tag-family-items > button').forEach(button=>{
+      const text=normalize(button.textContent);
+      button.classList.toggle('bridge-query-match',!!query&&text.includes(query));
+    });
+  }
+
+  /* ---------------------------------------------------------
+     Unified events — NO duplicate listeners elsewhere
+     --------------------------------------------------------- */
+
+  // Click-out: only outside entire search area. Internal metadata clicks stay usable.
+  document.addEventListener('pointerdown', event => {
+    const area=searchArea();
+    if (area && !area.contains(event.target)) {
+      closeSuggestions();
+      const panel=q('.filter-panel');
+      if (panel) closeFilters();
+    }
+    if (state.menu && !event.target.closest('.bridge-options-menu') && !event.target.closest('.bridge-more')) closeMenu();
+  }, true);
+
+  // Main input: one ranked suggestion list + Global Live filter.
+  document.addEventListener('input', event => {
+    const target=event.target;
+    if (target.matches?.('.search-box .input-flow input')) {
+      const raw=target.value.trim();
+      syncComposerLayout({keepVisible:true,smooth:false});
+
+      if (raw) {
+        openSuggestions();
+        state.keyboardIndex=-1;
+      } else if (!state.scope) {
+        closeSuggestions();
+      }
+
+      if (raw.length >= 3) {
+        // Until the user explicitly chooses a suggestion, raw text is a
+        // temporary Global Live filter across metadata + tags, layered on
+        // top of all already-selected explicit criteria.
+        scheduleGlobalLive(raw);
+      } else if (state.scope) {
+        clearTimeout(state.globalLiveTimer);
+        // Keep the previously validated explicit selection visible until
+        // the new raw query reaches the live threshold.
+        if (state.scope.type === 'global') {
+          renderGlobalSearch(state.scope.value,true);
+        } else if (state.scope.type === 'year' || state.scope.type === 'period') {
+          renderDateSearch(state.scope,true);
+        } else {
+          renderMetadataSearch(state.scope.type,state.scope.value,true);
+        }
+      } else {
+        clearTimeout(state.globalLiveTimer);
+        clearLiveMetadataResults();
+      }
+
+      closeFilters();
+      return;
+    }
+    if (target.matches?.('.filter-panel .tag-browser-search input')) {
+      requestAnimationFrame(updateFilterMatches);
+    }
+  }, true);
+
+  document.addEventListener('focusin', event => {
+    if (!event.target.matches?.('.search-box .input-flow input')) return;
+    syncComposerLayout({keepVisible:true,smooth:false});
+    const raw=event.target.value.trim();
+    if (raw || !state.scope) openSuggestions();
+  }, true);
+
+  // Voice recording shortcuts:
+  // Escape = cancel recording, Enter = confirm transcript.
+  document.addEventListener('keydown', event => {
+    if (!state.voice) return;
+    if (event.isComposing) return;
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      stopVoice(false);
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      stopVoice(true);
+    }
+  }, true);
+
+  // Keyboard owns the ranked suggestions; Enter accepts the first choice by default.
+  document.addEventListener('keydown', event => {
+    const target=event.target;
+    if (!(target instanceof Element)) return;
+
+    const panel=target.closest('.filter-panel');
+    if (panel) {
+      const search=target.matches('.tag-browser-search input');
+      const tag=target.closest('.tag-family-items > button');
+      if (event.key==='Escape') {
+        event.preventDefault(); event.stopPropagation();
+        closeFilters(); q('.filter-button')?.focus?.(); return;
+      }
+      const items=visibleFilterTags();
+      if (search && (event.key==='ArrowDown'||event.key==='ArrowUp')) {
+        event.preventDefault(); event.stopPropagation();
+        const item=event.key==='ArrowDown'?items[0]:items[items.length-1];
+        item?.focus({preventScroll:true}); item?.scrollIntoView({block:'nearest'}); return;
+      }
+      if (tag && (event.key==='ArrowDown'||event.key==='ArrowUp')) {
+        event.preventDefault(); event.stopPropagation();
+        let index=items.indexOf(tag);
+        index=(index+(event.key==='ArrowDown'?1:-1)+items.length)%items.length;
+        items[index]?.focus({preventScroll:true}); items[index]?.scrollIntoView({block:'nearest'}); return;
+      }
+      return;
+    }
+
+    if (!target.matches('.search-box .input-flow input')) return;
+
+    if (event.key==='Backspace' && !target.value) {
+      const criteria = qa('.search-box .criterion');
+      const last = criteria[criteria.length-1];
+      const remove = last ? q('.criterion-remove',last) : null;
+
+      if (remove) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        remove.click();
+        state.keyboardIndex=-1;
+        requestAnimationFrame(() => {
+          target.focus();
+          openSuggestions();
+          syncRankedDropdown();
+        });
+        return;
+      }
+
+      if (state.scope) {
+        event.preventDefault();
+        event.stopPropagation();
+        const previous=state.scope;
+        state.scope=null;
+        clearScopeChip();
+        clearLiveMetadataResults();
+        setReactInputValue(target,previous.value||'');
+        target.focus();
+        return;
+      }
+    }
+
+    const choices=visibleChoices();
+    if (event.key==='ArrowDown' && choices.length) {
+      event.preventDefault(); event.stopPropagation();
+      openSuggestions(); setKeyboardActive(state.keyboardIndex+1); return;
+    }
+    if (event.key==='ArrowUp' && choices.length) {
+      event.preventDefault(); event.stopPropagation();
+      openSuggestions(); setKeyboardActive(state.keyboardIndex<=0?choices.length-1:state.keyboardIndex-1); return;
+    }
+    if (event.key==='Enter' && !event.isComposing) {
+      const raw=target.value.trim();
+
+      if (choices.length) {
+        event.preventDefault();
+        event.stopPropagation();
+        const index = state.keyboardIndex >= 0 ? state.keyboardIndex : 0;
+        choices[index]?.click();
+        clearKeyboardActive();
+        return;
+      }
+
+      // Defensive fallback: if React has not rendered the dropdown yet,
+      // Global is the only safe interpretation.
+      if (raw) {
+        event.preventDefault();
+        event.stopPropagation();
+        freezeGlobalSearch(raw);
+        return;
+      }
+    }
+    if (event.key==='Escape') closeSuggestions();
+  }, true);
+
+  // Main search arrow mirrors Enter: validate the best interpretation.
+  document.addEventListener('click', event => {
+    const button=event.target.closest?.('.search-button');
+    if (button) {
+      const raw=mainInput()?.value.trim();
+      if (raw) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        const choices=visibleChoices();
+        if (choices.length) {
+          const index = state.keyboardIndex >= 0 ? state.keyboardIndex : 0;
+          choices[index]?.click();
+          clearKeyboardActive();
+        } else {
+          freezeGlobalSearch(raw);
+        }
+        return;
+      }
+    }
+
+    const nativeSuggestion=event.target.closest?.('.suggestions:not([data-bridge-owned="true"]) > button');
+    if (nativeSuggestion) {
+      clearLiveMetadataResults();
+      state.keyboardIndex=-1;
+      requestAnimationFrame(() => {
+        mainInput()?.focus();
+        openSuggestions();
+        syncRankedDropdown();
+      });
+    }
+
+    const filterTag=event.target.closest?.('.filter-panel .tag-family-items > button');
+    if (filterTag) {
+      filterTag.classList.remove('bridge-feedback');
+      void filterTag.offsetWidth;
+      filterTag.classList.add('bridge-feedback');
+      setTimeout(()=>filterTag.classList.remove('bridge-feedback'),220);
+    }
+
+    const voice=event.target.closest?.('.voice-button');
+    if (voice) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      startVoice(voice);
+      return;
+    }
+
+    const more=event.target.closest?.('.bridge-more');
+    if (more) {
+      event.preventDefault();
+      event.stopPropagation();
+      openMenu(more);
+    }
+  }, true);
+
+  // MutationObserver is presentation-only: inject metadata after React redraw,
+  // enhance result rows, never dispatches input/keyboard events.
+  let scheduled=false;
+  const observer=new MutationObserver(()=>{
+    if (scheduled) return;
+    scheduled=true;
+    requestAnimationFrame(()=>{
+      scheduled=false;
+      if (state.scope) renderScopeChip();
+      if (state.voice) renderVoiceSession();
+      syncComposerLayout();
+
+      const raw=mainInput()?.value.trim() || '';
+      if (state.voice) {
+        closeSuggestions();
+      } else if (raw || !state.scope) {
+        syncRankedDropdown();
+      } else {
+        ownedSuggestions()?.remove();
+      }
+
+      tuneMobileSuggestionCount();
+      enhanceNativeResults();
+      updateFilterMatches();
+    });
+  });
+  observer.observe(q('#root')||document.body,{subtree:true,childList:true});
+
+  window.addEventListener('resize',()=> {
+    syncComposerLayout();
+    tuneMobileSuggestionCount();
+    const raw=mainInput()?.value.trim() || '';
+    if (raw || !state.scope) syncRankedDropdown();
+  });
+  window.addEventListener('load',()=>{
+    cleanupVoiceDOM();
+    enhanceNativeResults();
+    updateFilterMatches();
+    renderScopeChip();
+    syncComposerLayout();
+  });
+})();
+</script>
+
+</body>
+</html>
